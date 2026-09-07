@@ -1,0 +1,20 @@
+@"
+__pycache__/
+*.pyc
+
+# ML models
+*.keras
+*.pt
+*.pth
+*.h5
+
+# Datasets
+*.csv
+*.xlsx
+*.zip
+
+# Environment
+.env
+.venv/
+venv/
+"@ | Set-Content .gitignore

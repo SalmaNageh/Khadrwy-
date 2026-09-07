@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Khadrwy | AI Plant Doctor</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+    <header class="navbar">
+
+        <div class="logo">
+            <span class="logo-icon">🌱</span>
+            <span>Khadrwy</span>
+        </div>
+
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#doctor">Plant Doctor</a>
+            <a href="#about">About</a>
+        </nav>
+
+    </header>
+
+
+    <!-- ================= HERO ================= -->
+    <section class="hero" id="home">
+
+        <div class="hero-content">
+
+            <div class="hero-text">
+
+                <span class="badge">
+                    🌿 AI-Powered Agriculture
+                </span>
+
+                <h1>
+                    Your Plant's
+                    <span>AI Doctor</span>
+                </h1>
+
+                <p>
+                    Upload a photo of your plant leaf and let Khadrwy
+                    analyze it using Artificial Intelligence to detect
+                    possible plant diseases.
+                </p>
+
+                <a href="#doctor" class="hero-button">
+                    Diagnose Your Plant →
+                </a>
+
+            </div>
+
+
+            <div class="hero-visual">
+
+                <div class="plant-circle">
+                    🌿
+                </div>
+
+                <div class="floating-card card-one">
+                    🔍 AI Detection
+                </div>
+
+                <div class="floating-card card-two">
+                    ✓ Healthy Plants
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= PLANT DOCTOR ================= -->
+    <section class="doctor-section" id="doctor">
+
+        <div class="section-title">
+
+            <span class="small-title">
+                AI PLANT DOCTOR
+            </span>
+
+            <h2>
+                Diagnose Your Plant
+            </h2>
+
+            <p>
+                Upload a clear image of the plant leaf to get an AI-powered
+                diagnosis.
+            </p>
+
+        </div>
+
+
+        <!-- ================= UPLOAD CARD ================= -->
+        <div class="doctor-card">
+
+            <div class="upload-area" id="uploadArea">
+
+                <div class="upload-icon">
+                    📷
+                </div>
+
+                <h3>
+                    Upload Plant Image
+                </h3>
+
+                <p>
+                    Drag & drop your image here
+                    <br>
+                    or
+                </p>
+
+                <label for="imageInput" class="choose-button">
+                    Choose Image
+                </label>
+
+                <input
+                    type="file"
+                    id="imageInput"
+                    accept="image/*"
+                    hidden
+                >
+
+                <span class="supported">
+                    JPG, JPEG, PNG
+                </span>
+
+            </div>
+
+
+            <!-- IMAGE PREVIEW -->
+
+            <div class="preview-container" id="previewContainer">
+
+                <img
+                    id="previewImage"
+                    src=""
+                    alt="Plant Preview"
+                >
+
+                <button
+                    class="remove-button"
+                    id="removeButton"
+                    type="button"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+
+            <!-- ANALYZE BUTTON -->
+
+            <button
+                id="analyzeButton"
+                class="analyze-button"
+                type="button"
+                disabled
+            >
+                🔬 Analyze Plant
+            </button>
+
+
+            <!-- LOADING -->
+
+            <div
+                class="loading"
+                id="loading"
+            >
+                <div class="spinner"></div>
+
+                <p>
+                    AI is analyzing your plant...
+                </p>
+            </div>
+
+
+            <!-- ================= RESULT ================= -->
+
+            <div
+                class="result-card"
+                id="resultCard"
+            >
+
+                <div class="result-header">
+
+                    <div class="result-icon" id="resultIcon">
+                        🌿
+                    </div>
+
+                    <div>
+
+                        <span class="result-label">
+                            AI DIAGNOSIS
+                        </span>
+
+                        <h3 id="resultCondition">
+                            -
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Plant -->
+
+                <div class="result-row">
+
+                    <span>
+                        🌱 Plant
+                    </span>
+
+                    <strong id="resultPlant">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <!-- Confidence -->
+
+                <div class="confidence-section">
+
+                    <div class="confidence-top">
+
+                        <span>
+                            AI Confidence
+                        </span>
+
+                        <strong id="resultConfidence">
+                            0%
+                        </strong>
+
+                    </div>
+
+                    <div class="progress-bar">
+
+                        <div
+                            class="progress"
+                            id="confidenceProgress"
+                        ></div>
+
+                    </div>
+
+                    <span
+                        class="confidence-level"
+                        id="confidenceLevel"
+                    >
+                        -
+                    </span>
+
+                </div>
+
+
+                <!-- Recommendation -->
+
+                <div class="recommendation">
+
+                    <div class="recommendation-title">
+                        💡 Recommendation
+                    </div>
+
+                    <p id="resultRecommendation">
+                        -
+                    </p>
+
+                </div>
+
+
+                <!-- Analyze another -->
+
+                <button
+                    class="another-button"
+                    id="anotherButton"
+                    type="button"
+                >
+                    Analyze Another Plant
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= HOW IT WORKS ================= -->
+
+    <section class="how-section">
+
+        <div class="section-title">
+
+            <span class="small-title">
+                HOW IT WORKS
+            </span>
+
+            <h2>
+                Simple. Fast. Smart.
+            </h2>
+
+        </div>
+
+
+        <div class="steps">
+
+            <div class="step">
+
+                <div class="step-number">
+                    01
+                </div>
+
+                <div class="step-icon">
+                    📷
+                </div>
+
+                <h3>
+                    Upload
+                </h3>
+
+                <p>
+                    Upload a clear photo of your plant leaf.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    02
+                </div>
+
+                <div class="step-icon">
+                    🤖
+                </div>
+
+                <h3>
+                    Analyze
+                </h3>
+
+                <p>
+                    Our MobileNetV2 AI model analyzes the image.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    03
+                </div>
+
+                <div class="step-icon">
+                    💡
+                </div>
+
+                <h3>
+                    Get Advice
+                </h3>
+
+                <p>
+                    Receive the predicted disease and recommendation.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= ABOUT ================= -->
+
+    <section class="about-section" id="about">
+
+        <div class="about-content">
+
+            <span class="small-title">
+                ABOUT KHADRWY
+            </span>
+
+            <h2>
+                Technology for
+                <span>Healthier Plants</span>
+            </h2>
+
+            <p>
+                Khadrwy combines Artificial Intelligence with agriculture
+                to help farmers and plant owners identify plant diseases
+                faster and make better decisions.
+            </p>
+
+            <div class="about-features">
+
+                <div>
+                    ✓ AI-powered detection
+                </div>
+
+                <div>
+                    ✓ Fast image analysis
+                </div>
+
+                <div>
+                    ✓ Practical recommendations
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-logo">
+            🌱 Khadrwy
+        </div>
+
+        <p>
+            Smart Agriculture. Powered by AI.
+        </p>
+
+        <span>
+            © 2026 Khadrwy
+        </span>
+
+    </footer>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
