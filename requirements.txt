@@ -1,6 +1,11 @@
 fastapi
 uvicorn
 python-multipart
+
 tensorflow
 numpy
 pillow
+
+sqlalchemy
+python-jose[cryptography]
+bcrypt
