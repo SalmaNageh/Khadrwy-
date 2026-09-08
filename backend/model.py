@@ -3,7 +3,6 @@ import numpy as np
 import json
 
 from PIL import Image
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 
 MODEL_PATH = "backend/best_plant_mobilenet.keras"
@@ -33,9 +32,8 @@ def predict_plant(image: Image.Image):
         dtype=np.float32
     )
 
-    # IMPORTANT:
-    # Same preprocessing used during training
-    image_array = preprocess_input(image_array)
+    # preprocess_input already runs inside the model itself
+    # (embedded right after data_augmentation) — don't apply it here
 
     # Add batch dimension
     image_array = np.expand_dims(
