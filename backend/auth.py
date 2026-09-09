@@ -1,10 +1,14 @@
+# =====================================================
+# KHADRWY - AUTHENTICATION
+# =====================================================
+
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
 from jose import JWTError, jwt
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from sqlalchemy.orm import Session
 
@@ -54,9 +58,7 @@ def verify_password(
 # JWT AUTHENTICATION
 # =====================================================
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/login"
-)
+security = HTTPBearer()
 
 
 def create_access_token(
@@ -98,7 +100,7 @@ def create_access_token(
 # =====================================================
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ):
 
@@ -109,6 +111,8 @@ def get_current_user(
             "WWW-Authenticate": "Bearer"
         }
     )
+
+    token = credentials.credentials
 
     try:
 
