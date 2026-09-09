@@ -1066,668 +1066,451 @@ if (cameraInput) {
 
 
 // =====================================================
-// HANDLE IMAGE
+// 1. HANDLE IMAGE (يظهر الصورة والزراير الجديدة)
 // =====================================================
-
 function handleImage(file) {
-
-    // -------------------------------------------------
-    // Check image
-    // -------------------------------------------------
-
-    if (
-        !file.type ||
-        !file.type.startsWith("image/")
-    ) {
-
-        alert(
-            "Please select a valid image."
-        );
-
+    if (!file.type || !file.type.startsWith("image/")) {
+        alert("Please select a valid image.");
         return;
     }
 
-
-    // -------------------------------------------------
-    // Maximum 10MB
-    // -------------------------------------------------
-
-    const maxSize =
-        10 * 1024 * 1024;
-
-
+    const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
-
-        alert(
-            "Image is too large. Please choose an image smaller than 10MB."
-        );
-
+        alert("Image is too large. Max 10MB.");
         return;
     }
 
+    selectedFile = file;
 
-    // -------------------------------------------------
-    // Save file
-    // -------------------------------------------------
-
-    selectedFile =
-        file;
-
-
-    // -------------------------------------------------
-    // Preview
-    // -------------------------------------------------
-
-    if (previewImage) {
-
-        previewImage.src =
-            URL.createObjectURL(file);
+    // تغيير الأيقونة بالصورة
+    const defaultIcon = document.getElementById("defaultIcon");
+    const previewImg = document.getElementById("previewImage");
+    if (defaultIcon) defaultIcon.style.display = "none";
+    if (previewImg) {
+        previewImg.src = URL.createObjectURL(file);
+        previewImg.style.display = "block";
     }
 
+    // إخفاء زراير الرفع وإظهار زراير (Analyze & Dismiss)
+    const uploadOptions = document.getElementById("uploadOptions");
+    const actionOptions = document.getElementById("actionOptions");
+    const loadingSpinner = document.getElementById("loading");
 
-    // -------------------------------------------------
-    // Show preview
-    // -------------------------------------------------
+    if (uploadOptions) uploadOptions.style.display = "none";
+    if (actionOptions) actionOptions.style.display = "flex";
+    if (loadingSpinner) loadingSpinner.style.display = "none";
 
-    if (previewContainer) {
-
-        previewContainer.classList.add(
-            "show"
-        );
-    }
-
-
-    // -------------------------------------------------
-    // Hide upload area
-    // -------------------------------------------------
-
-    if (uploadArea) {
-
-        uploadArea.style.display =
-            "none";
-    }
-
-
-    // -------------------------------------------------
-    // Enable analyze button
-    // -------------------------------------------------
-
-    if (analyzeButton) {
-
-        analyzeButton.disabled =
-            false;
-
-        analyzeButton.style.display =
-            "flex";
-    }
-
-
-    // -------------------------------------------------
-    // Hide old result
-    // -------------------------------------------------
-
-    if (resultCard) {
-
-        resultCard.classList.remove(
-            "show"
-        );
-    }
-
-
-    // -------------------------------------------------
-    // Clear old details
-    // -------------------------------------------------
-
-    if (resultDetails) {
-
-        resultDetails.innerHTML =
-            "";
-    }
+    // التأكد إن الشاشة لسه ملمومة والنتيجة مخفية
+    const workspace = document.getElementById("doctorWorkspace");
+    const resCard = document.getElementById("resultCard");
+    if (workspace) workspace.classList.remove("has-result");
+    if (resCard) resCard.classList.remove("show");
 }
 
-
 // =====================================================
-// REMOVE IMAGE
+// 2. RESET UPLOADER (زرار الـ Dismiss)
 // =====================================================
 
 if (removeButton) {
-
-    removeButton.addEventListener(
-        "click",
-        resetUploader
-    );
+    removeButton.addEventListener("click", resetUploader);
 }
-
 
 function resetUploader() {
+    selectedFile = null;
+    const imageInput = document.getElementById("imageInput");
+    const cameraInput = document.getElementById("cameraInput");
+    if (imageInput) imageInput.value = "";
+    if (cameraInput) cameraInput.value = "";
 
-    selectedFile =
-        null;
-
-
-    // -------------------------------------------------
-    // Reset inputs
-    // -------------------------------------------------
-
-    if (imageInput) {
-
-        imageInput.value =
-            "";
+    // إرجاع الأيقونة وإخفاء الصورة
+    const defaultIcon = document.getElementById("defaultIcon");
+    const previewImg = document.getElementById("previewImage");
+    if (previewImg) {
+        previewImg.src = "";
+        previewImg.style.display = "none";
     }
+    if (defaultIcon) defaultIcon.style.display = "block";
 
+    // إرجاع زراير الرفع الأصلية
+    const uploadOptions = document.getElementById("uploadOptions");
+    const actionOptions = document.getElementById("actionOptions");
+    const loadingSpinner = document.getElementById("loading");
 
-    if (cameraInput) {
+    if (uploadOptions) uploadOptions.style.display = "flex";
+    if (actionOptions) actionOptions.style.display = "none";
+    if (loadingSpinner) loadingSpinner.style.display = "none";
 
-        cameraInput.value =
-            "";
-    }
+    // إرجاع الشاشة لحالتها وإخفاء النتيجة
+    const workspace = document.getElementById("doctorWorkspace");
+    const resCard = document.getElementById("resultCard");
+    if (workspace) workspace.classList.remove("has-result");
+    if (resCard) resCard.classList.remove("show");
 
-
-    // -------------------------------------------------
-    // Reset preview
-    // -------------------------------------------------
-
-    if (previewImage) {
-
-        previewImage.src =
-            "";
-    }
-
-
-    if (previewContainer) {
-
-        previewContainer.classList.remove(
-            "show"
-        );
-    }
-
-
-    // -------------------------------------------------
-    // Show upload area
-    // -------------------------------------------------
-
-    if (uploadArea) {
-
-        uploadArea.style.display =
-            "flex";
-    }
-
-
-    // -------------------------------------------------
-    // Disable analyze
-    // -------------------------------------------------
-
-    if (analyzeButton) {
-
-        analyzeButton.disabled =
-            true;
-
-        analyzeButton.style.display =
-            "flex";
-    }
-
-
-    // -------------------------------------------------
-    // Hide loading
-    // -------------------------------------------------
-
-    if (loading) {
-
-        loading.classList.remove(
-            "show"
-        );
-    }
-
-
-    // -------------------------------------------------
-    // Hide result
-    // -------------------------------------------------
-
-    if (resultCard) {
-
-        resultCard.classList.remove(
-            "show"
-        );
-    }
-
-
-    // -------------------------------------------------
-    // Reset confidence
-    // -------------------------------------------------
-
-    if (confidenceProgress) {
-
-        confidenceProgress.style.width =
-            "0%";
-    }
-
-
-    // -------------------------------------------------
-    // Reset values
-    // -------------------------------------------------
-
-    if (resultPlant) {
-
-        resultPlant.textContent =
-            "-";
-    }
-
-
-    if (resultCondition) {
-
-        resultCondition.textContent =
-            "-";
-    }
-
-
-    if (resultConfidence) {
-
-        resultConfidence.textContent =
-            "0%";
-    }
-
-
-    if (confidenceLevel) {
-
-        confidenceLevel.textContent =
-            "-";
-    }
-
-
-    if (resultRecommendation) {
-
-        resultRecommendation.textContent =
-            "-";
-    }
-
-
-    if (resultIcon) {
-
-        resultIcon.textContent =
-            "🌿";
-    }
-
-
-    // -------------------------------------------------
-    // Reset details
-    // -------------------------------------------------
-
-    if (resultDetails) {
-
-        resultDetails.innerHTML =
-            "";
-    }
+    // تفريغ البيانات القديمة لو موجودة
+    const resultDetails = document.getElementById("resultDetails");
+    if (resultDetails) resultDetails.innerHTML = "";
 }
 
-
 // =====================================================
-// DRAG & DROP
+// 3. DRAG & DROP (السحب والإفلات)
 // =====================================================
+const uploadCardArea = document.getElementById("uploadCard");
 
-if (uploadArea) {
+if (uploadCardArea) {
+    uploadCardArea.addEventListener("dragover", function (event) {
+        event.preventDefault();
+        uploadCardArea.classList.add("dragover");
+    });
 
-    uploadArea.addEventListener(
-        "dragover",
-        function (event) {
+    uploadCardArea.addEventListener("dragleave", function () {
+        uploadCardArea.classList.remove("dragover");
+    });
 
-            event.preventDefault();
+    uploadCardArea.addEventListener("drop", function (event) {
+        event.preventDefault();
+        uploadCardArea.classList.remove("dragover");
 
-            uploadArea.classList.add(
-                "dragover"
-            );
+        const files = event.dataTransfer.files;
+        if (files && files.length > 0) {
+            handleImage(files[0]);
         }
-    );
-
-
-    uploadArea.addEventListener(
-        "dragleave",
-        function () {
-
-            uploadArea.classList.remove(
-                "dragover"
-            );
-        }
-    );
-
-
-    uploadArea.addEventListener(
-        "drop",
-        function (event) {
-
-            event.preventDefault();
-
-            uploadArea.classList.remove(
-                "dragover"
-            );
-
-
-            const files =
-                event.dataTransfer.files;
-
-
-            if (
-                !files ||
-                !files.length
-            ) {
-
-                return;
-            }
-
-
-            handleImage(
-                files[0]
-            );
-        }
-    );
+    });
 }
 
+// منع المتصفح من فتح الصورة في صفحة تانية لو اليوزر رماها بره المربع
+document.addEventListener("dragover", function (event) {
+    event.preventDefault();
+});
+
+document.addEventListener("drop", function (event) {
+    if (uploadCardArea && !uploadCardArea.contains(event.target)) {
+        event.preventDefault();
+    }
+});
 
 // =====================================================
-// ANALYZE BUTTON
+// 4. ANALYZE BUTTON & API FETCH
 // =====================================================
-
-if (analyzeButton) {
-
-    analyzeButton.addEventListener(
-        "click",
-        analyzePlant
-    );
+const analyzeBtn = document.getElementById("analyzeButton");
+if (analyzeBtn) {
+    analyzeBtn.addEventListener("click", analyzePlant);
 }
-
-
-// =====================================================
-// ANALYZE PLANT
-// =====================================================
 
 async function analyzePlant() {
-
     if (!selectedFile) {
-
-        alert(
-            "Please select an image first."
-        );
-
+        alert("Please select an image first.");
         return;
     }
-
-
-    // -------------------------------------------------
-    // LOGIN REQUIRED
-    // -------------------------------------------------
 
     if (!accessToken) {
-
-        alert(
-            "Please login to analyze your plant."
-        );
-
+        alert("Please login to analyze your plant.");
         openLogin();
-
         return;
     }
 
+    // إخفاء زراير التحكم وإظهار الـ Loading
+    const actionOptions = document.getElementById("actionOptions");
+    const loadingSpinner = document.getElementById("loading");
 
-    // -------------------------------------------------
-    // Console
-    // -------------------------------------------------
+    if (actionOptions) actionOptions.style.display = "none";
+    if (loadingSpinner) loadingSpinner.style.display = "block";
 
-    console.log(
-        "================================="
-    );
-
-    console.log(
-        "KHADRWY - PLANT ANALYSIS"
-    );
-
-    console.log(
-        "================================="
-    );
-
-    console.log(
-        "File:",
-        selectedFile.name
-    );
-
-    console.log(
-        "API:",
-        API_URL
-    );
-
-
-    // -------------------------------------------------
-    // Disable button
-    // -------------------------------------------------
-
-    analyzeButton.disabled =
-        true;
-
-    analyzeButton.style.display =
-        "none";
-
-
-    // -------------------------------------------------
-    // Hide previous result
-    // -------------------------------------------------
-
-    if (resultCard) {
-
-        resultCard.classList.remove(
-            "show"
-        );
-    }
-
-
-    // -------------------------------------------------
-    // Show loading
-    // -------------------------------------------------
-
-    if (loading) {
-
-        loading.classList.add(
-            "show"
-        );
-    }
-
-
-    // -------------------------------------------------
-    // Create FormData
-    // -------------------------------------------------
-
-    const formData =
-        new FormData();
-
-
-    formData.append(
-        "file",
-        selectedFile,
-        selectedFile.name
-    );
-
+    const formData = new FormData();
+    formData.append("file", selectedFile, selectedFile.name);
 
     try {
+        // إرسال الصورة للـ Backend بتاعك
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${accessToken}` },
+            body: formData
+        });
 
-        console.log(
-            "Sending request..."
-        );
-
-
-        // -------------------------------------------------
-        // Send request
-        // -------------------------------------------------
-
-        const response =
-            await fetch(
-                API_URL,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Authorization":
-                            `Bearer ${accessToken}`
-                    },
-
-                    body: formData
-                }
-            );
-
-
-        console.log(
-            "Status:",
-            response.status
-        );
-
-
-        // -------------------------------------------------
-        // Check content type
-        // -------------------------------------------------
-
-        const contentType =
-            response.headers.get(
-                "content-type"
-            );
-
-
+        const contentType = response.headers.get("content-type");
         let data;
 
-
-        if (
-            contentType &&
-            contentType.includes(
-                "application/json"
-            )
-        ) {
-
-            data =
-                await response.json();
-
+        if (contentType && contentType.includes("application/json")) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            throw new Error(`Server returned ${response.status}: ${text}`);
         }
 
-        else {
-
-            const text =
-                await response.text();
-
-
-            throw new Error(
-                `Server returned ${response.status}: ${text}`
-            );
-        }
-
-
-        // -------------------------------------------------
-        // Console result
-        // -------------------------------------------------
-
-        console.log(
-            "Result:",
-            data
-        );
-
-
-        // -------------------------------------------------
-        // TOKEN EXPIRED
-        // -------------------------------------------------
-
-        if (
-            response.status === 401
-        ) {
-
+        if (response.status === 401) {
             logout();
-
-            throw new Error(
-                "Your session has expired. Please login again."
-            );
+            throw new Error("Your session has expired. Please login again.");
         }
-
-
-        // -------------------------------------------------
-        // Check response
-        // -------------------------------------------------
 
         if (!response.ok) {
-
-            throw new Error(
-                data.detail ||
-                data.message ||
-                `Server Error ${response.status}`
-            );
+            throw new Error(data.detail || data.message || `Server Error ${response.status}`);
         }
 
+        // إخفاء الـ Loading
+        if (loadingSpinner) loadingSpinner.style.display = "none";
 
-        // -------------------------------------------------
-        // Display result
-        // -------------------------------------------------
+        // تقسيم الشاشة نصين وإظهار النتيجة
+        const workspace = document.getElementById("doctorWorkspace");
+        const resCard = document.getElementById("resultCard");
+        if (workspace) workspace.classList.add("has-result");
+        if (resCard) resCard.classList.add("show");
 
+        // استدعاء دالة العرض الموجودة عندك تحت في الكود
         displayResult(data);
 
-    }
+    } catch (error) {
+        console.error("ANALYSIS ERROR:", error);
+        alert("Analysis failed!\n\n" + (error.name === "TypeError" ? "Cannot connect to the AI server." : error.message));
 
-
-    catch (error) {
-
-        console.error(
-            "FULL ERROR:",
-            error
-        );
-
-
-        let message =
-            error.message;
-
-
-        // -------------------------------------------------
-        // Connection error
-        // -------------------------------------------------
-
-        if (
-            error.name === "TypeError"
-        ) {
-
-            message =
-                "Cannot connect to the AI server.\n\n" +
-                "Make sure FastAPI is running on:\n" +
-                API_BASE_URL;
-        }
-
-
-        alert(
-            "Analysis failed!\n\n" +
-            message
-        );
-
-    }
-
-
-    finally {
-
-        // -------------------------------------------------
-        // Hide loading
-        // -------------------------------------------------
-
-        if (loading) {
-
-            loading.classList.remove(
-                "show"
-            );
-        }
-
-
-        // -------------------------------------------------
-        // Enable button
-        // -------------------------------------------------
-
-        if (analyzeButton) {
-
-            analyzeButton.disabled =
-                false;
-
-            analyzeButton.style.display =
-                "flex";
-        }
+        // لو حصل خطأ، نرجع زراير التحكم (Analyze/Dismiss) تاني عشان اليوزر يقدر يحاول
+        if (loadingSpinner) loadingSpinner.style.display = "none";
+        if (actionOptions) actionOptions.style.display = "flex";
     }
 }
+// =====================================================
+// LOCAL TRANSLATION DICTIONARY (القاموس الثابت الشامل)
+// =====================================================
+const localTranslations = {
+    // --- أسماء النباتات ---
+    "Peach": "خوخ",
+    "Tomato": "طماطم",
+    "Apple": "تفاح",
+    "Potato": "بطاطس",
+    "Corn": "ذرة",
+    "Grape": "عنب",
+    "Orange": "برتقال",
+    "Strawberry": "فراولة",
+    "Squash": "كوسا",
+    "Pepper": "فلفل",
+    
+    // --- أسماء الأمراض (الأكثر شيوعاً) ---
+    "Bacterial spot": "تبقع بكتيري",
+    "Late blight": "لفحة متأخرة",
+    "Early blight": "لفحة مبكرة",
+    "Healthy": "سليم",
+    "Powdery mildew": "بياض دقيقي",
+    "Black rot": "عفن أسود",
+    "Apple scab": "جرب التفاح",
+    "Cedar apple rust": "صدأ التفاح والعرعر",
+    "Leaf scorch": "احتراق الأوراق",
+    "Septoria leaf spot": "تبقع السبتوريا",
+    // --- العناوين الثابتة ---
+    "🔎 Symptoms": "الأعراض 🔎",
+    "Symptoms 🔎": "الأعراض 🔎",
+    "🌱 Recommended Actions": "الإجراءات الموصى بها 🌱",
+    "Recommended Actions 🌱": "الإجراءات الموصى بها 🌱",
+    "🛡️ Prevention": "الوقاية 🛡️",
+    "Prevention 🛡️": "الوقاية 🛡️",
 
+    // --- الحالات العامة (سليم أو غير معروف) ---
+    "The plant appears healthy. Continue regular monitoring and proper plant care.": "يبدو النبات سليماً. استمر في المراقبة المنتظمة والرعاية المناسبة للنبات.",
+    "Continue regular monitoring.": "استمر في المراقبة المنتظمة.",
+    "Maintain appropriate irrigation.": "حافظ على ري مناسب.",
+    "Maintain balanced plant nutrition.": "حافظ على تغذية متوازنة للنبات.",
+    "Monitor for any new symptoms.": "راقب ظهور أي أعراض جديدة.",
+    "No specific recommendation is available for this condition.": "لا توجد توصيات محددة متاحة لهذه الحالة حالياً.",
+    "Take a clearer image if possible.": "التقط صورة أوضح إن أمكن.",
+    "Consult an agricultural specialist if symptoms continue.": "استشر أخصائي زراعي إذا استمرت الأعراض.",
 
+    // --- التفاح (Apple) ---
+    "Apple scab is a fungal disease that mainly affects apple leaves and fruits.": "جرب التفاح هو مرض فطري يصيب بشكل رئيسي أوراق وثمار التفاح.",
+    "Olive or dark spots on leaves": "بقع زيتونية أو داكنة على الأوراق",
+    "Dark lesions on fruits": "تقرحات داكنة على الثمار",
+    "Premature leaf drop": "تساقط الأوراق المبكر",
+    "Remove and dispose of severely infected leaves and fruits.": "قم بإزالة والتخلص من الأوراق والثمار المصابة بشدة.",
+    "Improve air circulation around the trees.": "قم بتحسين التهوية حول الأشجار.",
+    "Keep the orchard clean from fallen infected leaves.": "حافظ على نظافة البستان من الأوراق المصابة المتساقطة.",
+    "Monitor trees regularly.": "راقب الأشجار بانتظام.",
+    "Remove fallen infected leaves.": "قم بإزالة الأوراق المصابة المتساقطة.",
+    "Avoid conditions that keep leaves wet for long periods.": "تجنب الظروف التي تبقي الأوراق مبللة لفترات طويلة.",
+    "Black rot is a fungal disease that can affect apple leaves, branches, and fruits.": "العفن الأسود هو مرض فطري يمكن أن يصيب أوراق وأغصان وثمار التفاح.",
+    "Dark leaf spots": "بقع داكنة على الأوراق",
+    "Rotting fruit": "تعفن الثمار",
+    "Dead or damaged branches": "أغصان ميتة أو تالفة",
+    "Remove infected fruits and branches.": "قم بإزالة الثمار والأغصان المصابة.",
+    "Remove diseased plant material from the orchard.": "قم بإزالة أجزاء النباتات المريضة من البستان.",
+    "Maintain good orchard sanitation.": "حافظ على نظافة البستان بشكل جيد.",
+    "Remove fallen or mummified fruits.": "قم بإزالة الثمار المتساقطة أو المحنطة.",
+    "Cedar apple rust is a fungal disease affecting apple leaves and fruits.": "صدأ التفاح والعرعر هو مرض فطري يصيب أوراق وثمار التفاح.",
+    "Yellow or orange spots on leaves": "بقع صفراء أو برتقالية على الأوراق",
+    "Premature leaf damage": "تلف مبكر للأوراق",
+    "Remove severely affected leaves.": "قم بإزالة الأوراق المصابة بشدة.",
+    "Monitor the tree regularly.": "راقب الشجرة بانتظام.",
+    "Inspect plants regularly.": "افحص النباتات بانتظام.",
+    "Maintain orchard sanitation.": "حافظ على نظافة البستان.",
+    "Monitor for recurring symptoms.": "راقب تكرار ظهور الأعراض.",
+
+    // --- الكرز (Cherry) ---
+    "Powdery mildew is a fungal disease that produces a white powdery growth on plant surfaces.": "البياض الدقيقي هو مرض فطري ينتج نمواً أبيض مسحوقياً على أسطح النبات.",
+    "White powdery growth on leaves": "نمو أبيض مسحوقي على الأوراق",
+    "Leaf distortion": "تشوه الأوراق",
+    "Reduced plant growth": "ضعف نمو النبات",
+    "Remove heavily infected leaves when appropriate.": "قم بإزالة الأوراق شديدة الإصابة عند الاقتضاء.",
+    "Improve air circulation around plants.": "حسّن التهوية حول النباتات.",
+    "Avoid excessive humidity around the foliage.": "تجنب الرطوبة الزائدة حول المجموع الخضري.",
+    "Maintain proper plant spacing.": "حافظ على مسافات مناسبة بين النباتات.",
+    "Keep foliage dry when possible.": "حافظ على جفاف الأوراق قدر الإمكان.",
+
+    // --- الذرة (Corn) ---
+    "Gray leaf spot is a fungal disease that affects corn leaves and can reduce plant productivity.": "تبقع الأوراق الرمادي هو مرض فطري يصيب أوراق الذرة ويمكن أن يقلل من إنتاجية النبات.",
+    "Long gray or brown lesions on leaves": "تقرحات رمادية أو بنية طويلة على الأوراق",
+    "Progressive leaf damage": "تلف تدريجي للأوراق",
+    "Reduced photosynthetic activity": "انخفاض نشاط التمثيل الضوئي",
+    "Remove or properly manage infected plant residues.": "قم بإزالة أو إدارة بقايا النباتات المصابة بشكل صحيح.",
+    "Monitor the crop regularly.": "راقب المحصول بانتظام.",
+    "Improve field ventilation where possible.": "حسّن تهوية الحقل حيثما أمكن.",
+    "Maintain good field sanitation.": "حافظ على نظافة الحقل بشكل جيد.",
+    "Use appropriate crop rotation practices.": "استخدم ممارسات الدورة الزراعية المناسبة.",
+    "Monitor the crop during favorable disease conditions.": "راقب المحصول خلال الظروف المواتية لانتشار المرض.",
+    "Common rust is a fungal disease that produces rust-colored lesions on corn leaves.": "الصدأ العادي هو مرض فطري ينتج تقرحات بلون الصدأ على أوراق الذرة.",
+    "Small reddish-brown pustules": "بثور صغيرة بنية محمرة",
+    "Leaf discoloration": "تغير لون الأوراق",
+    "Monitor affected plants closely.": "راقب النباتات المصابة عن كثب.",
+    "Remove severely affected leaves when practical.": "قم بإزالة الأوراق المصابة بشدة عندما يكون ذلك عملياً.",
+    "Maintain proper crop management.": "حافظ على إدارة سليمة للمحصول.",
+    "Inspect crops regularly.": "افحص المحاصيل بانتظام.",
+    "Use appropriate resistant varieties when available.": "استخدم الأصناف المقاومة المناسبة عند توفرها.",
+    "Maintain good field management.": "حافظ على إدارة جيدة للحقل.",
+    "Northern leaf blight is a fungal disease that causes large lesions on corn leaves.": "لفحة الأوراق الشمالية هو مرض فطري يسبب تقرحات كبيرة على أوراق الذرة.",
+    "Long gray-green lesions": "تقرحات طويلة رمادية مخضرة",
+    "Leaf yellowing": "اصفرار الأوراق",
+    "Manage infected crop residues.": "تعامل مع بقايا المحاصيل المصابة بشكل سليم.",
+    "Improve field conditions and airflow where possible.": "حسّن ظروف الحقل والتهوية حيثما أمكن.",
+    "Practice crop rotation.": "طبق الدورة الزراعية.",
+    "Maintain field sanitation.": "حافظ على نظافة الحقل.",
+
+    // --- العنب (Grape) ---
+    "Black rot is a fungal disease affecting grape leaves, shoots, and berries.": "العفن الأسود هو مرض فطري يصيب أوراق وأغصان وثمار العنب.",
+    "Brown or reddish leaf spots": "بقع بنية أو محمرة على الأوراق",
+    "Dark lesions on berries": "تقرحات داكنة على الثمار (العنب)",
+    "Shriveled infected grapes": "انكماش حبات العنب المصابة",
+    "Remove infected berries and leaves.": "قم بإزالة الثمار والأوراق المصابة.",
+    "Maintain good vineyard sanitation.": "حافظ على نظافة الكرم (مزرعة العنب) بشكل جيد.",
+    "Improve air circulation around vines.": "حسّن التهوية حول الكروم.",
+    "Remove mummified berries.": "قم بإزالة الثمار المحنطة.",
+    "Monitor vines regularly.": "راقب الكروم بانتظام.",
+    "Esca is a complex grapevine disease that can affect leaves, shoots, and fruit.": "إسكا العنب هو مرض معقد يصيب أوراق وأغصان وثمار العنب.",
+    "Discolored areas between leaf veins": "مناطق متغيرة اللون بين عروق الأوراق",
+    "Leaf deterioration": "تدهور الأوراق",
+    "Dark spots on berries": "بقع داكنة على الثمار",
+    "Remove severely affected plant parts.": "قم بإزالة أجزاء النبات المصابة بشدة.",
+    "Monitor the vineyard regularly.": "راقب مزرعة العنب بانتظام.",
+    "Maintain proper vineyard sanitation.": "حافظ على نظافة مزرعة العنب السليمة.",
+    "Manage pruning wounds carefully.": "تعامل مع جروح التقليم بعناية.",
+    "Remove severely diseased material when appropriate.": "قم بإزالة المواد المريضة بشدة عند الاقتضاء.",
+    "Leaf blight can cause spotting and damage to grapevine leaves.": "لفحة الأوراق يمكن أن تسبب تبقع وتلف لأوراق العنب.",
+
+    // --- البرتقال / الموالح (Orange) ---
+    "Citrus greening is a serious bacterial disease that affects citrus trees.": "اخضرار الموالح (التنين الأصفر) هو مرض بكتيري خطير يصيب أشجار الحمضيات.",
+    "Uneven yellowing of leaves": "اصفرار غير منتظم للأوراق",
+    "Reduced fruit quality": "انخفاض جودة الثمار",
+    "Poor tree growth": "ضعف نمو الشجرة",
+    "Remove severely affected trees according to local agricultural guidance.": "قم بإزالة الأشجار المصابة بشدة وفقاً للإرشادات الزراعية المحلية.",
+    "Manage insect vectors such as psyllids.": "كافح الحشرات الناقلة للمرض مثل حشرة البسيلا.",
+    "Use healthy planting material.": "استخدم مواد زراعة سليمة وموثوقة.",
+    "Monitor for insect vectors.": "راقب وجود الحشرات الناقلة للمرض.",
+    "Inspect citrus trees regularly.": "افحص أشجار الحمضيات بانتظام.",
+
+    // --- الخوخ (Peach) ---
+    "Bacterial spot affects peach leaves and fruits and can reduce crop quality.": "يؤثر التبقع البكتيري على أوراق وثمار الخوخ ويمكن أن يقلل من جودة المحصول.",
+    "Small dark spots on leaves": "بقع داكنة صغيرة على الأوراق",
+    "Lesions on fruit": "تقرحات على الثمار",
+    "Leaf damage": "تلف الأوراق",
+    "Remove severely infected plant material when appropriate.": "قم بإزالة أجزاء النبات المصابة بشدة عند الاقتضاء.",
+    "Avoid overhead irrigation.": "تجنب الري العلوي (الرش).",
+
+    // --- الفلفل (Pepper) ---
+    "Bacterial spot is a disease that affects pepper leaves and fruits.": "التبقع البكتيري هو مرض يصيب أوراق وثمار الفلفل.",
+    "Fruit lesions": "تقرحات على الثمار",
+    "Leaf yellowing or damage": "اصفرار أو تلف الأوراق",
+    "Remove severely infected plant material.": "قم بإزالة أجزاء النبات المصابة بشدة.",
+    "Avoid overhead watering.": "تجنب الري العلوي.",
+    "Avoid working with wet plants.": "تجنب التعامل مع النباتات وهي مبللة.",
+
+    // --- البطاطس (Potato) ---
+    "Early blight is a fungal disease that commonly affects potato leaves.": "اللفحة المبكرة هو مرض فطري يصيب عادة أوراق البطاطس.",
+    "Dark circular spots": "بقع دائرية داكنة",
+    "Concentric ring patterns": "أنماط حلقات متداخلة",
+    "Yellowing around lesions": "اصفرار حول التقرحات",
+    "Maintain proper crop sanitation.": "حافظ على النظافة المناسبة للمحصول.",
+    "Remove infected crop residues.": "قم بإزالة بقايا المحاصيل المصابة.",
+    "Late blight is a serious disease that can rapidly damage potato foliage and tubers.": "اللفحة المتأخرة مرض خطير يمكن أن يتلف أوراق ودرنات البطاطس بسرعة.",
+    "Dark water-soaked lesions": "تقرحات داكنة مشبعة بالماء",
+    "Rapid leaf deterioration": "تدهور سريع للأوراق",
+    "Brown or damaged tubers": "درنات بنية أو تالفة",
+    "Avoid prolonged leaf moisture.": "تجنب بقاء الأوراق رطبة لفترات طويلة.",
+    "Monitor the crop closely.": "راقب المحصول عن كثب.",
+    "Avoid unnecessary leaf wetness.": "تجنب بلل الأوراق غير الضروري.",
+    "Use disease management practices recommended locally.": "استخدم ممارسات إدارة الأمراض الموصى بها محلياً.",
+
+    // --- الكوسا / القرعيات (Squash) ---
+    "Powdery mildew produces a white powdery coating on squash leaves.": "البياض الدقيقي ينتج طبقة بيضاء مسحوقية على أوراق الكوسا.",
+    "White powdery patches": "بقع بيضاء مسحوقية",
+    "Reduce excessive humidity around foliage.": "قلل من الرطوبة الزائدة حول الأوراق.",
+    "Avoid excessive moisture on foliage.": "تجنب الرطوبة الزائدة على الأوراق.",
+
+    // --- الفراولة (Strawberry) ---
+    "Leaf scorch causes dark lesions and damage to strawberry leaves.": "احتراق الأوراق يسبب تقرحات داكنة وتلفاً في أوراق الفراولة.",
+    "Purple or dark leaf spots": "بقع أرجوانية أو داكنة على الأوراق",
+    "Leaf browning": "تحول الأوراق للون البني",
+    "Reduced leaf health": "تدهور صحة الأوراق",
+    "Keep the growing area clean.": "حافظ على نظافة منطقة الزراعة.",
+
+    // --- الطماطم (Tomato) ---
+    "Bacterial spot affects tomato leaves and fruits.": "يؤثر التبقع البكتيري على أوراق وثمار الطماطم.",
+    "Avoid handling wet plants.": "تجنب التعامل مع النباتات المبللة.",
+    "Early blight is a fungal disease that commonly affects tomato leaves.": "اللفحة المبكرة هو مرض فطري يصيب عادة أوراق الطماطم.",
+    "Dark circular lesions": "تقرحات دائرية داكنة",
+    "Yellowing around infected areas": "اصفرار حول المناطق المصابة",
+    "Maintain good garden sanitation.": "حافظ على نظافة الحديقة بشكل جيد.",
+    "Remove infected plant debris.": "قم بإزالة بقايا النباتات المصابة.",
+    "Late blight is a rapidly developing disease that can severely damage tomato plants.": "اللفحة المتأخرة مرض سريع التطور يمكن أن يتلف نباتات الطماطم بشدة.",
+    "Brown or dark areas on stems and fruit": "مناطق بنية أو داكنة على السيقان والثمار",
+    "Avoid unnecessary overhead irrigation.": "تجنب الري العلوي غير الضروري.",
+    "Tomato leaf mold is a fungal disease favored by high humidity.": "عفن أوراق الطماطم هو مرض فطري ينشط في الرطوبة العالية.",
+    "Yellow spots on upper leaf surfaces": "بقع صفراء على الأسطح العلوية للأوراق",
+    "Mold growth on the underside of leaves": "نمو العفن على الجانب السفلي للأوراق",
+    "Improve greenhouse or field ventilation.": "حسّن تهوية الصوبة الزراعية أو الحقل.",
+    "Reduce excessive humidity.": "قلل الرطوبة الزائدة.",
+    "Avoid excessive humidity.": "تجنب الرطوبة الزائدة.",
+    "Septoria leaf spot is a fungal disease that mainly affects tomato leaves.": "تبقع أوراق السبتوريا هو مرض فطري يصيب بشكل رئيسي أوراق الطماطم.",
+    "Small circular spots": "بقع دائرية صغيرة",
+    "Dark borders around lesions": "حواف داكنة حول التقرحات",
+    "Leaf yellowing and drop": "اصفرار وتساقط الأوراق",
+    "Two-spotted spider mites are small pests that feed on plant leaves.": "سوس العنكبوت ذو البقعتين هي آفات صغيرة تتغذى على أوراق النبات.",
+    "Tiny yellow or pale spots": "بقع صغيرة صفراء أو باهتة",
+    "Fine webbing in severe infestations": "نسيج عنكبوتي دقيق في الإصابات الشديدة",
+    "Inspect the underside of leaves.": "افحص الجانب السفلي للأوراق.",
+    "Monitor the infestation closely.": "راقب الإصابة عن كثب.",
+    "Maintain appropriate plant conditions.": "حافظ على ظروف بيئية مناسبة للنبات.",
+    "Monitor for increasing pest populations.": "راقب تزايد أعداد الآفات.",
+    "Target spot is a fungal disease that affects tomato leaves and fruit.": "البقعة المستهدفة (تارجت سبوت) هو مرض فطري يصيب أوراق وثمار الطماطم.",
+    "Circular brown lesions": "تقرحات بنية دائرية",
+    "Concentric rings": "حلقات متداخلة",
+    "Maintain plant sanitation.": "حافظ على نظافة النبات.",
+    "Tomato yellow leaf curl virus is a viral disease commonly associated with whitefly transmission.": "فيروس تجعد واصفرار أوراق الطماطم هو مرض فيروسي يرتبط عادة بانتقاله عبر الذبابة البيضاء.",
+    "Yellowing of leaves": "اصفرار الأوراق",
+    "Leaf curling": "تجعد الأوراق",
+    "Stunted plant growth": "تقزم نمو النبات",
+    "Monitor and manage whitefly populations.": "راقب وكافح مجموعات الذبابة البيضاء.",
+    "Separate affected plants when possible.": "افصل النباتات المصابة متى أمكن.",
+    "Monitor whiteflies regularly.": "راقب الذبابة البيضاء بانتظام.",
+    "Remove infected plants when appropriate.": "قم بإزالة النباتات المصابة عند الاقتضاء.",
+    "Tomato mosaic virus is a viral disease that can cause leaf and plant growth abnormalities.": "فيروس تبرقش الطماطم (الموزايك) هو مرض فيروسي يسبب تشوهات في الأوراق ونمو النبات.",
+    "Mottled or mosaic leaf patterns": "أنماط مبرقشة أو فسيفسائية على الأوراق",
+    "Disinfect tools between plants.": "عقم الأدوات بين النباتات.",
+    "Avoid spreading plant sap between healthy and infected plants.": "تجنب نقل عصارة النبات بين النباتات السليمة والمصابة.",
+    "Use clean planting material.": "استخدم مواد زراعة نظيفة.",
+    "Disinfect tools regularly.": "عقم الأدوات بانتظام.",
+    "Monitor plants for new symptoms.": "راقب النباتات لظهور أعراض جديدة.",
+
+    // --- أوامر مكررة تم دمجها للسرعة ---
+    "Improve air circulation.": "تحسين التهوية.",
+    "Monitor the plant regularly.": "راقب النبات بانتظام.",
+    "Monitor plants regularly.": "مراقبة النباتات بانتظام.",
+    "Maintain proper spacing.": "حافظ على مسافات مناسبة.",
+    "Avoid prolonged leaf wetness.": "تجنب بلل الأوراق لفترات طويلة.",
+    "Remove severely infected leaves.": "قم بإزالة الأوراق المصابة بشدة."
+};
 // =====================================================
 // DISPLAY RESULT
 // =====================================================
@@ -1740,9 +1523,10 @@ function displayResult(data) {
 
     if (resultPlant) {
 
-        resultPlant.textContent =
+        resultPlant.textContent = getLocalTranslation(
             data.plant ||
-            "Unknown";
+            "Unknown"
+        );
     }
 
 
@@ -1752,9 +1536,10 @@ function displayResult(data) {
 
     if (resultCondition) {
 
-        resultCondition.textContent =
+        resultCondition.textContent = getLocalTranslation(
             data.condition ||
-            "Unknown";
+            "Unknown"
+        );
     }
 
 
@@ -1860,20 +1645,23 @@ function displayResult(data) {
 
         if (recommendation.message) {
 
-            resultRecommendation.textContent =
-                recommendation.message;
+            resultRecommendation.textContent = getLocalTranslation(
+                recommendation.message
+            );
         }
 
         else if (recommendation.description) {
 
-            resultRecommendation.textContent =
-                recommendation.description;
+            resultRecommendation.textContent = getLocalTranslation(
+                recommendation.description
+            );
         }
 
         else {
 
-            resultRecommendation.textContent =
-                "Monitor your plant regularly.";
+            resultRecommendation.textContent = getLocalTranslation(
+                "Monitor your plant regularly."
+            );
         }
     }
 
@@ -1900,8 +1688,8 @@ function displayResult(data) {
         ) {
 
             createRecommendationSection(
-                "🔎 Symptoms",
-                recommendation.symptoms
+                getLocalTranslation("🔎 Symptoms"),
+                recommendation.symptoms.map(item => getLocalTranslation(item))
             );
         }
 
@@ -1918,8 +1706,8 @@ function displayResult(data) {
         ) {
 
             createRecommendationSection(
-                "🌱 Recommended Actions",
-                recommendation.actions
+                getLocalTranslation("🌱 Recommended Actions"),
+                recommendation.actions.map(item => getLocalTranslation(item))
             );
         }
 
@@ -1936,8 +1724,8 @@ function displayResult(data) {
         ) {
 
             createRecommendationSection(
-                "🛡️ Prevention",
-                recommendation.prevention
+                getLocalTranslation("🛡️ Prevention"),
+                recommendation.prevention.map(item => getLocalTranslation(item))
             );
         }
     }
@@ -1971,7 +1759,15 @@ function displayResult(data) {
         );
     }
 }
-
+// دالة الترجمة اللي الكود بيدور عليها
+function getLocalTranslation(text) {
+    if (!text) return "";
+    const currentLang = document.documentElement.lang || 'en';
+    
+    if (currentLang === 'en') return text;
+    
+    return localTranslations[text] || text; 
+}
 
 // =====================================================
 // CONFIDENCE LEVEL
@@ -2277,3 +2073,326 @@ console.log(
     "Logged in:",
     Boolean(accessToken)
 );
+// =====================================================
+// HAMBURGER MENU TOGGLE
+// =====================================================
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const navContainer = document.getElementById('navContainer');
+
+if (hamburgerBtn && navContainer) {
+    hamburgerBtn.addEventListener('click', () => {
+        // Toggle the 'active' class to show/hide the menu
+        navContainer.classList.toggle('active');
+
+        // Change icon between ☰ and ✕
+        if (navContainer.classList.contains('active')) {
+            hamburgerBtn.textContent = '✕';
+        } else {
+            hamburgerBtn.textContent = '☰';
+        }
+    });
+
+    // Close menu when clicking a link (optional but good for UX)
+    const navLinksList = navContainer.querySelectorAll('nav a');
+    navLinksList.forEach(link => {
+        link.addEventListener('click', () => {
+            navContainer.classList.remove('active');
+            hamburgerBtn.textContent = '☰';
+        });
+    });
+}
+
+
+// =====================================================
+// TRANSLATION & BILINGUAL SUPPORT (EN/AR)
+// =====================================================
+
+const btnEn = document.getElementById("btnEn");
+const btnAr = document.getElementById("btnAr");
+
+const translations = {
+    en: {
+        // Head & Nav
+        page_title: "Khadrwy | AI Plant Doctor",
+        nav_home: "Home",
+        nav_doctor: "Plant Doctor",
+        nav_monitor: "Monitoring",
+        nav_assist: "AI Assistant",
+        nav_about: "About",
+        btn_login: "Login",
+        btn_signup: "Sign Up",
+        btn_logout: "Logout",
+        
+        // Auth Modals
+        auth_login_title: "Welcome Back",
+        auth_login_desc: "Login to your Khadrwy account.",
+        auth_user: "Username",
+        auth_pass: "Password",
+        auth_email: "Email",
+        auth_login_btn: "Login",
+        auth_no_acc: "Don't have an account?",
+        auth_signup_link: "Sign Up",
+        auth_signup_title: "Create Account",
+        auth_signup_desc: "Join Khadrwy and start caring for your plants.",
+        auth_signup_btn: "Create Account",
+        auth_has_acc: "Already have an account?",
+        auth_login_link: "Login",
+        
+        // Placeholders (handled via data-i18n-placeholder)
+        auth_user_ph: "Enter your username",
+        auth_pass_ph: "Enter your password",
+        auth_user_ph2: "Choose a username",
+        auth_email_ph: "Enter your email",
+        auth_pass_ph2: "Create a password",
+
+        // Hero
+        hero_badge: "AI-Powered Agricultural Platform — خضراوي",
+        hero_title: "Smart Care for <br><span class='serif-highlight'>Healthier Plants.</span>",
+        hero_desc: "Detect diseases instantly, monitor your farm in real-time, and get AI-driven recommendations — in Arabic or English. Built for every farmer, from smallholders to agri-enterprises.",
+        hero_btn_start: "Diagnose Your Plant &rarr;",
+        hero_btn_demo: "How It Works",
+        stat_1_val: "38", stat_1_label: "Plant Conditions",
+        stat_2_val: "AI", stat_2_label: "Powered Detection",
+        stat_3_val: "Fast", stat_3_label: "Analysis",
+        badge_ai: "AI Analysis Active",
+        badge_pro: "Pro Feature Unlocked",
+
+        // Plant Doctor
+        doc_badge: "FREE FEATURE — ACTIVE",
+        doc_title: "AI Plant<br>Doctor",
+        doc_desc: "Upload a photo of your crop and our AI diagnoses disease, pests, and nutrient deficiencies in seconds — completely free.",
+        up_title: "Drop your plant photo here",
+        up_support: "Supports JPG, PNG, HEIC — Max 10MB",
+        up_choose: "Choose Image",
+        up_camera: "Take Photo",
+        up_dismiss: "Dismiss",
+        up_analyze: "Analyze",
+        up_loading: "Analyzing...",
+        
+        // Result Card
+        res_id_label: "IDENTIFIED PLANT",
+        res_critical: "⚠ CRITICAL",
+        res_disease_label: "Detected Disease / Condition",
+        res_conf_label: "AI Confidence Score",
+        res_treat_label: "TREATMENT RECOMMENDATION",
+        res_scan_btn: "Scan Another Plant",
+
+        // How it Works
+        how_badge: "HOW IT WORKS",
+        how_title: "Simple. Fast. Smart.",
+        how_desc: "From a simple leaf photo to practical plant care advice.",
+        step_1_title: "Capture", step_1_desc: "Take a clear photo or upload an existing image of your plant leaf.",
+        step_2_title: "Analyze", step_2_desc: "Our MobileNetV2 AI model analyzes the image and identifies the most likely condition.",
+        step_3_title: "Get Advice", step_3_desc: "Receive an AI diagnosis with symptoms, actions, and prevention tips.",
+
+        // Monitoring
+        mon_badge: "SMART MONITORING",
+        mon_title: "Monitor Your Plants",
+        mon_desc: "Keep track of your plants and understand their health using smart agricultural monitoring.",
+        sens_temp: "Temperature", sens_temp_desc: "Monitor environmental temperature.",
+        sens_hum: "Humidity", sens_hum_desc: "Track air humidity around plants.",
+        sens_soil: "Soil Moisture", sens_soil_desc: "Monitor soil moisture levels.",
+        sens_light: "Light", sens_light_desc: "Monitor available light conditions.",
+        mon_stat_1: "Plant Health", mon_stat_1_val: "Healthy", mon_stat_1_desc: "Current plant health status.",
+        mon_stat_2: "System Status", mon_stat_2_val: "Online", mon_stat_2_desc: "Monitoring system is ready.",
+
+        // AI Assistant
+        ast_badge: "AI ASSISTANT",
+        ast_title: "Your Smart Farming Assistant",
+        ast_desc: "Ask questions about plant diseases, plant care, and smart agriculture.",
+        ast_card_title: "Khadrwy AI Assistant",
+        ast_card_desc: "Your intelligent companion for plant care and agricultural guidance.",
+        ast_soon: "AI Assistant coming soon...",
+
+        // About
+        abt_badge: "ABOUT KHADRWY",
+        abt_title: "Smarter Agriculture with <span class='serif-highlight'>AI.</span>",
+        abt_desc: "Khadrwy is an AI-powered agricultural platform designed to help farmers and plant owners detect plant diseases, understand plant health, and receive practical recommendations.",
+        abt_f1: "🌿 AI Plant Diagnosis", abt_f2: "🤖 MobileNetV2", abt_f3: "📊 Smart Monitoring", abt_f4: "💡 Smart Recommendations",
+
+        // Footer
+        ftr_logo: "Khadrwy",
+        ftr_desc: "Smart Agriculture. Powered by AI.",
+        ftr_copy: "© 2026 Khadrwy. All rights reserved."
+    },
+    ar: {
+        // Head & Nav
+        page_title: "خضراوي | طبيب النباتات الذكي",
+        nav_home: "الرئيسية",
+        nav_doctor: "الفحص الذكي",
+        nav_monitor: "المراقبة",
+        nav_assist: "المساعد الذكي",
+        nav_about: "من نحن",
+        btn_login: "تسجيل الدخول",
+        btn_signup: "حساب جديد",
+        btn_logout: "تسجيل الخروج",
+
+        // Auth Modals
+        auth_login_title: "مرحباً بعودتك",
+        auth_login_desc: "سجل الدخول إلى حسابك في خضراوي.",
+        auth_user: "اسم المستخدم",
+        auth_pass: "كلمة المرور",
+        auth_email: "البريد الإلكتروني",
+        auth_login_btn: "دخول",
+        auth_no_acc: "ليس لديك حساب؟",
+        auth_signup_link: "سجل الآن",
+        auth_signup_title: "إنشاء حساب",
+        auth_signup_desc: "انضم لخضراوي وابدأ في العناية بنباتاتك.",
+        auth_signup_btn: "إنشاء حساب",
+        auth_has_acc: "لديك حساب بالفعل؟",
+        auth_login_link: "تسجيل الدخول",
+        
+        // Placeholders
+        auth_user_ph: "أدخل اسم المستخدم",
+        auth_pass_ph: "أدخل كلمة المرور",
+        auth_user_ph2: "اختر اسم مستخدم",
+        auth_email_ph: "أدخل بريدك الإلكتروني",
+        auth_pass_ph2: "أنشئ كلمة مرور",
+
+        // Hero
+        hero_badge: "منصة زراعية مدعومة بالذكاء الاصطناعي — Khadrwy",
+        hero_title: "رعاية ذكية لـ <br><span class='serif-highlight'>محاصيل أكثر صحة.</span>",
+        hero_desc: "اكتشف الأمراض فوراً، راقب مزرعتك في الوقت الفعلي، واحصل على توصيات دقيقة بالذكاء الاصطناعي — صُمم ليناسب كل مزارع.",
+        hero_btn_start: "افحص نباتك الآن &larr;",
+        hero_btn_demo: "كيف يعمل؟",
+        stat_1_val: "38", stat_1_label: "حالة مرضية",
+        stat_2_val: "AI", stat_2_label: "فحص بالذكاء الاصطناعي",
+        stat_3_val: "سريع", stat_3_label: "تحليل فوري",
+        badge_ai: "التحليل الذكي مُفعل",
+        badge_pro: "ميزة Pro مُتاحة",
+
+        // Plant Doctor
+        doc_badge: "ميزة مجانية — مُفعلة",
+        doc_title: "طبيب النباتات<br>الذكي",
+        doc_desc: "ارفع صورة لمحصولك وسيقوم الذكاء الاصطناعي بتشخيص الأمراض والآفات ونقص التغذية في ثوانٍ — مجاناً تماماً.",
+        up_title: "اسحب صورة النبات هنا",
+        up_support: "يدعم JPG, PNG, HEIC — بحد أقصى 10MB",
+        up_choose: "اختر صورة",
+        up_camera: "التقط صورة",
+        up_dismiss: "إلغاء",
+        up_analyze: "تحليل",
+        up_loading: "جاري التحليل...",
+
+        // Result Card
+        res_id_label: "النبات المُكتشف",
+        res_critical: "⚠ خطير",
+        res_disease_label: "المرض / الحالة المُكتشفة",
+        res_conf_label: "نسبة دقة الذكاء الاصطناعي",
+        res_treat_label: "توصيات العلاج",
+        res_scan_btn: "فحص نبات آخر",
+
+        // How it Works
+        how_badge: "كيف يعمل",
+        how_title: "بسيط. سريع. ذكي.",
+        how_desc: "من مجرد صورة لورقة النبات إلى نصائح عملية للعناية به.",
+        step_1_title: "التقط الصورة", step_1_desc: "التقط صورة واضحة أو ارفع صورة موجودة لورقة النبات.",
+        step_2_title: "التحليل الذكي", step_2_desc: "يقوم نموذج MobileNetV2 الخاص بنا بتحليل الصورة وتحديد الحالة.",
+        step_3_title: "تلقي النصيحة", step_3_desc: "احصل على تشخيص دقيق مع الأعراض وإجراءات العلاج.",
+
+        // Monitoring
+        mon_badge: "المراقبة الذكية",
+        mon_title: "راقب نباتاتك",
+        mon_desc: "تتبع حالة محاصيلك وافهم احتياجاتها باستخدام تقنيات الزراعة الذكية.",
+        sens_temp: "الحرارة", sens_temp_desc: "مراقبة درجة حرارة البيئة المحيطة.",
+        sens_hum: "الرطوبة", sens_hum_desc: "تتبع رطوبة الهواء حول النباتات.",
+        sens_soil: "رطوبة التربة", sens_soil_desc: "مراقبة مستويات المياه في التربة.",
+        sens_light: "الإضاءة", sens_light_desc: "مراقبة ظروف الإضاءة المتاحة.",
+        mon_stat_1: "صحة النبات", mon_stat_1_val: "جيدة", mon_stat_1_desc: "الحالة الصحية الحالية للنبات.",
+        mon_stat_2: "حالة النظام", mon_stat_2_val: "متصل", mon_stat_2_desc: "نظام المراقبة جاهز ويعمل.",
+
+        // AI Assistant
+        ast_badge: "المساعد الذكي",
+        ast_title: "مساعدك الزراعي الذكي",
+        ast_desc: "اطرح أسئلة حول أمراض النباتات وطرق العناية والزراعة الذكية.",
+        ast_card_title: "مساعد خضراوي الذكي",
+        ast_card_desc: "رفيقك الذكي للحصول على الإرشادات الزراعية الدقيقة.",
+        ast_soon: "المساعد الذكي سيكون متاحاً قريباً...",
+
+        // About
+        abt_badge: "عن خضراوي",
+        abt_title: "زراعة أذكى مع <span class='serif-highlight'>الذكاء الاصطناعي.</span>",
+        abt_desc: "خضراوي هي منصة زراعية ذكية مصممة لمساعدة المزارعين وأصحاب النباتات على اكتشاف الأمراض وفهم حالة النبات وتلقي التوصيات.",
+        abt_f1: "🌿 تشخيص ذكي", abt_f2: "🤖 نموذج MobileNetV2", abt_f3: "📊 مراقبة ذكية", abt_f4: "💡 توصيات دقيقة",
+
+        // Footer
+        ftr_logo: "خضراوي",
+        ftr_desc: "الزراعة الذكية. مدعومة بالذكاء الاصطناعي.",
+        ftr_copy: "© 2026 خضراوي. جميع الحقوق محفوظة."
+    }
+};
+
+function setLanguage(lang) {
+    localStorage.setItem('khadrwy_lang', lang);
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = lang;
+
+    if (lang === 'ar') {
+        if(btnAr) btnAr.classList.add('active');
+        if(btnEn) btnEn.classList.remove('active');
+        // تعديلات ستايل إضافية للعربي عشان الخط يكون متناسق
+        document.body.style.fontFamily = "'Cairo', Arial, sans-serif";
+        document.querySelectorAll('.serif-highlight').forEach(el => el.style.fontFamily = "'Cairo', serif");
+    } else {
+        if(btnEn) btnEn.classList.add('active');
+        if(btnAr) btnAr.classList.remove('active');
+        document.body.style.fontFamily = "Arial, Helvetica, sans-serif";
+        document.querySelectorAll('.serif-highlight').forEach(el => el.style.fontFamily = "'Georgia', serif");
+    }
+
+    // ترجمة النصوص العادية
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang][key]) {
+            // لو كان العنوان بتاع الصفحة
+            if(el.tagName === 'TITLE') {
+                document.title = translations[lang][key];
+            } else {
+                el.innerHTML = translations[lang][key];
+            }
+        }
+    });
+
+    // ترجمة الـ Placeholders في الـ Inputs
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[lang][key]) {
+            el.placeholder = translations[lang][key];
+        }
+    });
+}
+
+// إضافة المستمعين لزراير اللغة
+if (btnEn) btnEn.addEventListener("click", () => setLanguage("en"));
+if (btnAr) btnAr.addEventListener("click", () => setLanguage("ar"));
+
+// تشغيل اللغة المحفوظة أول ما الصفحة تفتح
+document.addEventListener("DOMContentLoaded", () => {
+    const savedLang = localStorage.getItem('khadrwy_lang') || 'en';
+    setLanguage(savedLang);
+});
+// =====================================================
+// RESET BUTTON (إخفاء النتيجة لفحص نبات جديد) 
+// =====================================================
+document.addEventListener("DOMContentLoaded", () => {
+    // استخدمنا anotherButton زي ما هو مكتوب في الـ HTML عندك
+    const resetBtn = document.getElementById("anotherButton"); 
+    const cardToHide = document.getElementById("resultCard"); 
+
+    if (resetBtn) {
+        resetBtn.addEventListener("click", (e) => {
+            e.preventDefault(); // منع أي تحديث للصفحة
+
+            if (cardToHide) {
+                // إخفاء الكارت نهائياً
+                cardToHide.classList.remove("show");
+                cardToHide.style.display = "none"; 
+            }
+
+            // تمرير الشاشة لفوق عند مربع سحب الصورة
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+    }
+});

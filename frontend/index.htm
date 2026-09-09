@@ -1,1331 +1,445 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Khadrwy | AI Plant Doctor</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="page_title">Khadrwy | AI Plant Doctor</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
-
 
     <!-- =====================================================
          NAVBAR
     ====================================================== -->
-
     <header class="navbar">
-
         <div class="logo">
-
-            <span class="logo-icon">
-                🌱
-            </span>
-
-            <span>
-                Khadrwy
-            </span>
-
+            <div class="logo-icon">🌳</div>
+            <div class="logo-text">
+                <strong>Khadrawy</strong>
+                <span class="logo-ar">خضراوي</span>
+            </div>
         </div>
 
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Menu">
+            ☰
+        </button>
 
-        <nav>
+        <div class="nav-container" id="navContainer">
+            <nav>
+                <a href="#home" class="active" data-i18n="nav_home">Home</a>
+                <a href="#doctor" data-i18n="nav_doctor">Plant Doctor</a>
+                <a href="#monitoring" data-i18n="nav_monitor">Monitoring</a>
+                <a href="#assistant" data-i18n="nav_assist">AI Assistant</a>
+                <a href="#about" data-i18n="nav_about">About</a>
+            </nav>
 
-            <a
-                href="#home"
-                class="active"
-            >
-                Home
-            </a>
+            <div class="nav-right">
+                <div class="lang-toggle-box">
+                    <button class="lang-option active" id="btnEn">EN</button>
+                    <button class="lang-option" id="btnAr">AR</button>
+                </div>
 
-            <a href="#doctor">
-                Plant Doctor
-            </a>
+                <div class="auth-buttons" id="authButtons">
+                    <button type="button" class="login-button" id="loginButton" data-i18n="btn_login">Login</button>
+                    <button type="button" class="signup-button" id="signupButton" data-i18n="btn_signup">Sign Up</button>
+                </div>
 
-            <a href="#monitoring">
-                Monitoring
-            </a>
-
-            <a href="#assistant">
-                AI Assistant
-            </a>
-
-            <a href="#about">
-                About
-            </a>
-
-        </nav>
-
-
-        <!-- =================================================
-             AUTH BUTTONS
-        ================================================== -->
-
-        <div
-            class="auth-buttons"
-            id="authButtons"
-        >
-
-            <button
-                type="button"
-                class="login-button"
-                id="loginButton"
-            >
-                Login
-            </button>
-
-            <button
-                type="button"
-                class="signup-button"
-                id="signupButton"
-            >
-                Sign Up
-            </button>
-
+                <div class="user-menu" id="userMenu" style="display: none;">
+                    <span class="user-name" id="userName">👤 User</span>
+                    <button type="button" class="logout-button" id="logoutButton" data-i18n="btn_logout">Logout</button>
+                </div>
+            </div>
         </div>
 
+        <!-- =====================================================
+             AUTH MODAL
+        ====================================================== -->
+        <div class="auth-overlay" id="authOverlay" style="display: none;">
+            <div class="auth-modal">
 
-        <!-- =================================================
-             USER MENU
-        ================================================== -->
+                <button type="button" class="auth-close" id="authClose" aria-label="Close">✕</button>
 
-        <div
-            class="user-menu"
-            id="userMenu"
-            style="display: none;"
-        >
+                <!-- LOGIN FORM -->
+                <div class="auth-form" id="loginForm">
+                    <div class="auth-icon">🔐</div>
+                    <h2 data-i18n="auth_login_title">Welcome Back</h2>
+                    <p data-i18n="auth_login_desc">Login to your Khadrwy account.</p>
 
-            <span
-                class="user-name"
-                id="userName"
-            >
-                👤 User
-            </span>
+                    <form id="loginFormElement">
+                        <div class="auth-field">
+                            <label for="loginUsername" data-i18n="auth_user">Username</label>
+                            <input type="text" id="loginUsername" data-i18n-placeholder="auth_user_ph" placeholder="Enter your username" required>
+                        </div>
+                        <div class="auth-field">
+                            <label for="loginPassword" data-i18n="auth_pass">Password</label>
+                            <input type="password" id="loginPassword" data-i18n-placeholder="auth_pass_ph" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="auth-submit" data-i18n="auth_login_btn">Login</button>
+                        <p class="auth-message" id="loginMessage"></p>
+                    </form>
 
-            <button
-                type="button"
-                class="logout-button"
-                id="logoutButton"
-            >
-                Logout
-            </button>
+                    <div class="auth-switch">
+                        <span data-i18n="auth_no_acc">Don't have an account?</span> 
+                        <button type="button" id="showSignup" data-i18n="auth_signup_link">Sign Up</button>
+                    </div>
+                </div>
 
+                <!-- SIGN UP FORM -->
+                <div class="auth-form" id="signupForm" style="display: none;">
+                    <div class="auth-icon">🌱</div>
+                    <h2 data-i18n="auth_signup_title">Create Account</h2>
+                    <p data-i18n="auth_signup_desc">Join Khadrwy and start caring for your plants.</p>
+
+                    <form id="signupFormElement">
+                        <div class="auth-field">
+                            <label for="signupUsername" data-i18n="auth_user">Username</label>
+                            <input type="text" id="signupUsername" data-i18n-placeholder="auth_user_ph2" placeholder="Choose a username" required>
+                        </div>
+                        <div class="auth-field">
+                            <label for="signupEmail" data-i18n="auth_email">Email</label>
+                            <input type="email" id="signupEmail" data-i18n-placeholder="auth_email_ph" placeholder="Enter your email" required>
+                        </div>
+                        <div class="auth-field">
+                            <label for="signupPassword" data-i18n="auth_pass">Password</label>
+                            <input type="password" id="signupPassword" data-i18n-placeholder="auth_pass_ph2" placeholder="Create a password" minlength="8" required>
+                        </div>
+                        <button type="submit" class="auth-submit" data-i18n="auth_signup_btn">Create Account</button>
+                        <p class="auth-message" id="signupMessage"></p>
+                    </form>
+
+                    <div class="auth-switch">
+                        <span data-i18n="auth_has_acc">Already have an account?</span> 
+                        <button type="button" id="showLogin" data-i18n="auth_login_link">Login</button>
+                    </div>
+                </div>
+
+            </div>
         </div>
-
     </header>
 
-
-
-    <!-- =====================================================
-         AUTH MODAL
-    ====================================================== -->
-
-    <div
-        class="auth-overlay"
-        id="authOverlay"
-        style="display: none;"
-    >
-
-        <div class="auth-modal">
-
-
-            <!-- CLOSE -->
-
-            <button
-                type="button"
-                class="auth-close"
-                id="authClose"
-                aria-label="Close"
-            >
-                ✕
-            </button>
-
-
-            <!-- =================================================
-                 LOGIN
-            ================================================== -->
-
-            <div
-                class="auth-form"
-                id="loginForm"
-            >
-
-                <div class="auth-icon">
-                    🔐
-                </div>
-
-                <h2>
-                    Welcome Back
-                </h2>
-
-                <p>
-                    Login to your Khadrwy account.
-                </p>
-
-
-                <form id="loginFormElement">
-
-                    <div class="auth-field">
-
-                        <label for="loginUsername">
-                            Username
-                        </label>
-
-                        <input
-                            type="text"
-                            id="loginUsername"
-                            placeholder="Enter your username"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="auth-field">
-
-                        <label for="loginPassword">
-                            Password
-                        </label>
-
-                        <input
-                            type="password"
-                            id="loginPassword"
-                            placeholder="Enter your password"
-                            required
-                        >
-
-                    </div>
-
-
-                    <button
-                        type="submit"
-                        class="auth-submit"
-                    >
-                        Login
-                    </button>
-
-
-                    <p
-                        class="auth-message"
-                        id="loginMessage"
-                    ></p>
-
-                </form>
-
-
-                <div class="auth-switch">
-
-                    Don't have an account?
-
-                    <button
-                        type="button"
-                        id="showSignup"
-                    >
-                        Sign Up
-                    </button>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 SIGN UP
-            ================================================== -->
-
-            <div
-                class="auth-form"
-                id="signupForm"
-                style="display: none;"
-            >
-
-                <div class="auth-icon">
-                    🌱
-                </div>
-
-                <h2>
-                    Create Account
-                </h2>
-
-                <p>
-                    Join Khadrwy and start caring for your plants.
-                </p>
-
-
-                <form id="signupFormElement">
-
-                    <div class="auth-field">
-
-                        <label for="signupUsername">
-                            Username
-                        </label>
-
-                        <input
-                            type="text"
-                            id="signupUsername"
-                            placeholder="Choose a username"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="auth-field">
-
-                        <label for="signupEmail">
-                            Email
-                        </label>
-
-                        <input
-                            type="email"
-                            id="signupEmail"
-                            placeholder="Enter your email"
-                            required
-                        >
-
-                    </div>
-
-
-                    <div class="auth-field">
-
-                        <label for="signupPassword">
-                            Password
-                        </label>
-
-                        <input
-                            type="password"
-                            id="signupPassword"
-                            placeholder="Create a password"
-                            minlength="8"
-                            required
-                        >
-
-                    </div>
-
-
-                    <button
-                        type="submit"
-                        class="auth-submit"
-                    >
-                        Create Account
-                    </button>
-
-
-                    <p
-                        class="auth-message"
-                        id="signupMessage"
-                    ></p>
-
-                </form>
-
-
-                <div class="auth-switch">
-
-                    Already have an account?
-
-                    <button
-                        type="button"
-                        id="showLogin"
-                    >
-                        Login
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- =====================================================
-         MAIN
-    ====================================================== -->
-
     <main>
-
 
         <!-- =================================================
              HOME / HERO
         ================================================== -->
-
-        <section
-            class="hero"
-            id="home"
-        >
-
+        <section class="hero" id="home">
             <div class="hero-content">
-
-
+                
                 <div class="hero-text">
+                    <div class="badge new-badge">
+                        <span class="status-dot"></span> <span data-i18n="hero_badge">AI-Powered Agricultural Platform — خضراوي</span>
+                    </div>
 
-                    <span class="badge">
-                        🌿 AI-Powered Agriculture
-                    </span>
-
-
-                    <h1>
-                        Smart Care for
-                        <span>
-                            Healthier Plants.
-                        </span>
+                    <h1 data-i18n="hero_title">
+                        Smart Care for <br>
+                        <span class="serif-highlight">Healthier Plants.</span>
                     </h1>
 
-
-                    <p>
-                        Detect plant diseases faster with
-                        AI-powered image analysis and get
-                        practical recommendations for healthier
-                        crops.
+                    <p class="hero-desc" data-i18n="hero_desc">
+                        Detect diseases instantly, monitor your farm in real-time, and get AI-driven recommendations — in Arabic or English. Built for every farmer, from smallholders to agri-enterprises.
                     </p>
-
 
                     <div class="hero-actions">
-
-                        <a
-                            href="#doctor"
-                            class="hero-button"
-                        >
-                            Diagnose Your Plant
-
-                            <span>
-                                →
-                            </span>
-
-                        </a>
-
-
-                        <a
-                            href="#how-it-works"
-                            class="hero-secondary"
-                        >
-                            How It Works
-                        </a>
-
+                        <a href="#doctor" class="btn-start" data-i18n="hero_btn_start">Diagnose Your Plant →</a>
+                        <a href="#how-it-works" class="btn-demo" data-i18n="hero_btn_demo">How It Works</a>
                     </div>
 
-
-                    <!-- TRUST / STATS -->
-
-                    <div class="hero-trust">
-
-                        <div class="trust-item">
-
-                            <strong>
-                                38
-                            </strong>
-
-                            <span>
-                                Plant Conditions
-                            </span>
-
+                    <div class="hero-stats">
+                        <div class="stat-box">
+                            <strong data-i18n="stat_1_val">38</strong>
+                            <span data-i18n="stat_1_label">Plant Conditions</span>
                         </div>
-
-
-                        <div
-                            class="trust-divider"
-                            aria-hidden="true"
-                        ></div>
-
-
-                        <div class="trust-item">
-
-                            <strong>
-                                AI
-                            </strong>
-
-                            <span>
-                                Powered Detection
-                            </span>
-
+                        <div class="stat-box">
+                            <strong data-i18n="stat_2_val">AI</strong>
+                            <span data-i18n="stat_2_label">Powered Detection</span>
                         </div>
-
-
-                        <div
-                            class="trust-divider"
-                            aria-hidden="true"
-                        ></div>
-
-
-                        <div class="trust-item">
-
-                            <strong>
-                                Fast
-                            </strong>
-
-                            <span>
-                                Analysis
-                            </span>
-
+                        <div class="stat-box">
+                            <strong data-i18n="stat_3_val">Fast</strong>
+                            <span data-i18n="stat_3_label">Analysis</span>
                         </div>
-
                     </div>
-
                 </div>
 
+                <div class="hero-visual-square">
+                    <div class="square-card">
+                        
+                        <div class="scan-illustration">
+                            <div class="scan-corners"></div>
+                            <div class="scan-plant">🪴</div>
+                            <div class="scan-line-anim"></div>
+                        </div>
 
+                        <div class="float-badge badge-top-right">
+                            <span style="color:#d9534f; margin-right:5px;">⚡</span> <span data-i18n="badge_ai">AI Analysis Active</span>
+                        </div>
 
-                <!-- HERO VISUAL -->
-
-                <div class="hero-visual">
-
-                    <div class="hero-glow"></div>
-
-
-                    <div
-                        class="plant-circle"
-                        aria-label="Plant"
-                    >
-                        🌿
-                    </div>
-
-
-                    <div class="floating-card card-one">
-
-                        <span class="floating-icon">
-                            🔍
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                AI Detection
-                            </strong>
-
-                            <small>
-                                Instant Analysis
-                            </small>
-
+                        <div class="float-badge badge-bottom-left gold-badge">
+                            ★ <span data-i18n="badge_pro">Pro Feature Unlocked</span>
                         </div>
 
                     </div>
-
-
-                    <div class="floating-card card-two">
-
-                        <span class="floating-icon">
-                            ✓
-                        </span>
-
-                        <div>
-
-                            <strong>
-                                Plant Health
-                            </strong>
-
-                            <small>
-                                Smart Recommendations
-                            </small>
-
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="floating-dot dot-one"
-                        aria-hidden="true"
-                    ></div>
-
-                    <div
-                        class="floating-dot dot-two"
-                        aria-hidden="true"
-                    ></div>
-
                 </div>
 
             </div>
-
         </section>
-
-
 
         <!-- =================================================
-             PLANT DOCTOR
+             PLANT DOCTOR (SPLIT LAYOUT)
         ================================================== -->
-
-        <section
-            class="doctor-section"
-            id="doctor"
-        >
-
-            <div class="section-title">
-
-                <span class="small-title">
-                    AI PLANT DOCTOR
-                </span>
-
-                <h2>
-                    Diagnose Your Plant
-                </h2>
-
-                <p>
-                    Upload a clear image of your plant leaf
-                    and let Khadrwy analyze its health.
-                </p>
-
-            </div>
-
-
-            <div class="doctor-card">
-
-
-                <!-- UPLOAD AREA -->
-
-                <div
-                    class="upload-area"
-                    id="uploadArea"
-                >
-
-                    <div class="upload-icon">
-                        🌿
-                    </div>
-
-
-                    <h3>
-                        Upload Your Plant Image
-                    </h3>
-
-
-                    <p class="upload-description">
-                        Take a clear photo of a plant leaf
-                        or upload an existing image.
-                    </p>
-
-
-                    <div class="upload-options">
-
-
-                        <label
-                            class="upload-option"
-                            for="imageInput"
-                        >
-
-                            <span class="upload-option-icon">
-                                📁
-                            </span>
-
-                            Choose Image
-
-                        </label>
-
-
-                        <input
-                            type="file"
-                            id="imageInput"
-                            accept="image/*"
-                            hidden
-                        >
-
-
-                        <label
-                            class="upload-option"
-                            for="cameraInput"
-                        >
-
-                            <span class="upload-option-icon">
-                                📷
-                            </span>
-
-                            Take Photo
-
-                        </label>
-
-
-                        <input
-                            type="file"
-                            id="cameraInput"
-                            accept="image/*"
-                            capture="environment"
-                            hidden
-                        >
-
-                    </div>
-
-
-                    <span class="supported">
-                        JPG, JPEG, PNG • Max 10MB
+        <section class="doctor-section" id="doctor">
+            
+            <div class="doctor-header-top">
+                <div class="doctor-title-area">
+                    <span class="badge free-badge">
+                        <span class="status-dot"></span> <span data-i18n="doc_badge">FREE FEATURE — ACTIVE</span>
                     </span>
+                    <h2 class="serif-highlight" data-i18n="doc_title">AI Plant<br>Doctor</h2>
+                </div>
+                <div class="doctor-desc-area">
+                    <p data-i18n="doc_desc">Upload a photo of your crop and our AI diagnoses disease, pests, and nutrient deficiencies in seconds — completely free.</p>
+                </div>
+            </div>
+
+            <div class="doctor-workspace" id="doctorWorkspace">
+                
+                <!-- 1. UPLOAD CARD -->
+                <div class="upload-card" id="uploadCard">
+                    
+                    <div class="upload-icon-wrapper" id="uploadIconWrapper">
+                        <span id="defaultIcon">🌿</span>
+                        <img id="previewImage" src="" alt="Selected plant" style="display: none;">
+                    </div>
+                    
+                    <h3 data-i18n="up_title">Drop your plant photo here</h3>
+                    <p class="supported" data-i18n="up_support">Supports JPG, PNG, HEIC — Max 10MB</p>
+                    
+                    <div class="upload-options" id="uploadOptions">
+                        <label class="upload-btn" for="imageInput">
+                            <span class="btn-icon">📁</span> <span data-i18n="up_choose">Choose Image</span>
+                        </label>
+                        <input type="file" id="imageInput" accept="image/*" hidden>
+
+                        <label class="upload-btn camera-btn" for="cameraInput">
+                            <span class="btn-icon">📷</span> <span data-i18n="up_camera">Take Photo</span>
+                        </label>
+                        <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+                    </div>
+
+                    <div class="action-options" id="actionOptions" style="display: none;">
+                        <button type="button" class="action-btn dismiss-btn" id="removeButton">✕ <span data-i18n="up_dismiss">Dismiss</span></button>
+                        <button type="button" class="action-btn analyze-btn" id="analyzeButton">🔍 <span data-i18n="up_analyze">Analyze</span></button>
+                    </div>
+
+                    <div class="loading" id="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p data-i18n="up_loading">Analyzing...</p>
+                    </div>
 
                 </div>
 
-
-
-                <!-- PREVIEW -->
-
-                <div
-                    class="preview-container"
-                    id="previewContainer"
-                >
-
-                    <div class="preview-header">
-
-                        <span class="preview-label">
-                            Selected Image
-                        </span>
-
+                <!-- 2. RESULT CARD -->
+                <div class="result-card-modern" id="resultCard">
+                    
+                    <div class="result-header-modern">
+                        <div class="plant-id-area">
+                            <div class="plant-avatar" id="resultIcon">🍅</div>
+                            <div class="plant-name-info">
+                                <span class="label-sm" data-i18n="res_id_label">IDENTIFIED PLANT</span>
+                                <h3 id="resultPlant">Tomato — طماطم</h3>
+                            </div>
+                        </div>
+                        <div class="critical-badge" id="criticalBadge" data-i18n="res_critical">⚠ CRITICAL</div>
                     </div>
 
+                    <div class="result-body-modern">
+                        <div class="disease-info">
+                            <span class="label-sm" data-i18n="res_disease_label">Detected Disease / Condition</span>
+                            <h4 id="resultCondition">Late Blight (Phytophthora infestans)</h4>
+                        </div>
 
-                    <div class="preview-image-wrapper">
+                        <div class="confidence-info">
+                            <div class="conf-top">
+                                <span class="label-sm" data-i18n="res_conf_label">AI Confidence Score</span>
+                                <strong id="resultConfidence">98.3%</strong>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" id="confidenceProgress" style="width: 0%;"></div>
+                            </div>
+                        </div>
 
-                        <img
-                            id="previewImage"
-                            src=""
-                            alt="Selected plant"
-                        >
+                        <div class="treatment-box">
+                            <span class="label-sm title-treatment" data-i18n="res_treat_label">TREATMENT RECOMMENDATION</span>
+                            <p id="resultRecommendation">
+                                Apply copper-based fungicide immediately. Remove and destroy infected leaves.
+                            </p>
+                            <div id="resultDetails"></div>
+                        </div>
 
-
-                        <button
-                            type="button"
-                            class="remove-button"
-                            id="removeButton"
-                            aria-label="Remove image"
-                        >
-                            ✕
-                        </button>
-
+                        <button type="button" class="another-scan-btn" id="anotherButton">↻ <span data-i18n="res_scan_btn">Scan Another Plant</span></button>
                     </div>
-
-                </div>
-
-
-
-                <!-- ANALYZE BUTTON -->
-
-                <button
-                    type="button"
-                    class="analyze-button"
-                    id="analyzeButton"
-                    disabled
-                >
-                    🔍 Analyze Plant
-                </button>
-
-
-
-                <!-- LOADING -->
-
-                <div
-                    class="loading"
-                    id="loading"
-                >
-
-                    <div class="spinner"></div>
-
-                    <p>
-                        Analyzing your plant...
-                    </p>
-
-                </div>
-
-
-
-                <!-- RESULT -->
-
-                <div
-                    class="result-card"
-                    id="resultCard"
-                >
-
-                    <div class="result-header">
-
-                        <div
-                            class="result-icon"
-                            id="resultIcon"
-                        >
-                            🌿
-                        </div>
-
-
-                        <div>
-
-                            <span class="result-label">
-                                AI DIAGNOSIS
-                            </span>
-
-                            <h3>
-                                Analysis Result
-                            </h3>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <div class="result-info-grid">
-
-
-                        <div class="result-info-box">
-
-                            <span class="info-label">
-                                Plant
-                            </span>
-
-                            <strong id="resultPlant">
-                                -
-                            </strong>
-
-                        </div>
-
-
-                        <div class="result-info-box">
-
-                            <span class="info-label">
-                                Condition
-                            </span>
-
-                            <strong id="resultCondition">
-                                -
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- CONFIDENCE -->
-
-                    <div class="confidence-section">
-
-                        <div class="confidence-top">
-
-                            <span>
-                                Confidence
-                            </span>
-
-                            <strong id="resultConfidence">
-                                0%
-                            </strong>
-
-                        </div>
-
-
-                        <div class="progress-bar">
-
-                            <div
-                                class="progress"
-                                id="confidenceProgress"
-                            ></div>
-
-                        </div>
-
-
-                        <span
-                            class="confidence-level"
-                            id="confidenceLevel"
-                        >
-                            -
-                        </span>
-
-                    </div>
-
-
-
-                    <!-- RECOMMENDATION -->
-
-                    <div class="recommendation">
-
-                        <div class="recommendation-title">
-                            💡 Recommendation
-                        </div>
-
-
-                        <p id="resultRecommendation">
-                            -
-                        </p>
-
-
-                        <div id="resultDetails"></div>
-
-                    </div>
-
-
-
-                    <button
-                        type="button"
-                        class="another-button"
-                        id="anotherButton"
-                    >
-                        ↻ Analyze Another Plant
-                    </button>
 
                 </div>
 
             </div>
-
         </section>
-
-
 
         <!-- =================================================
              HOW IT WORKS
         ================================================== -->
-
-        <section
-            class="how-section"
-            id="how-it-works"
-        >
-
+        <section class="how-section" id="how-it-works">
             <div class="section-title">
-
-                <span class="small-title">
-                    HOW IT WORKS
-                </span>
-
-                <h2>
-                    Simple. Fast. Smart.
-                </h2>
-
-                <p>
-                    From a simple leaf photo to practical
-                    plant care advice.
-                </p>
-
+                <span class="small-title" data-i18n="how_badge">HOW IT WORKS</span>
+                <h2 data-i18n="how_title">Simple. Fast. Smart.</h2>
+                <p data-i18n="how_desc">From a simple leaf photo to practical plant care advice.</p>
             </div>
-
 
             <div class="steps">
-
-
                 <article class="step">
-
-                    <div class="step-number">
-                        01
-                    </div>
-
-                    <div class="step-icon">
-                        📷
-                    </div>
-
-                    <h3>
-                        Capture
-                    </h3>
-
-                    <p>
-                        Take a clear photo or upload an existing
-                        image of your plant leaf.
-                    </p>
-
+                    <div class="step-number">01</div>
+                    <div class="step-icon">📷</div>
+                    <h3 data-i18n="step_1_title">Capture</h3>
+                    <p data-i18n="step_1_desc">Take a clear photo or upload an existing image of your plant leaf.</p>
                 </article>
 
-
-
                 <article class="step">
-
-                    <div class="step-number">
-                        02
-                    </div>
-
-                    <div class="step-icon">
-                        🤖
-                    </div>
-
-                    <h3>
-                        Analyze
-                    </h3>
-
-                    <p>
-                        Our MobileNetV2 AI model analyzes the
-                        image and identifies the most likely
-                        condition.
-                    </p>
-
+                    <div class="step-number">02</div>
+                    <div class="step-icon">🤖</div>
+                    <h3 data-i18n="step_2_title">Analyze</h3>
+                    <p data-i18n="step_2_desc">Our MobileNetV2 AI model analyzes the image and identifies the most likely condition.</p>
                 </article>
 
-
-
                 <article class="step">
-
-                    <div class="step-number">
-                        03
-                    </div>
-
-                    <div class="step-icon">
-                        💡
-                    </div>
-
-                    <h3>
-                        Get Advice
-                    </h3>
-
-                    <p>
-                        Receive an AI diagnosis with symptoms,
-                        actions, and prevention tips.
-                    </p>
-
+                    <div class="step-number">03</div>
+                    <div class="step-icon">💡</div>
+                    <h3 data-i18n="step_3_title">Get Advice</h3>
+                    <p data-i18n="step_3_desc">Receive an AI diagnosis with symptoms, actions, and prevention tips.</p>
                 </article>
-
             </div>
-
         </section>
-
-
 
         <!-- =================================================
              MONITORING
         ================================================== -->
-
-        <section
-            class="monitoring-section"
-            id="monitoring"
-        >
-
+        <section class="monitoring-section" id="monitoring">
             <div class="monitoring-content">
-
-
                 <div class="monitoring-text">
-
-                    <span class="phase-badge">
-                        SMART MONITORING
-                    </span>
-
-
-                    <h2>
-                        Monitor Your Plants
-                    </h2>
-
-
-                    <p>
-                        Keep track of your plants and understand
-                        their health using smart agricultural
-                        monitoring.
-                    </p>
-
+                    <span class="phase-badge" data-i18n="mon_badge">SMART MONITORING</span>
+                    <h2 data-i18n="mon_title">Monitor Your Plants</h2>
+                    <p data-i18n="mon_desc">Keep track of your plants and understand their health using smart agricultural monitoring.</p>
                 </div>
-
 
                 <div class="sensor-grid">
-
-
                     <article class="sensor-card">
-
-                        <div class="sensor-icon">
-                            🌡️
-                        </div>
-
-                        <h3>
-                            Temperature
-                        </h3>
-
-                        <p>
-                            Monitor environmental temperature.
-                        </p>
-
+                        <div class="sensor-icon">🌡️</div>
+                        <h3 data-i18n="sens_temp">Temperature</h3>
+                        <p data-i18n="sens_temp_desc">Monitor environmental temperature.</p>
                     </article>
 
-
-
                     <article class="sensor-card">
-
-                        <div class="sensor-icon">
-                            💧
-                        </div>
-
-                        <h3>
-                            Humidity
-                        </h3>
-
-                        <p>
-                            Track air humidity around plants.
-                        </p>
-
+                        <div class="sensor-icon">💧</div>
+                        <h3 data-i18n="sens_hum">Humidity</h3>
+                        <p data-i18n="sens_hum_desc">Track air humidity around plants.</p>
                     </article>
 
-
-
                     <article class="sensor-card">
-
-                        <div class="sensor-icon">
-                            🌱
-                        </div>
-
-                        <h3>
-                            Soil Moisture
-                        </h3>
-
-                        <p>
-                            Monitor soil moisture levels.
-                        </p>
-
+                        <div class="sensor-icon">🌱</div>
+                        <h3 data-i18n="sens_soil">Soil Moisture</h3>
+                        <p data-i18n="sens_soil_desc">Monitor soil moisture levels.</p>
                     </article>
 
-
-
                     <article class="sensor-card">
-
-                        <div class="sensor-icon">
-                            ☀️
-                        </div>
-
-                        <h3>
-                            Light
-                        </h3>
-
-                        <p>
-                            Monitor available light conditions.
-                        </p>
-
+                        <div class="sensor-icon">☀️</div>
+                        <h3 data-i18n="sens_light">Light</h3>
+                        <p data-i18n="sens_light_desc">Monitor available light conditions.</p>
                     </article>
-
                 </div>
 
-
-                <div
-                    class="monitor-grid"
-                    style="margin-top: 30px;"
-                >
-
+                <div class="monitor-grid" style="margin-top: 30px;">
                     <article class="monitor-card">
-
-                        <div class="monitor-icon">
-                            📊
-                        </div>
-
-                        <h3>
-                            Plant Health
-                        </h3>
-
-                        <div class="monitor-value">
-                            Healthy
-                        </div>
-
-                        <p>
-                            Current plant health status.
-                        </p>
-
+                        <div class="monitor-icon">📊</div>
+                        <h3 data-i18n="mon_stat_1">Plant Health</h3>
+                        <div class="monitor-value" data-i18n="mon_stat_1_val">Healthy</div>
+                        <p data-i18n="mon_stat_1_desc">Current plant health status.</p>
                     </article>
 
-
                     <article class="monitor-card">
-
-                        <div class="monitor-icon">
-                            🟢
-                        </div>
-
-                        <h3>
-                            System Status
-                        </h3>
-
-                        <div class="monitor-value">
-                            Online
-                        </div>
-
-                        <p>
-                            Monitoring system is ready.
-                        </p>
-
+                        <div class="monitor-icon">🟢</div>
+                        <h3 data-i18n="mon_stat_2">System Status</h3>
+                        <div class="monitor-value" data-i18n="mon_stat_2_val">Online</div>
+                        <p data-i18n="mon_stat_2_desc">Monitoring system is ready.</p>
                     </article>
-
                 </div>
-
             </div>
-
         </section>
-
-
 
         <!-- =================================================
              AI ASSISTANT
         ================================================== -->
-
-        <section
-            class="assistant-section"
-            id="assistant"
-        >
-
+        <section class="assistant-section" id="assistant">
             <div class="assistant-content">
-
                 <div class="section-title">
-
-                    <span class="small-title">
-                        AI ASSISTANT
-                    </span>
-
-                    <h2>
-                        Your Smart Farming Assistant
-                    </h2>
-
-                    <p>
-                        Ask questions about plant diseases,
-                        plant care, and smart agriculture.
-                    </p>
-
+                    <span class="small-title" data-i18n="ast_badge">AI ASSISTANT</span>
+                    <h2 data-i18n="ast_title">Your Smart Farming Assistant</h2>
+                    <p data-i18n="ast_desc">Ask questions about plant diseases, plant care, and smart agriculture.</p>
                 </div>
-
 
                 <div class="assistant-card">
-
-                    <div class="assistant-icon">
-                        🤖
-                    </div>
-
-
-                    <h3>
-                        Khadrwy AI Assistant
-                    </h3>
-
-
-                    <p>
-                        Your intelligent companion for
-                        plant care and agricultural guidance.
-                    </p>
-
+                    <div class="assistant-icon">🤖</div>
+                    <h3 data-i18n="ast_card_title">Khadrwy AI Assistant</h3>
+                    <p data-i18n="ast_card_desc">Your intelligent companion for plant care and agricultural guidance.</p>
 
                     <div class="chat-placeholder">
-
-                        <span>
-                            💬
-                        </span>
-
-                        <p>
-                            AI Assistant coming soon...
-                        </p>
-
+                        <span>💬</span>
+                        <p data-i18n="ast_soon">AI Assistant coming soon...</p>
                     </div>
-
                 </div>
-
             </div>
-
         </section>
-
-
 
         <!-- =================================================
              ABOUT
         ================================================== -->
-
-        <section
-            class="about-section"
-            id="about"
-        >
-
+        <section class="about-section" id="about">
             <div class="about-content">
-
-                <span class="small-title">
-                    ABOUT KHADRWY
-                </span>
-
-
-                <h2>
-                    Smarter Agriculture with
-                    <span>
-                        AI.
-                    </span>
-                </h2>
-
-
-                <p>
-                    Khadrwy is an AI-powered agricultural
-                    platform designed to help farmers and
-                    plant owners detect plant diseases,
-                    understand plant health, and receive
-                    practical recommendations.
-                </p>
-
+                <span class="small-title" data-i18n="abt_badge">ABOUT KHADRWY</span>
+                <h2 data-i18n="abt_title">Smarter Agriculture with <span>AI.</span></h2>
+                <p data-i18n="abt_desc">Khadrwy is an AI-powered agricultural platform designed to help farmers and plant owners detect plant diseases, understand plant health, and receive practical recommendations.</p>
 
                 <div class="about-features">
-
-                    <div>
-                        🌿 AI Plant Diagnosis
-                    </div>
-
-                    <div>
-                        🤖 MobileNetV2
-                    </div>
-
-                    <div>
-                        📊 Smart Monitoring
-                    </div>
-
-                    <div>
-                        💡 Smart Recommendations
-                    </div>
-
+                    <div data-i18n="abt_f1">🌿 AI Plant Diagnosis</div>
+                    <div data-i18n="abt_f2">🤖 MobileNetV2</div>
+                    <div data-i18n="abt_f3">📊 Smart Monitoring</div>
+                    <div data-i18n="abt_f4">💡 Smart Recommendations</div>
                 </div>
-
             </div>
-
         </section>
 
     </main>
 
-
-
     <!-- =====================================================
          FOOTER
     ====================================================== -->
-
     <footer>
-
-        <div class="footer-logo">
-            🌱 Khadrwy
-        </div>
-
-
-        <p>
-            Smart Agriculture. Powered by AI.
-        </p>
-
+        <div class="footer-logo">🌱 <span data-i18n="ftr_logo">Khadrwy</span></div>
+        <p data-i18n="ftr_desc">Smart Agriculture. Powered by AI.</p>
 
         <div class="footer-links">
-
-            <a href="#home">
-                Home
-            </a>
-
-            <a href="#doctor">
-                Plant Doctor
-            </a>
-
-            <a href="#monitoring">
-                Monitoring
-            </a>
-
-            <a href="#assistant">
-                AI Assistant
-            </a>
-
-            <a href="#about">
-                About
-            </a>
-
+            <a href="#home" data-i18n="nav_home">Home</a>
+            <a href="#doctor" data-i18n="nav_doctor">Plant Doctor</a>
+            <a href="#monitoring" data-i18n="nav_monitor">Monitoring</a>
+            <a href="#assistant" data-i18n="nav_assist">AI Assistant</a>
+            <a href="#about" data-i18n="nav_about">About</a>
         </div>
 
-
-        <span>
-            © 2026 Khadrwy. All rights reserved.
-        </span>
-
+        <span data-i18n="ftr_copy">© 2026 Khadrwy. All rights reserved.</span>
     </footer>
-
-
 
     <!-- =====================================================
          JAVASCRIPT
     ====================================================== -->
-
     <script src="script.js"></script>
 
 </body>
-
 </html>
