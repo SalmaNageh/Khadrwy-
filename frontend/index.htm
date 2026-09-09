@@ -185,10 +185,7 @@
             </div>
         </section>
 
-        <!-- =================================================
-             PLANT DOCTOR (SPLIT LAYOUT)
-        ================================================== -->
-        <section class="doctor-section" id="doctor">
+ <section class="doctor-section" id="doctor">
             
             <div class="doctor-header-top">
                 <div class="doctor-title-area">
@@ -237,11 +234,15 @@
                         <p data-i18n="up_loading">Analyzing...</p>
                     </div>
 
+                    <!-- 🪄 زرار فحص نبات آخر بقى مكانه هنا تحت الصورة جة الـ Upload Card -->
+                    <button type="button" class="another-scan-btn" id="anotherButton" style="display: none;">
+                        ↻ <span data-i18n="res_scan_btn">Scan Another Plant</span>
+                    </button>
+
                 </div>
 
                 <!-- 2. RESULT CARD -->
-                <div class="result-card-modern" id="resultCard">
-                    
+                <div class="result-card-modern" id="resultCard" style="display: none;">                    
                     <div class="result-header-modern">
                         <div class="plant-id-area">
                             <div class="plant-avatar" id="resultIcon">🍅</div>
@@ -276,8 +277,6 @@
                             </p>
                             <div id="resultDetails"></div>
                         </div>
-
-                        <button type="button" class="another-scan-btn" id="anotherButton">↻ <span data-i18n="res_scan_btn">Scan Another Plant</span></button>
                     </div>
 
                 </div>

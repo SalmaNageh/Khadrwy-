@@ -1281,7 +1281,7 @@ const localTranslations = {
     "Strawberry": "فراولة",
     "Squash": "كوسا",
     "Pepper": "فلفل",
-    
+
     // --- أسماء الأمراض (الأكثر شيوعاً) ---
     "Bacterial spot": "تبقع بكتيري",
     "Late blight": "لفحة متأخرة",
@@ -1736,6 +1736,9 @@ function displayResult(data) {
     // -------------------------------------------------
 
     if (resultCard) {
+        document.getElementById("anotherButton").style.display = "block";
+        // السطر ده بيرجع يظهر الكارت تاني بعد التحليل
+        resultCard.style.display = "flex";
 
         resultCard.classList.add(
             "show"
@@ -1763,10 +1766,10 @@ function displayResult(data) {
 function getLocalTranslation(text) {
     if (!text) return "";
     const currentLang = document.documentElement.lang || 'en';
-    
+
     if (currentLang === 'en') return text;
-    
-    return localTranslations[text] || text; 
+
+    return localTranslations[text] || text;
 }
 
 // =====================================================
@@ -2122,7 +2125,7 @@ const translations = {
         btn_login: "Login",
         btn_signup: "Sign Up",
         btn_logout: "Logout",
-        
+
         // Auth Modals
         auth_login_title: "Welcome Back",
         auth_login_desc: "Login to your Khadrwy account.",
@@ -2137,7 +2140,7 @@ const translations = {
         auth_signup_btn: "Create Account",
         auth_has_acc: "Already have an account?",
         auth_login_link: "Login",
-        
+
         // Placeholders (handled via data-i18n-placeholder)
         auth_user_ph: "Enter your username",
         auth_pass_ph: "Enter your password",
@@ -2168,7 +2171,7 @@ const translations = {
         up_dismiss: "Dismiss",
         up_analyze: "Analyze",
         up_loading: "Analyzing...",
-        
+
         // Result Card
         res_id_label: "IDENTIFIED PLANT",
         res_critical: "⚠ CRITICAL",
@@ -2241,7 +2244,7 @@ const translations = {
         auth_signup_btn: "إنشاء حساب",
         auth_has_acc: "لديك حساب بالفعل؟",
         auth_login_link: "تسجيل الدخول",
-        
+
         // Placeholders
         auth_user_ph: "أدخل اسم المستخدم",
         auth_pass_ph: "أدخل كلمة المرور",
@@ -2327,14 +2330,14 @@ function setLanguage(lang) {
     document.documentElement.lang = lang;
 
     if (lang === 'ar') {
-        if(btnAr) btnAr.classList.add('active');
-        if(btnEn) btnEn.classList.remove('active');
+        if (btnAr) btnAr.classList.add('active');
+        if (btnEn) btnEn.classList.remove('active');
         // تعديلات ستايل إضافية للعربي عشان الخط يكون متناسق
         document.body.style.fontFamily = "'Cairo', Arial, sans-serif";
         document.querySelectorAll('.serif-highlight').forEach(el => el.style.fontFamily = "'Cairo', serif");
     } else {
-        if(btnEn) btnEn.classList.add('active');
-        if(btnAr) btnAr.classList.remove('active');
+        if (btnEn) btnEn.classList.add('active');
+        if (btnAr) btnAr.classList.remove('active');
         document.body.style.fontFamily = "Arial, Helvetica, sans-serif";
         document.querySelectorAll('.serif-highlight').forEach(el => el.style.fontFamily = "'Georgia', serif");
     }
@@ -2344,7 +2347,7 @@ function setLanguage(lang) {
         const key = el.getAttribute('data-i18n');
         if (translations[lang][key]) {
             // لو كان العنوان بتاع الصفحة
-            if(el.tagName === 'TITLE') {
+            if (el.tagName === 'TITLE') {
                 document.title = translations[lang][key];
             } else {
                 el.innerHTML = translations[lang][key];
@@ -2375,17 +2378,17 @@ document.addEventListener("DOMContentLoaded", () => {
 // =====================================================
 document.addEventListener("DOMContentLoaded", () => {
     // استخدمنا anotherButton زي ما هو مكتوب في الـ HTML عندك
-    const resetBtn = document.getElementById("anotherButton"); 
-    const cardToHide = document.getElementById("resultCard"); 
+    const resetBtn = document.getElementById("anotherButton");
+    const cardToHide = document.getElementById("resultCard");
 
     if (resetBtn) {
         resetBtn.addEventListener("click", (e) => {
             e.preventDefault(); // منع أي تحديث للصفحة
-
+            document.getElementById("anotherButton").style.display = "none";
             if (cardToHide) {
                 // إخفاء الكارت نهائياً
                 cardToHide.classList.remove("show");
-                cardToHide.style.display = "none"; 
+                cardToHide.style.display = "none";
             }
 
             // تمرير الشاشة لفوق عند مربع سحب الصورة

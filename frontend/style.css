@@ -488,10 +488,30 @@ input {
     margin: 0 auto;
     transition: all 0.5s ease;
 }
-
 .doctor-workspace.has-result {
     max-width: 1100px;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1.2fr; /* كبرنا مساحة النتيجة سيكا عشان تاخد راحتها */
+    gap: 40px;
+    align-items: center; /* 🪄 ده السحر اللي هيخلي كارت الصورة مربع في النص وميطولش */
+}
+
+/* تنسيق زرار فحص نبات آخر لما يتنقل تحت الصورة */
+#anotherButton {
+    margin-top: 25px;
+    width: 100%;
+    padding: 12px;
+    background-color: #f4f8f4;
+    border: 1px solid #ddebdd;
+    color: #2e7d32;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: none; /* هنخبيه في البداية لحد ما النتيجة تظهر */
+}
+
+#anotherButton:hover {
+    background-color: #eaf3eb;
 }
 
 /* =====================================================
