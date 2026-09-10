@@ -1509,8 +1509,8 @@ const localTranslations = {
     "Monitor plants regularly.": "مراقبة النباتات بانتظام.",
     "Maintain proper spacing.": "حافظ على مسافات مناسبة.",
     "Avoid prolonged leaf wetness.": "تجنب بلل الأوراق لفترات طويلة.",
-    "Remove severely infected leaves.": "قم بإزالة الأوراق المصابة بشدة."
-};
+    "Remove severely infected leaves.": "قم بإزالة الأوراق المصابة بشدة.",
+}
 // =====================================================
 // DISPLAY RESULT
 // =====================================================
@@ -1735,8 +1735,14 @@ function displayResult(data) {
     // Show result
     // -------------------------------------------------
 
-    if (resultCard) {
+if (resultCard) {
+        // إظهار زرار فحص نبات آخر
         document.getElementById("anotherButton").style.display = "block";
+        
+        // 🪄 السطرين دول هما اللي هيظهروا زرار القراءة!
+        const speakBtn = document.getElementById("speakResultButton");
+        if (speakBtn) speakBtn.style.display = "block";
+
         // السطر ده بيرجع يظهر الكارت تاني بعد التحليل
         resultCard.style.display = "flex";
 
@@ -1771,7 +1777,259 @@ function getLocalTranslation(text) {
 
     return localTranslations[text] || text;
 }
+// =====================================================
+// TEXT TO SPEECH - RESULT
+// =====================================================
 
+const speakResultButton =
+    document.getElementById("speakResultButton");
+
+let speechUtterance = null;
+
+
+// =====================================================
+// GET RESULT TEXT
+// =====================================================
+
+function getResultTextForSpeech() {
+
+    const lang =
+        document.documentElement.lang || "en";
+
+    let text = "";
+
+
+    // -------------------------------------------------
+    // Plant
+    // -------------------------------------------------
+
+    if (resultPlant && resultPlant.textContent.trim()) {
+
+        text +=
+            lang === "ar"
+                ? `النبات المكتشف هو ${resultPlant.textContent}. `
+                : `The identified plant is ${resultPlant.textContent}. `;
+    }
+
+
+    // -------------------------------------------------
+    // Condition
+    // -------------------------------------------------
+
+    if (resultCondition && resultCondition.textContent.trim()) {
+
+        text +=
+            lang === "ar"
+                ? `الحالة أو المرض المكتشف هو ${resultCondition.textContent}. `
+                : `The detected disease or condition is ${resultCondition.textContent}. `;
+    }
+
+
+    // -------------------------------------------------
+    // Confidence
+    // -------------------------------------------------
+
+    if (resultConfidence && resultConfidence.textContent.trim()) {
+
+        text +=
+            lang === "ar"
+                ? `نسبة ثقة الذكاء الاصطناعي هي ${resultConfidence.textContent}. `
+                : `The AI confidence score is ${resultConfidence.textContent}. `;
+    }
+
+
+    // -------------------------------------------------
+    // Recommendation
+    // -------------------------------------------------
+
+    if (
+        resultRecommendation &&
+        resultRecommendation.textContent.trim()
+    ) {
+
+        text +=
+            lang === "ar"
+                ? `التوصية: ${resultRecommendation.textContent}. `
+                : `Recommendation: ${resultRecommendation.textContent}. `;
+    }
+
+
+    // -------------------------------------------------
+    // Details
+    // -------------------------------------------------
+
+    if (resultDetails) {
+
+        const sections =
+            resultDetails.querySelectorAll(
+                ".recommendation-list"
+            );
+
+
+        sections.forEach(function (section) {
+
+            const heading =
+                section.querySelector("h4");
+
+            const items =
+                section.querySelectorAll("li");
+
+
+            if (heading) {
+
+                text +=
+                    `${heading.textContent}. `;
+            }
+
+
+            items.forEach(function (item) {
+
+                text +=
+                    `${item.textContent}. `;
+            });
+
+        });
+    }
+
+
+    return text.trim();
+}
+
+
+// =====================================================
+// SPEAK RESULT
+// =====================================================
+
+function speakResult() {
+
+    if (!("speechSynthesis" in window)) {
+
+        alert(
+            "Text-to-speech is not supported by your browser."
+        );
+
+        return;
+    }
+
+
+    const text =
+        getResultTextForSpeech();
+
+
+    if (!text) {
+        return;
+    }
+
+
+    // إيقاف أي قراءة شغالة
+    window.speechSynthesis.cancel();
+
+
+    const lang =
+        document.documentElement.lang || "en";
+
+
+    speechUtterance =
+        new SpeechSynthesisUtterance(text);
+
+
+    // تحديد اللغة
+    if (lang === "ar") {
+
+        speechUtterance.lang =
+            "ar-EG";
+
+    } else {
+
+        speechUtterance.lang =
+            "en-US";
+    }
+
+
+    speechUtterance.rate = 0.9;
+    speechUtterance.pitch = 1;
+    speechUtterance.volume = 1;
+
+
+    // -------------------------------------------------
+    // تغيير شكل الزر أثناء القراءة
+    // -------------------------------------------------
+
+    if (speakResultButton) {
+
+        speakResultButton.textContent =
+            lang === "ar"
+                ? "⏹ إيقاف القراءة"
+                : "⏹ Stop Reading";
+    }
+
+
+    speechUtterance.onend =
+        function () {
+
+            updateSpeakButton();
+        };
+
+
+    speechUtterance.onerror =
+        function () {
+
+            updateSpeakButton();
+        };
+
+
+    window.speechSynthesis.speak(
+        speechUtterance
+    );
+}
+
+
+// =====================================================
+// UPDATE SPEAK BUTTON
+// =====================================================
+
+function updateSpeakButton() {
+
+    if (!speakResultButton) {
+        return;
+    }
+
+
+    const lang =
+        document.documentElement.lang || "en";
+
+
+    speakResultButton.textContent =
+        lang === "ar"
+            ? "🔊 قراءة النتيجة"
+            : "🔊 Read Result";
+}
+
+
+// =====================================================
+// BUTTON CLICK
+// =====================================================
+
+if (speakResultButton) {
+
+    speakResultButton.addEventListener(
+        "click",
+        function () {
+
+            if (window.speechSynthesis.speaking) {
+
+                window.speechSynthesis.cancel();
+
+                updateSpeakButton();
+
+            } else {
+
+                speakResult();
+            }
+
+        }
+    );
+}
 // =====================================================
 // CONFIDENCE LEVEL
 // =====================================================
@@ -2109,6 +2367,9 @@ if (hamburgerBtn && navContainer) {
 // =====================================================
 // TRANSLATION & BILINGUAL SUPPORT (EN/AR)
 // =====================================================
+// =====================================================
+// TRANSLATION & BILINGUAL SUPPORT (EN/AR)
+// =====================================================
 
 const btnEn = document.getElementById("btnEn");
 const btnAr = document.getElementById("btnAr");
@@ -2141,7 +2402,7 @@ const translations = {
         auth_has_acc: "Already have an account?",
         auth_login_link: "Login",
 
-        // Placeholders (handled via data-i18n-placeholder)
+        // Placeholders
         auth_user_ph: "Enter your username",
         auth_pass_ph: "Enter your password",
         auth_user_ph2: "Choose a username",
@@ -2149,7 +2410,7 @@ const translations = {
         auth_pass_ph2: "Create a password",
 
         // Hero
-        hero_badge: "AI-Powered Agricultural Platform — خضراوي",
+        hero_badge: "AI-Powered Agricultural Platform — Khadrwy",
         hero_title: "Smart Care for <br><span class='serif-highlight'>Healthier Plants.</span>",
         hero_desc: "Detect diseases instantly, monitor your farm in real-time, and get AI-driven recommendations — in Arabic or English. Built for every farmer, from smallholders to agri-enterprises.",
         hero_btn_start: "Diagnose Your Plant &rarr;",
@@ -2180,43 +2441,86 @@ const translations = {
         res_treat_label: "TREATMENT RECOMMENDATION",
         res_scan_btn: "Scan Another Plant",
 
-        // How it Works
+        // --- How it Works ---
         how_badge: "HOW IT WORKS",
-        how_title: "Simple. Fast. Smart.",
+        how_title: "Diagnosis Made Simple",
         how_desc: "From a simple leaf photo to practical plant care advice.",
-        step_1_title: "Capture", step_1_desc: "Take a clear photo or upload an existing image of your plant leaf.",
-        step_2_title: "Analyze", step_2_desc: "Our MobileNetV2 AI model analyzes the image and identifies the most likely condition.",
-        step_3_title: "Get Advice", step_3_desc: "Receive an AI diagnosis with symptoms, actions, and prevention tips.",
+        step_1_title: "Capture", 
+        step_1_desc: "Take a clear photo or upload an existing image of your plant leaf.",
+        step_2_title: "Analyze", 
+        step_2_desc: "Our AI model analyzes the image and identifies the most likely condition.",
+        step_3_title: "Get Advice", 
+        step_3_desc: "Receive an AI diagnosis with symptoms, actions, and prevention tips.",
 
-        // Monitoring
+        // --- Smart Monitoring ---
         mon_badge: "SMART MONITORING",
-        mon_title: "Monitor Your Plants",
-        mon_desc: "Keep track of your plants and understand their health using smart agricultural monitoring.",
-        sens_temp: "Temperature", sens_temp_desc: "Monitor environmental temperature.",
-        sens_hum: "Humidity", sens_hum_desc: "Track air humidity around plants.",
-        sens_soil: "Soil Moisture", sens_soil_desc: "Monitor soil moisture levels.",
-        sens_light: "Light", sens_light_desc: "Monitor available light conditions.",
-        mon_stat_1: "Plant Health", mon_stat_1_val: "Healthy", mon_stat_1_desc: "Current plant health status.",
-        mon_stat_2: "System Status", mon_stat_2_val: "Online", mon_stat_2_desc: "Monitoring system is ready.",
+        mon_title: "Your Farm, Always<br>in Sight",
+        mon_desc: "Real-time environmental data from precision sensors deployed across your fields<br>— delivered to you instantly, interpreted intelligently.",
+        sens_temp_label: "AIR TEMPERATURE",
+        sens_hum_label: "HUMIDITY",
+        sens_soil_label: "SOIL MOISTURE",
+        sens_light_label: "LIGHT INTENSITY",
+        status_optimal: "Optimal",
+        status_normal: "Normal",
+        status_review: "Review",
+        status_high: "High",
 
-        // AI Assistant
-        ast_badge: "AI ASSISTANT",
-        ast_title: "Your Smart Farming Assistant",
-        ast_desc: "Ask questions about plant diseases, plant care, and smart agriculture.",
-        ast_card_title: "Khadrwy AI Assistant",
-        ast_card_desc: "Your intelligent companion for plant care and agricultural guidance.",
-        ast_soon: "AI Assistant coming soon...",
+        // --- AI Assistant ---
+        ai_badge: "AI ASSISTANT",
+        ai_title: "Your Expert Agronomist,<br>Available 24 / 7",
+        ai_desc: "Khadrawy's AI speaks your language — ask anything from soil chemistry to harvest timing. It learns your farm, so advice gets sharper over time.",
+        ai_feat1_title: "Instant advice",
+        ai_feat1_desc: "Actionable answers in seconds — no waiting, no call centres.",
+        ai_feat2_title: "Pest & disease identification",
+        ai_feat2_desc: "Upload a photo and get a diagnosis with a treatment plan.",
+        ai_feat3_title: "Seasonal crop planning",
+        ai_feat3_desc: "Personalised sowing and irrigation schedules built around your climate.",
+        ai_feat4_title: "Arabic & English support",
+        ai_feat4_desc: "Switch languages mid-conversation — the AI keeps up.",
+        chat_name: "Khadrawy AI",
+        chat_welcome: "Hello! I'm here to help with your crops. What's on your mind today?",
+        chat_placeholder: "Ask anything about your farm...",
 
-        // About
-        abt_badge: "ABOUT KHADRWY",
-        abt_title: "Smarter Agriculture with <span class='serif-highlight'>AI.</span>",
-        abt_desc: "Khadrwy is an AI-powered agricultural platform designed to help farmers and plant owners detect plant diseases, understand plant health, and receive practical recommendations.",
-        abt_f1: "🌿 AI Plant Diagnosis", abt_f2: "🤖 MobileNetV2", abt_f3: "📊 Smart Monitoring", abt_f4: "💡 Smart Recommendations",
+        // About (Our Mission)
+        abt_mission_badge: "OUR MISSION",
+        abt_mission_title: "Empowering Farmers with AI",
+        abt_mission_desc: "Khadrawy was founded on a simple conviction: every farmer — regardless of farm size or technical background — deserves access to world-class agricultural intelligence.",
+        abt_card1_title: "Sustainability",
+        abt_card1_desc: "We design every feature to reduce chemical use, conserve water, and protect soil health — because long-term yield depends on long-term stewardship.",
+        abt_card2_title: "Innovation",
+        abt_card2_desc: "From satellite imagery to in-field sensor networks, we combine the best available technology to give farmers an edge rooted in evidence, not guesswork.",
+        abt_card3_title: "Community",
+        abt_card3_desc: "We grow stronger together. Khadrawy connects farmers, agronomists, and researchers into a shared knowledge network that benefits everyone on the platform.",
+        abt_stat1_label: "ACTIVE FARMERS",
+        abt_stat2_label: "HECTARES MONITORED",
+        abt_stat3_label: "SATISFACTION RATE",
+        abt_stat4_label: "AI AVAILABILITY",
 
         // Footer
-        ftr_logo: "Khadrwy",
-        ftr_desc: "Smart Agriculture. Powered by AI.",
-        ftr_copy: "© 2026 Khadrwy. All rights reserved."
+        ftr_brand_desc: "Precision agriculture intelligence for the farmers who feed the world. Smarter growing starts here.",
+        ftr_quick_links: "QUICK LINKS",
+        ftr_link_home: "Home",
+        ftr_link_monitor: "Smart Monitoring",
+        ftr_link_ai: "AI Assistant",
+        ftr_link_about: "About Us",
+        ftr_link_pricing: "Pricing",
+        ftr_link_contact: "Contact",
+        ftr_resources: "RESOURCES",
+        ftr_link_docs: "Documentation",
+        ftr_link_blog: "Blog & Insights",
+        ftr_link_guides: "Crop Guides",
+        ftr_link_api: "API Access",
+        ftr_link_support: "Support Centre",
+        ftr_link_forum: "Community Forum",
+        ftr_newsletter: "STAY IN THE KNOW",
+        ftr_news_desc: "Seasonal tips, new features, and agronomy insights — delivered monthly. No spam.",
+        ftr_news_ph: "your@email.com",
+        ftr_news_btn: "Subscribe",
+        ftr_news_privacy: "We respect your privacy. Unsubscribe any time.",
+        ftr_copyright: "© 2026 Khadrawy — خضراوي. All rights reserved.",
+        ftr_privacy: "Privacy Policy",
+        ftr_terms: "Terms of Service",
+        ftr_cookies: "Cookie Settings"
     },
     ar: {
         // Head & Nav
@@ -2253,7 +2557,7 @@ const translations = {
         auth_pass_ph2: "أنشئ كلمة مرور",
 
         // Hero
-        hero_badge: "منصة زراعية مدعومة بالذكاء الاصطناعي — Khadrwy",
+        hero_badge: "منصة زراعية مدعومة بالذكاء الاصطناعي — خضراوي",
         hero_title: "رعاية ذكية لـ <br><span class='serif-highlight'>محاصيل أكثر صحة.</span>",
         hero_desc: "اكتشف الأمراض فوراً، راقب مزرعتك في الوقت الفعلي، واحصل على توصيات دقيقة بالذكاء الاصطناعي — صُمم ليناسب كل مزارع.",
         hero_btn_start: "افحص نباتك الآن &larr;",
@@ -2284,43 +2588,86 @@ const translations = {
         res_treat_label: "توصيات العلاج",
         res_scan_btn: "فحص نبات آخر",
 
-        // How it Works
-        how_badge: "كيف يعمل",
-        how_title: "بسيط. سريع. ذكي.",
+        // --- How it Works ---
+        how_badge: "كيف يعمل؟",
+        how_title: "التشخيص الزراعي أصبح أسهل",
         how_desc: "من مجرد صورة لورقة النبات إلى نصائح عملية للعناية به.",
-        step_1_title: "التقط الصورة", step_1_desc: "التقط صورة واضحة أو ارفع صورة موجودة لورقة النبات.",
-        step_2_title: "التحليل الذكي", step_2_desc: "يقوم نموذج MobileNetV2 الخاص بنا بتحليل الصورة وتحديد الحالة.",
-        step_3_title: "تلقي النصيحة", step_3_desc: "احصل على تشخيص دقيق مع الأعراض وإجراءات العلاج.",
+        step_1_title: "التقط صورة", 
+        step_1_desc: "التقط صورة واضحة أو ارفع صورة موجودة لورقة نباتك.",
+        step_2_title: "الفحص والتحليل", 
+        step_2_desc: "يقوم نموذج الذكاء الاصطناعي الخاص بنا بتحليل الصورة وتحديد الحالة الأكثر احتمالاً.",
+        step_3_title: "احصل على النصيحة", 
+        step_3_desc: "احصل على تشخيص دقيق مع الأعراض، والإجراءات، ونصائح الوقاية.",
 
-        // Monitoring
+        // --- Smart Monitoring ---
         mon_badge: "المراقبة الذكية",
-        mon_title: "راقب نباتاتك",
-        mon_desc: "تتبع حالة محاصيلك وافهم احتياجاتها باستخدام تقنيات الزراعة الذكية.",
-        sens_temp: "الحرارة", sens_temp_desc: "مراقبة درجة حرارة البيئة المحيطة.",
-        sens_hum: "الرطوبة", sens_hum_desc: "تتبع رطوبة الهواء حول النباتات.",
-        sens_soil: "رطوبة التربة", sens_soil_desc: "مراقبة مستويات المياه في التربة.",
-        sens_light: "الإضاءة", sens_light_desc: "مراقبة ظروف الإضاءة المتاحة.",
-        mon_stat_1: "صحة النبات", mon_stat_1_val: "جيدة", mon_stat_1_desc: "الحالة الصحية الحالية للنبات.",
-        mon_stat_2: "حالة النظام", mon_stat_2_val: "متصل", mon_stat_2_desc: "نظام المراقبة جاهز ويعمل.",
+        mon_title: "مزرعتك، دائماً<br>تحت نظرك",
+        mon_desc: "بيانات بيئية لحظية من مستشعرات دقيقة موزعة في حقلك<br>— تصلك فوراً، وتُحلل بذكاء.",
+        sens_temp_label: "درجة حرارة الهواء",
+        sens_hum_label: "الرطوبة",
+        sens_soil_label: "رطوبة التربة",
+        sens_light_label: "شدة الإضاءة",
+        status_optimal: "مثالي",
+        status_normal: "طبيعي",
+        status_review: "يحتاج مراجعة",
+        status_high: "مرتفع",
 
-        // AI Assistant
-        ast_badge: "المساعد الذكي",
-        ast_title: "مساعدك الزراعي الذكي",
-        ast_desc: "اطرح أسئلة حول أمراض النباتات وطرق العناية والزراعة الذكية.",
-        ast_card_title: "مساعد خضراوي الذكي",
-        ast_card_desc: "رفيقك الذكي للحصول على الإرشادات الزراعية الدقيقة.",
-        ast_soon: "المساعد الذكي سيكون متاحاً قريباً...",
+        // --- AI Assistant ---
+        ai_badge: "المساعد الذكي",
+        ai_title: "مهندسك الزراعي الخبير،<br>متاح على مدار الساعة",
+        ai_desc: "الذكاء الاصطناعي في خضراوي يتحدث لغتك — اسأل عن أي شيء من كيمياء التربة إلى مواعيد الحصاد. إنه يتعلم تفاصيل مزرعتك لتصبح النصائح أدق بمرور الوقت.",
+        ai_feat1_title: "نصائح فورية",
+        ai_feat1_desc: "إجابات عملية في ثوانٍ — بلا انتظار، وبلا حاجة لمراكز الاتصال.",
+        ai_feat2_title: "التعرف على الآفات والأمراض",
+        ai_feat2_desc: "ارفع صورة واحصل على تشخيص دقيق مع خطة علاج متكاملة.",
+        ai_feat3_title: "تخطيط المحاصيل الموسمي",
+        ai_feat3_desc: "جداول مخصصة للزراعة والري مصممة خصيصاً لتناسب مناخ منطقتك.",
+        ai_feat4_title: "دعم باللغتين العربية والإنجليزية",
+        ai_feat4_desc: "بدّل بين اللغتين في منتصف المحادثة — والذكاء الاصطناعي سيجاريك بسهولة.",
+        chat_name: "خضراوي AI",
+        chat_welcome: "أهلاً بك! أنا هنا لمساعدتك في محاصيلك. بم تفكر اليوم؟",
+        chat_placeholder: "اسأل عن أي شيء يخص مزرعتك...",
 
-        // About
-        abt_badge: "عن خضراوي",
-        abt_title: "زراعة أذكى مع <span class='serif-highlight'>الذكاء الاصطناعي.</span>",
-        abt_desc: "خضراوي هي منصة زراعية ذكية مصممة لمساعدة المزارعين وأصحاب النباتات على اكتشاف الأمراض وفهم حالة النبات وتلقي التوصيات.",
-        abt_f1: "🌿 تشخيص ذكي", abt_f2: "🤖 نموذج MobileNetV2", abt_f3: "📊 مراقبة ذكية", abt_f4: "💡 توصيات دقيقة",
+        // About (Our Mission)
+        abt_mission_badge: "مهمتنا",
+        abt_mission_title: "تمكين المزارعين من خلال الذكاء الاصطناعي",
+        abt_mission_desc: "تأسست خضراوي على قناعة بسيطة: كل مزارع — بغض النظر عن حجم مزرعته أو خلفيته التقنية — يستحق الوصول إلى ذكاء زراعي بمستوى عالمي.",
+        abt_card1_title: "الاستدامة",
+        abt_card1_desc: "نصمم كل ميزة لتقليل استخدام المواد الكيميائية، والحفاظ على المياه، وحماية صحة التربة — لأن المحصول طويل الأجل يعتمد على الرعاية طويلة الأجل.",
+        abt_card2_title: "الابتكار",
+        abt_card2_desc: "من صور الأقمار الصناعية إلى شبكات الاستشعار في الحقل، نجمع أفضل التقنيات المتاحة لمنح المزارعين ميزة مبنية على الأدلة، وليس التخمين.",
+        abt_card3_title: "المجتمع",
+        abt_card3_desc: "ننمو معاً بقوة أكبر. تربط خضراوي المزارعين والمهندسين الزراعيين والباحثين في شبكة معرفية مشتركة تفيد الجميع على المنصة.",
+        abt_stat1_label: "مزارع نشط",
+        abt_stat2_label: "هكتار تحت المراقبة",
+        abt_stat3_label: "نسبة الرضا",
+        abt_stat4_label: "توفر الذكاء الاصطناعي",
 
         // Footer
-        ftr_logo: "خضراوي",
-        ftr_desc: "الزراعة الذكية. مدعومة بالذكاء الاصطناعي.",
-        ftr_copy: "© 2026 خضراوي. جميع الحقوق محفوظة."
+        ftr_brand_desc: "ذكاء زراعي دقيق للمزارعين الذين يطعمون العالم. الزراعة الأذكى تبدأ من هنا.",
+        ftr_quick_links: "روابط سريعة",
+        ftr_link_home: "الرئيسية",
+        ftr_link_monitor: "المراقبة الذكية",
+        ftr_link_ai: "المساعد الذكي",
+        ftr_link_about: "من نحن",
+        ftr_link_pricing: "الباقات والأسعار",
+        ftr_link_contact: "اتصل بنا",
+        ftr_resources: "المصادر",
+        ftr_link_docs: "دليل الاستخدام",
+        ftr_link_blog: "المدونة والمقالات",
+        ftr_link_guides: "أدلة المحاصيل",
+        ftr_link_api: "الوصول للـ API",
+        ftr_link_support: "مركز الدعم",
+        ftr_link_forum: "مجتمع المزارعين",
+        ftr_newsletter: "ابقَ على اطلاع",
+        ftr_news_desc: "نصائح موسمية، ميزات جديدة، ورؤى زراعية دقيقة — تصلك شهرياً. بدون رسائل مزعجة.",
+        ftr_news_ph: "بريدك@الإلكتروني.com",
+        ftr_news_btn: "اشتراك",
+        ftr_news_privacy: "نحن نحترم خصوصيتك. يمكنك إلغاء الاشتراك في أي وقت.",
+        ftr_copyright: "© 2026 خضراوي. جميع الحقوق محفوظة.",
+        ftr_privacy: "سياسة الخصوصية",
+        ftr_terms: "شروط الخدمة",
+        ftr_cookies: "إعدادات ملفات تعريف الارتباط"
     }
 };
 
@@ -2362,6 +2709,7 @@ function setLanguage(lang) {
             el.placeholder = translations[lang][key];
         }
     });
+    updateSpeakButton();
 }
 
 // إضافة المستمعين لزراير اللغة
@@ -2383,7 +2731,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (resetBtn) {
         resetBtn.addEventListener("click", (e) => {
-            e.preventDefault(); // منع أي تحديث للصفحة
+            // إخفاء زرار قراءة النتيجة
+const speakBtn = document.getElementById("speakResultButton");
+if (speakBtn) speakBtn.style.display = "none";
+           // منع أي تحديث للصفحة
             document.getElementById("anotherButton").style.display = "none";
             if (cardToHide) {
                 // إخفاء الكارت نهائياً
@@ -2397,5 +2748,74 @@ document.addEventListener("DOMContentLoaded", () => {
                 behavior: "smooth"
             });
         });
+    }
+});
+// =====================================================
+// AI CHATBOT LOGIC (Front-end Simulation)
+// =====================================================
+document.addEventListener("DOMContentLoaded", () => {
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const chatBody = document.getElementById("chatBody");
+
+    if (chatForm) {
+        chatForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const userText = chatInput.value.trim();
+            if (!userText) return;
+
+            // 1. إضافة رسالة المستخدم
+            appendMessage(userText, "user-message");
+            chatInput.value = "";
+
+            // 2. إظهار حالة جاري الكتابة "Typing..."
+            const typingId = showTypingIndicator();
+
+            // 3. محاكاة رد الـ API بعد ثانيتين
+            setTimeout(() => {
+                removeTypingIndicator(typingId);
+                // هنا مستقبلاً هتحطي الـ Response اللي راجع من الموديل بتاعك
+                const aiResponse = "I recommend checking the soil moisture levels first. If drainage is fine, consider applying a balanced NPK feed to support healthy growth.";
+                appendMessage(aiResponse, "ai-message");
+            }, 2000);
+        });
+    }
+
+    // دالة لطباعة الرسالة في الشات
+    function appendMessage(text, className) {
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `message ${className}`;
+        msgDiv.innerHTML = `
+            <div class="bubble">${text}</div>
+            <span class="msg-time">${time}</span>
+        `;
+        chatBody.appendChild(msgDiv);
+        scrollToBottom();
+    }
+
+    // دالة لإظهار النقط المتحركة (جاري الكتابة)
+    function showTypingIndicator() {
+        const id = "typing-" + Date.now();
+        const typingDiv = document.createElement("div");
+        typingDiv.className = "typing-indicator";
+        typingDiv.id = id;
+        typingDiv.innerHTML = `<span></span><span></span><span></span>`;
+        chatBody.appendChild(typingDiv);
+        scrollToBottom();
+        return id;
+    }
+
+    // دالة لإخفاء النقط
+    function removeTypingIndicator(id) {
+        const typingDiv = document.getElementById(id);
+        if (typingDiv) {
+            typingDiv.remove();
+        }
+    }
+
+    // دالة للنزول لآخر رسالة أوتوماتيك
+    function scrollToBottom() {
+        chatBody.scrollTop = chatBody.scrollHeight;
     }
 });
