@@ -1,17 +1,29 @@
 # =====================================================
 # KHADRWY - RAG GENERATOR
 # =====================================================
+#
+# Gemini-based grounded agricultural answer generator.
+#
+# Responsibilities:
+# - Retrieve relevant agricultural knowledge
+# - Combine retrieved knowledge with diagnosis context
+# - Generate complete grounded answers
+# - Avoid unsupported agricultural claims
+# - Return answer + clean source metadata
+#
+# =====================================================
 
 import os
 
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 
 from backend.rag.retriever import get_context
 
 
 # =====================================================
-# LOAD ENVIRONMENT VARIABLES
+# ENVIRONMENT
 # =====================================================
 
 load_dotenv()
@@ -21,20 +33,17 @@ load_dotenv()
 # GEMINI CONFIGURATION
 # =====================================================
 
-GEMINI_API_KEY = os.getenv(
-    "GEMINI_API_KEY"
-)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 GEMINI_MODEL = os.getenv(
     "GEMINI_MODEL",
-    "gemini-3.6-flash"
+    "gemini-3.5-flash"
 )
 
 
 if not GEMINI_API_KEY:
-
-    raise ValueError(
-        "GEMINI_API_KEY is not set in the .env file."
+    raise RuntimeError(
+        "GEMINI_API_KEY is not set in the environment."
     )
 
 
@@ -45,6 +54,372 @@ if not GEMINI_API_KEY:
 client = genai.Client(
     api_key=GEMINI_API_KEY
 )
+
+
+# =====================================================
+# SYSTEM INSTRUCTIONS
+# =====================================================
+
+SYSTEM_INSTRUCTIONS = """
+You are Khadrwy AI, an agricultural assistant.
+
+Your primary responsibility is to provide useful, complete,
+careful, evidence-grounded agricultural answers.
+
+The retrieved agricultural knowledge supplied below is your
+PRIMARY factual evidence.
+
+You may reason across multiple retrieved sources, but you
+must not invent agricultural facts that are not supported by
+the retrieved knowledge.
+
+=====================================================
+1. CORE RULE
+=====================================================
+
+Answer the USER'S ACTUAL QUESTION.
+
+Do not give a generic introduction and stop.
+
+If the user asks multiple questions, answer ALL of them.
+
+If the user describes multiple plant groups, compare ALL
+groups.
+
+If the user asks for causes, explain the relevant possible
+causes.
+
+If the user asks how to distinguish between causes, explicitly
+compare the causes.
+
+If the user asks what data to monitor, explicitly list the
+important observations or measurements.
+
+If the user asks which plant should receive attention first,
+explain how to prioritize them using the available evidence.
+
+=====================================================
+2. RETRIEVED KNOWLEDGE
+=====================================================
+
+Use the retrieved knowledge as the main factual source.
+
+Multiple sources may need to be combined.
+
+For example, if the retrieved knowledge contains:
+
+- crop-specific information
+- irrigation information
+- nutrient information
+- root-health information
+- monitoring information
+
+combine them when they are relevant to the user's question.
+
+Do NOT mention internal technical details such as:
+
+- RAG
+- FAISS
+- embeddings
+- vector search
+- retriever
+- chunks
+- prompt
+- semantic search
+
+The user should simply experience you as an agricultural
+assistant.
+
+=====================================================
+3. EVIDENCE DISCIPLINE
+=====================================================
+
+Separate three levels of information:
+
+A. Supported by retrieved knowledge
+B. Reasonable possibility based on the available evidence
+C. Information that cannot currently be determined
+
+Use cautious language for B and C.
+
+Examples:
+
+- "قد يشير إلى..."
+- "من الاحتمالات..."
+- "هذا النمط يجعلني أتحقق من..."
+- "لا يمكن تأكيد السبب من هذه المعلومة وحدها."
+- "نحتاج إلى بيانات إضافية للتفريق بين..."
+
+Never present a possibility as a confirmed diagnosis.
+
+=====================================================
+4. PLANT MODEL PREDICTION
+=====================================================
+
+The user may provide:
+
+- Plant
+- Condition
+- Confidence
+
+These values may come from a computer vision model.
+
+Treat them as MODEL PREDICTIONS.
+
+Never describe them as absolute truth.
+
+For example:
+
+Bad:
+"The tomato definitely has Early Blight."
+
+Good:
+"The vision model predicts a possible Early Blight
+condition with approximately 91% confidence."
+
+Then use agricultural knowledge to explain what observations
+would support or contradict that prediction.
+
+=====================================================
+5. SENSOR DATA
+=====================================================
+
+Sensor information may include:
+
+- Soil moisture
+- Temperature
+- Humidity
+- Light intensity
+- Pump status
+
+Treat these as measurements.
+
+Do not invent exact agricultural thresholds unless those
+thresholds are explicitly present in the retrieved knowledge.
+
+When several measurements are available, analyze their
+RELATIONSHIP and TREND.
+
+For example:
+
+High soil moisture + wilting
+
+should NOT automatically be interpreted as underwatering.
+
+Low soil moisture + wilting
+
+may be consistent with water stress, but other causes may
+still exist.
+
+=====================================================
+6. SYMPTOMS WITH MULTIPLE POSSIBLE CAUSES
+=====================================================
+
+A symptom such as yellow leaves does not automatically prove
+one cause.
+
+Possible causes may include, when supported by the retrieved
+knowledge:
+
+- water stress
+- excessive irrigation
+- nutrient problems
+- root problems
+- environmental stress
+- disease
+- other plant-health problems
+
+When the user asks how to distinguish causes, provide a
+COMPARISON.
+
+For example, explain:
+
+Possible cause
+→ observations that support it
+→ observations that make it less likely
+→ additional data to check
+
+Do not fabricate symptoms that are not supported by the
+retrieved knowledge.
+
+=====================================================
+7. MULTI-FACTOR ANALYSIS
+=====================================================
+
+When the user provides several variables, do not analyze them
+as isolated facts.
+
+Connect:
+
+symptoms
++
+soil condition
++
+irrigation
++
+environment
++
+plant-to-plant differences
++
+time trends
+
+when relevant.
+
+The goal is to identify patterns that help narrow down the
+possible cause.
+
+=====================================================
+8. COMPARING PLANTS
+=====================================================
+
+If the user describes different groups of plants:
+
+Compare them explicitly.
+
+Useful comparisons include:
+
+- wet soil vs dry soil
+- wilting vs non-wilting
+- yellowing vs normal leaves
+- worsening vs stable condition
+- different environmental exposure
+- different sensor readings
+- different growth behavior
+
+Do not assume all plants have the same problem.
+
+=====================================================
+9. PRIORITIZATION
+=====================================================
+
+If the user asks which plant should receive intervention first,
+prioritize based on observable risk patterns supported by the
+available knowledge.
+
+Explain WHY one group deserves earlier attention.
+
+For example, a worsening plant with severe symptoms may need
+earlier inspection than a plant with mild and stable symptoms.
+
+Do not invent a numerical risk score unless one exists in the
+retrieved knowledge.
+
+=====================================================
+10. MONITORING VS DIAGNOSIS
+=====================================================
+
+Monitoring means collecting observations and measurements over
+time.
+
+Diagnosis means identifying the most likely cause.
+
+Do not confuse the two.
+
+A sensor measurement can support an investigation but does not
+automatically prove a diagnosis.
+
+=====================================================
+11. AGRICULTURAL SAFETY
+=====================================================
+
+Do NOT invent:
+
+- pesticide names
+- chemical doses
+- pesticide mixing instructions
+- fertilizer rates
+- irrigation schedules
+- treatment schedules
+- unsupported exact numerical thresholds
+
+unless explicitly supported by the retrieved knowledge.
+
+When exact treatment information is unavailable, recommend
+general safe agricultural practices and, when appropriate,
+consulting a qualified agricultural specialist or following
+locally approved product labels.
+
+=====================================================
+12. LANGUAGE
+=====================================================
+
+Detect the user's language automatically.
+
+Arabic question:
+Answer naturally in Arabic.
+
+English question:
+Answer in English.
+
+Mixed Arabic/English:
+Natural technical terminology is acceptable.
+
+For Egyptian Arabic:
+Use clear, natural Egyptian-friendly Arabic.
+
+Do not make the response unnecessarily formal.
+
+=====================================================
+13. ANSWER STRUCTURE
+=====================================================
+
+For SIMPLE questions:
+
+Give a direct answer.
+
+For COMPLEX questions:
+
+Use this structure when appropriate:
+
+1. Short conclusion
+
+2. Distinguishing the possible causes
+
+3. What to monitor
+
+4. How to compare the plants
+
+5. Which condition should be checked first
+
+6. What additional information is needed
+
+Do not force all sections when they are irrelevant.
+
+=====================================================
+14. COMPLETENESS REQUIREMENT
+=====================================================
+
+Before producing the final answer, silently check:
+
+- Did I answer the main question?
+- Did I answer every sub-question?
+- Did I address every plant/group mentioned?
+- Did I compare the relevant possible causes?
+- Did I explain which observations distinguish them?
+- Did I mention relevant sensor or environmental data?
+- Did I explain what additional data would help?
+- Did I avoid unsupported exact numbers?
+- Did I distinguish possibility from diagnosis?
+- Did I avoid inventing facts?
+
+If any important part is missing, complete it before returning
+the answer.
+
+=====================================================
+15. INSUFFICIENT INFORMATION
+=====================================================
+
+If the retrieved knowledge is insufficient:
+
+Do not hallucinate.
+
+Say clearly that the available information is not sufficient
+to determine the cause confidently.
+
+Then explain which observations or measurements would help.
+
+=====================================================
+"""
 
 
 # =====================================================
@@ -60,10 +435,21 @@ def generate_rag_answer(
 ):
 
     # =================================================
-    # RETRIEVE RELEVANT AGRICULTURAL INFORMATION
+    # VALIDATE QUERY
     # =================================================
 
-    context, results = get_context(
+    if not query or not query.strip():
+
+        raise ValueError(
+            "Query cannot be empty."
+        )
+
+
+    # =================================================
+    # RETRIEVE CONTEXT
+    # =================================================
+
+    context, retrieved_results = get_context(
         query=query,
         top_k=top_k,
         plant=plant,
@@ -72,154 +458,59 @@ def generate_rag_answer(
 
 
     # =================================================
-    # BUILD DIAGNOSIS CONTEXT
+    # DIAGNOSIS CONTEXT
     # =================================================
 
     diagnosis_context = ""
 
-    if plant:
+    if (
+        plant
+        or condition
+        or confidence is not None
+    ):
 
-        diagnosis_context += f"""
-Detected Plant:
-{plant}
+        diagnosis_context = """
+=====================================================
+VISION MODEL CONTEXT
+=====================================================
 """
 
-    if condition:
+        if plant:
 
-        diagnosis_context += f"""
-Detected Condition:
-{condition}
-"""
+            diagnosis_context += (
+                f"Predicted plant: {plant}\n"
+            )
 
-    if confidence is not None:
+        if condition:
 
-        diagnosis_context += f"""
-Model Prediction Confidence:
-{confidence}%
-"""
+            diagnosis_context += (
+                f"Predicted condition: {condition}\n"
+            )
 
+        if confidence is not None:
 
-    # =================================================
-    # HANDLE EMPTY RETRIEVAL
-    # =================================================
+            diagnosis_context += (
+                f"Model confidence: {confidence}%\n"
+            )
 
-    if not context:
-
-        context = """
-No relevant agricultural information was retrieved
-from the knowledge base.
-"""
-
-
-    # =================================================
-    # DEBUG RETRIEVED CONTEXT
-    # =================================================
-
-    print("\n" + "=" * 70)
-    print("RAG DEBUG - RETRIEVED CONTEXT")
-    print("=" * 70)
-
-    print(context)
-
-    print("=" * 70)
-    print("RAG DEBUG - RESULTS")
-    print("=" * 70)
-
-    print(results)
-
-    print("=" * 70 + "\n")
-
-
-    # =================================================
-    # RAG PROMPT
-    # =================================================
-
-    prompt = f"""
-You are Khadrwy AI, an intelligent agricultural assistant.
-
-Your job is to answer agricultural questions using the
-retrieved agricultural knowledge provided below.
-
-=====================================================
-LANGUAGE
-=====================================================
-
-- Detect the language of the user's question.
-- If the question is Arabic, answer in Arabic.
-- If the question is English, answer in English.
-- If the question is mixed, answer naturally using the
-  same language style as the user.
-
-=====================================================
-CORE KNOWLEDGE RULE
-=====================================================
-
-The retrieved agricultural information is your primary
-source of truth.
-
-Use only information supported by the retrieved knowledge.
-
-You may combine multiple retrieved sources when they are
-clearly relevant to the user's question.
-
-Do NOT invent agricultural information.
-
-Do NOT add information that is not supported by the
-retrieved knowledge.
-
-=====================================================
-STRICTLY DO NOT INVENT
-=====================================================
-
-Do NOT invent:
-
-- pesticides
-- chemicals
-- pesticide names
-- chemical doses
-- fertilizer doses
-- treatment schedules
-- irrigation schedules
-- disease causes
-- disease symptoms
-- agricultural measurements
-- unsupported treatments
-- unsupported prevention methods
-
-If the retrieved information does not contain enough
-information to answer the user's question, clearly say
-that there is not enough information in the knowledge base.
-
-Arabic response:
-
-"ليس لدي معلومات كافية في قاعدة المعرفة الخاصة بي للإجابة عن هذا السؤال."
-
-English response:
-
-"I don't have enough information in my knowledge base to answer this."
-
-=====================================================
-PLANT DIAGNOSIS CONTEXT
-=====================================================
-
-The following information comes from the plant detection
-model.
-
-Treat it as a MODEL PREDICTION, not as confirmed truth.
-
-{diagnosis_context}
+        diagnosis_context += """
 
 IMPORTANT:
+The information above is a computer vision model
+prediction, NOT a confirmed agricultural diagnosis.
 
-- Do not describe the prediction as 100% certain.
-- Do not treat the confidence score as medical or scientific
-  certainty.
-- Use the detected plant and condition only when relevant
-  to the user's question.
-- If the user's question is unrelated to the detected
-  condition, answer the general agricultural question
-  instead of forcing the diagnosis into the answer.
+Use it only as contextual evidence.
+=====================================================
+"""
 
+
+    # =================================================
+    # RETRIEVED KNOWLEDGE
+    # =================================================
+
+    if context and context.strip():
+
+        retrieved_context = f"""
 =====================================================
 RETRIEVED AGRICULTURAL KNOWLEDGE
 =====================================================
@@ -227,102 +518,319 @@ RETRIEVED AGRICULTURAL KNOWLEDGE
 {context}
 
 =====================================================
-USER QUESTION
+END OF RETRIEVED KNOWLEDGE
+=====================================================
+"""
+
+    else:
+
+        retrieved_context = """
+=====================================================
+RETRIEVED AGRICULTURAL KNOWLEDGE
 =====================================================
 
-{query}
+No sufficiently relevant agricultural knowledge was
+retrieved.
 
-=====================================================
-ANSWER RULES
-=====================================================
+Do not invent missing agricultural information.
 
-1. Answer the user's exact question.
-
-2. Keep the answer concise and practical.
-
-3. If the user asks about symptoms:
-   - Give only symptoms supported by the retrieved knowledge.
-
-4. If the user asks about management:
-   - Give only management practices supported by the
-     retrieved knowledge.
-
-5. If the user asks about irrigation:
-   - Use irrigation and soil-moisture information when
-     relevant.
-
-6. If the user asks about environmental conditions:
-   - Use temperature, humidity, light, soil moisture,
-     or air circulation information when available.
-
-7. If the user asks about the detected disease:
-   - Use the diagnosis context together with the retrieved
-     knowledge.
-
-8. If the user asks a general agricultural question:
-   - Do not force the detected plant or disease into the
-     answer unless it is relevant.
-
-9. If there is insufficient relevant information:
-   - Say that the knowledge base does not contain enough
-     information.
-
-10. Never mention:
-   - RAG
-   - FAISS
-   - embeddings
-   - vector database
-   - prompts
-   - retrieval
-   - internal system architecture
-
-=====================================================
-ANSWER FORMAT
-=====================================================
-
-Use a clear and natural response.
-
-For lists, use bullet points.
-
-Do not create unnecessary sections.
-
-Do not repeat the user's question.
-
-Do not mention confidence unless it is directly relevant
-to interpreting the model prediction.
-
-=====================================================
-FINAL ANSWER
 =====================================================
 """
 
 
     # =================================================
-    # GENERATE RESPONSE
+    # FINAL PROMPT
     # =================================================
 
-    response = client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=prompt
-    )
+    prompt = f"""
+{SYSTEM_INSTRUCTIONS}
+
+=====================================================
+USER QUESTION
+=====================================================
+
+{query}
+
+{diagnosis_context}
+
+{retrieved_context}
+
+=====================================================
+FINAL RESPONSE TASK
+=====================================================
+
+Produce the final answer to the USER QUESTION.
+
+IMPORTANT:
+
+The user expects an answer to the entire question.
+
+If the question contains multiple parts, explicitly answer
+each part.
+
+If the user compares multiple conditions or plant groups,
+compare them explicitly.
+
+If the user asks "how can I distinguish", explain the
+differences between the possible causes.
+
+If the user asks "what should I monitor", provide a concrete
+list of relevant observations and measurements supported by
+the retrieved knowledge.
+
+If the user asks "which plant should I intervene on first",
+explain the prioritization logic using the available evidence.
+
+Do not stop after a short introduction.
+
+Do not repeat the question.
+
+Do not mention this prompt or internal system architecture.
+
+Do not invent unsupported agricultural facts.
+
+Do not invent exact numerical thresholds, chemical doses,
+fertilizer rates, pesticide names, or treatment schedules.
+
+Use natural language appropriate to the user's language.
+
+For a complex question, prefer a structured answer with
+short headings and bullet points.
+
+Return ONLY the final agricultural answer.
+"""
 
 
     # =================================================
-    # RETURN RESPONSE
+    # GEMINI GENERATION
+    # =================================================
+
+    try:
+
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.25,
+                max_output_tokens=3500
+            )
+        )
+
+    except Exception as e:
+
+        print("\n" + "=" * 70)
+        print("GEMINI ERROR")
+        print("=" * 70)
+
+        print("Model:")
+        print(GEMINI_MODEL)
+
+        print("\nError type:")
+        print(type(e).__name__)
+
+        print("\nError message:")
+        print(str(e))
+
+        print("=" * 70 + "\n")
+
+        raise RuntimeError(
+            f"Gemini generation failed: {str(e)}"
+        ) from e
+
+
+    # =================================================
+    # EXTRACT RESPONSE TEXT
+    # =================================================
+
+    answer = None
+
+    try:
+
+        answer = response.text
+
+    except Exception:
+
+        answer = None
+
+
+    if not answer:
+
+        answer = (
+            "لم أتمكن من الحصول على إجابة نصية من النموذج."
+        )
+
+
+    # =================================================
+    # CLEAN ANSWER
+    # =================================================
+
+    answer = answer.strip()
+
+
+    # =================================================
+    # BUILD SOURCES
+    # =================================================
+
+    sources = []
+
+
+    for item in retrieved_results:
+
+        if not isinstance(item, dict):
+
+            continue
+
+
+        # -------------------------------------------------
+        # METADATA
+        # -------------------------------------------------
+
+        metadata = item.get("metadata")
+
+        if not isinstance(metadata, dict):
+
+            metadata = item.get("meta")
+
+        if not isinstance(metadata, dict):
+
+            metadata = item
+
+
+        # -------------------------------------------------
+        # TITLE
+        # -------------------------------------------------
+
+        title = (
+            metadata.get("title")
+            or metadata.get("name")
+            or metadata.get("document_title")
+            or metadata.get("source_title")
+            or metadata.get("doc_title")
+            or ""
+        )
+
+
+        if not title:
+
+            title = (
+                item.get("title")
+                or item.get("name")
+                or item.get("document_title")
+                or item.get("source_title")
+                or ""
+            )
+
+
+        if not title:
+
+            title = "Agricultural Knowledge"
+
+
+        # -------------------------------------------------
+        # SOURCE NAME
+        # -------------------------------------------------
+
+        source_name = (
+            metadata.get("source_name")
+            or metadata.get("source")
+            or "Khadrwy Agricultural Knowledge Base"
+        )
+
+
+        # -------------------------------------------------
+        # SOURCE TYPE
+        # -------------------------------------------------
+
+        source_type = (
+            metadata.get("source_type")
+            or "khadrwy_knowledge"
+        )
+
+
+        # -------------------------------------------------
+        # SOURCE URL
+        # -------------------------------------------------
+
+        source_url = (
+            metadata.get("source_url")
+            or ""
+        )
+
+
+        # -------------------------------------------------
+        # OTHER METADATA
+        # -------------------------------------------------
+
+        plant_name = (
+            metadata.get("plant")
+            or ""
+        )
+
+        condition_name = (
+            metadata.get("condition")
+            or ""
+        )
+
+        category = (
+            metadata.get("category")
+            or ""
+        )
+
+        year = metadata.get("year")
+
+
+        # -------------------------------------------------
+        # CLEAN SOURCE
+        # -------------------------------------------------
+
+        source = {
+            "title": str(title),
+            "source_name": str(source_name),
+            "source_type": str(source_type),
+            "source_url": str(source_url),
+            "plant": str(plant_name),
+            "condition": str(condition_name),
+            "category": str(category),
+            "year": year
+        }
+
+
+        sources.append(source)
+
+
+    # =================================================
+    # REMOVE DUPLICATES
+    # =================================================
+
+    unique_sources = []
+
+    seen_sources = set()
+
+
+    for source in sources:
+
+        source_key = (
+            source.get("title", ""),
+            source.get("source_name", ""),
+            source.get("source_type", "")
+        )
+
+
+        if source_key in seen_sources:
+
+            continue
+
+
+        seen_sources.add(source_key)
+
+        unique_sources.append(source)
+
+
+    # =================================================
+    # RETURN
     # =================================================
 
     return {
-        "answer": response.text,
-
-        "sources": [
-            {
-                "title": result["title"],
-                "score": round(
-                    result["score"],
-                    4
-                )
-            }
-
-            for result in results
-        ]
+        "answer": answer,
+        "sources": unique_sources
     }

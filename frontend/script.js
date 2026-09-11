@@ -2777,7 +2777,218 @@ if (speakBtn) speakBtn.style.display = "none";
 // KHADRWY - AI AGRICULTURAL ASSISTANT
 // REAL BACKEND RAG CHAT
 // =====================================================
+// =====================================================
+// KHADRWY - DETECT DIAGNOSIS CONTEXT
+// Determines whether the user is referring to the
+// previously uploaded / diagnosed plant.
+// =====================================================
 
+function shouldUseLastDiagnosis(message) {
+
+    if (!lastDiagnosis) {
+        return false;
+    }
+
+    if (!message || !message.trim()) {
+        return false;
+    }
+
+
+    const text =
+        message
+            .toLowerCase()
+            .trim();
+
+
+    // =================================================
+    // EXPLICIT ARABIC REFERENCES
+    // =================================================
+
+    const arabicDiagnosisKeywords = [
+
+        "الصورة",
+        "الصوره",
+        "الصورة دي",
+        "الصوره دي",
+        "الصورة اللي",
+        "الصوره اللي",
+        "الصورة التي",
+        "الصوره التي",
+
+        "النبات ده",
+        "النبات دا",
+        "النبات دي",
+        "النبات ده اللي",
+        "النبات اللي",
+        "النبات اللى",
+        "النبات الذي",
+        "النبات الذى",
+        "النبات الي",
+        "النبات السابق",
+        "النبات المصور",
+        "النبات اللي صورته",
+        "النبات اللي صورتهولك",
+        "النبات اللي رفعته",
+        "النبات الذي رفعته",
+
+        "التشخيص",
+        "التشخيص ده",
+        "التشخيص السابق",
+
+        "النتيجة",
+        "النتيجة دي",
+        "النتيجة السابقة",
+        "النتيجة اللي ظهرت",
+
+        "المرض اللي ظهر",
+        "المرض الذي ظهر",
+        "المرض المكتشف",
+        "المرض ده",
+
+        "الحالة اللي ظهرت",
+        "الحالة التي ظهرت",
+        "الحالة المكتشفة",
+        "الحالة دي",
+
+        "نسبة الثقة",
+        "نسبة الدقة",
+
+        "التحليل",
+        "التحليل ده",
+
+        "الفحص",
+        "الفحص ده"
+    ];
+
+
+    // =================================================
+    // EXPLICIT ENGLISH REFERENCES
+    // =================================================
+
+    const englishDiagnosisKeywords = [
+
+        "this plant",
+        "this image",
+        "this photo",
+        "the image",
+        "the photo",
+
+        "the plant i uploaded",
+        "the plant i uploaded before",
+        "the plant i showed",
+        "the plant i sent",
+
+        "the picture i uploaded",
+        "the picture i sent",
+
+        "the uploaded image",
+        "the uploaded photo",
+
+        "the previous image",
+        "the previous photo",
+        "the previous plant",
+
+        "my uploaded plant",
+        "my plant image",
+        "my plant photo",
+
+        "the diagnosis",
+        "this diagnosis",
+        "previous diagnosis",
+
+        "the result",
+        "this result",
+        "previous result",
+
+        "detected disease",
+        "detected condition",
+        "the detected disease",
+        "the detected condition",
+
+        "confidence score",
+        "confidence",
+
+        "analysis result",
+        "the analysis",
+        "this analysis"
+    ];
+
+
+    // =================================================
+    // CHECK ARABIC REFERENCES
+    // =================================================
+
+    for (
+        const keyword
+        of arabicDiagnosisKeywords
+    ) {
+
+        if (text.includes(keyword)) {
+            return true;
+        }
+    }
+
+
+    // =================================================
+    // CHECK ENGLISH REFERENCES
+    // =================================================
+
+    for (
+        const keyword
+        of englishDiagnosisKeywords
+    ) {
+
+        if (text.includes(keyword)) {
+            return true;
+        }
+    }
+
+
+    // =================================================
+    // QUESTIONS THAT CLEARLY REFER TO THE
+    // PREVIOUSLY DETECTED CONDITION
+    // =================================================
+
+    const diagnosisQuestionPatterns = [
+
+        // Arabic
+        "أعالجه",
+        "اعالجه",
+        "أتعامل معاه",
+        "اتعامل معاه",
+        "هل هو مصاب",
+        "هل الحالة خطيرة",
+        "هل المرض خطير",
+
+        // English
+        "what should i do with it",
+        "how should i treat it",
+        "how do i treat it",
+        "is it infected",
+        "is it serious",
+        "is the disease serious",
+        "what is the treatment",
+        "how can i treat it"
+    ];
+
+
+    for (
+        const pattern
+        of diagnosisQuestionPatterns
+    ) {
+
+        if (text.includes(pattern)) {
+            return true;
+        }
+    }
+
+
+    // =================================================
+    // DEFAULT
+    // =================================================
+
+    return false;
+}
 document.addEventListener(
     "DOMContentLoaded",
     function () {
@@ -2892,37 +3103,49 @@ document.addEventListener(
 
                 try {
 
-                    // =================================================
-                    // BUILD CHAT REQUEST
-                    // =================================================
+                   // =================================================
+               // BUILD CHAT REQUEST
+            // =================================================
 
-                    const requestBody = {
-
-                        message:
-                            userText,
-
-                        plant:
-                            lastDiagnosis
-                                ? lastDiagnosis.plant
-                                : null,
-
-                        condition:
-                            lastDiagnosis
-                                ? lastDiagnosis.condition
-                                : null,
-
-                        confidence:
-                            lastDiagnosis
-                                ? lastDiagnosis.confidence
-                                : null
-                    };
+              const useDiagnosis =
+                  shouldUseLastDiagnosis(userText);
 
 
-                    console.log(
-                        "🌱 Sending Chat Request:",
-                        requestBody
-                    );
+               const requestBody = {
 
+                 message:
+                    userText,
+
+                  plant:
+                       useDiagnosis && lastDiagnosis
+                      ? lastDiagnosis.plant
+                      : null,
+
+                 condition:
+                        useDiagnosis && lastDiagnosis
+                      ? lastDiagnosis.condition
+                      : null,
+
+                   confidence:
+                       useDiagnosis && lastDiagnosis
+                       ? lastDiagnosis.confidence
+                     : null
+};
+
+
+        // =================================================
+        // DEBUG
+      // =================================================
+
+         console.log(
+            "🌱 Sending Chat Request:",
+            requestBody
+);
+
+         console.log(
+        "🩺 Diagnosis context used:",
+         useDiagnosis
+);
 
                     // =================================================
                     // CALL BACKEND
@@ -3288,78 +3511,167 @@ document.addEventListener(
         // DISPLAY SOURCES
         // =================================================
 
-        function appendSources(
-            sources
-        ) {
+        // =================================================
+// DISPLAY SOURCES
+// =================================================
 
-            const sourcesDiv =
-                document.createElement(
-                    "div"
-                );
+function appendSources(sources) {
 
+    if (!Array.isArray(sources) || sources.length === 0) {
+        return;
+    }
 
-            sourcesDiv.className =
-                "ai-sources";
+    const sourcesDiv =
+        document.createElement("div");
 
-
-            const title =
-                document.createElement(
-                    "div"
-                );
+    sourcesDiv.className =
+        "ai-sources";
 
 
-            title.className =
-                "ai-sources-title";
+    // =================================================
+    // TITLE
+    // =================================================
+
+    const title =
+        document.createElement("div");
+
+    title.className =
+        "ai-sources-title";
+
+    title.textContent =
+        document.documentElement.lang === "ar"
+            ? "📚 مصادر المعلومات"
+            : "📚 Information Sources";
+
+    sourcesDiv.appendChild(title);
 
 
-            title.textContent =
-                document.documentElement.lang === "ar"
-                    ? "📚 مصادر المعلومات"
-                    : "📚 Information Sources";
+    // =================================================
+    // SOURCES
+    // =================================================
 
+    sources.forEach(function (source) {
 
-            sourcesDiv.appendChild(
-                title
-            );
-
-
-            sources.forEach(
-                function (source) {
-
-                    if (!source || !source.title) {
-                        return;
-                    }
-
-
-                    const sourceItem =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    sourceItem.className =
-                        "ai-source-item";
-
-
-                    sourceItem.textContent =
-                        source.title;
-
-
-                    sourcesDiv.appendChild(
-                        sourceItem
-                    );
-                }
-            );
-
-
-            chatBody.appendChild(
-                sourcesDiv
-            );
-
-
-            scrollToBottom();
+        if (!source) {
+            return;
         }
 
+
+        // -------------------------------------------------
+        // SOURCE TITLE
+        // -------------------------------------------------
+
+        const sourceTitle =
+            source.title ||
+            source.name ||
+            source.source_title ||
+            "Unknown";
+
+
+        // -------------------------------------------------
+        // SOURCE NAME
+        // -------------------------------------------------
+
+        const sourceName =
+            source.source_name ||
+            source.source ||
+            source.source_type ||
+            "";
+
+
+        // -------------------------------------------------
+        // SOURCE ITEM
+        // -------------------------------------------------
+
+        const sourceItem =
+            document.createElement("div");
+
+        sourceItem.className =
+            "ai-source-item";
+
+
+        // -------------------------------------------------
+        // TITLE
+        // -------------------------------------------------
+
+        const sourceTitleElement =
+            document.createElement("div");
+
+        sourceTitleElement.className =
+            "ai-source-title";
+
+        sourceTitleElement.textContent =
+            `• ${sourceTitle}`;
+
+
+        sourceItem.appendChild(
+            sourceTitleElement
+        );
+
+
+        // -------------------------------------------------
+        // SOURCE NAME
+        // -------------------------------------------------
+
+        if (sourceName) {
+
+            const sourceNameElement =
+                document.createElement("div");
+
+            sourceNameElement.className =
+                "ai-source-name";
+
+            sourceNameElement.textContent =
+                sourceName;
+
+            sourceItem.appendChild(
+                sourceNameElement
+            );
+        }
+
+
+        // -------------------------------------------------
+        // SOURCE TYPE
+        // -------------------------------------------------
+
+        if (
+            source.source_type &&
+            source.source_type !== sourceName
+        ) {
+
+            const sourceTypeElement =
+                document.createElement("div");
+
+            sourceTypeElement.className =
+                "ai-source-type";
+
+            sourceTypeElement.textContent =
+                source.source_type;
+
+            sourceItem.appendChild(
+                sourceTypeElement
+            );
+        }
+
+
+        sourcesDiv.appendChild(
+            sourceItem
+        );
+
+    });
+
+
+    // =================================================
+    // ADD TO CHAT
+    // =================================================
+
+    chatBody.appendChild(
+        sourcesDiv
+    );
+
+
+    scrollToBottom();
+}
 
         // =================================================
         // SCROLL CHAT TO BOTTOM
