@@ -2,9 +2,8 @@
 // KHADRWY - AI PLANT DOCTOR
 // =====================================================
 
-
 // =====================================================
-// CONFIG
+// KHADRWY - CONFIG
 // =====================================================
 
 const API_BASE_URL =
@@ -12,6 +11,9 @@ const API_BASE_URL =
 
 const API_URL =
     `${API_BASE_URL}/predict`;
+
+const CHAT_URL =
+    `${API_BASE_URL}/chat`;
 
 const REGISTER_URL =
     `${API_BASE_URL}/register`;
@@ -27,6 +29,7 @@ const TOKEN_KEY =
 
 const USERNAME_KEY =
     "khadrwy_username";
+
 
 
 // =====================================================
@@ -1511,11 +1514,29 @@ const localTranslations = {
     "Avoid prolonged leaf wetness.": "تجنب بلل الأوراق لفترات طويلة.",
     "Remove severely infected leaves.": "قم بإزالة الأوراق المصابة بشدة.",
 }
+
+// =====================================================
+// SELECTED FILE & LAST DIAGNOSIS
+// =====================================================
+
+
+let lastDiagnosis = null;
+
+
+
 // =====================================================
 // DISPLAY RESULT
 // =====================================================
 
 function displayResult(data) {
+
+
+    lastDiagnosis = {
+        plant: data.plant || "Unknown",
+        condition: data.condition || "Unknown",
+        confidence: data.confidence || 0
+    };
+
 
     // -------------------------------------------------
     // Plant
@@ -2211,6 +2232,9 @@ if (anotherButton) {
 }
 
 
+
+
+
 // =====================================================
 // NAVBAR ACTIVE LINK
 // =====================================================
@@ -2749,73 +2773,602 @@ if (speakBtn) speakBtn.style.display = "none";
             });
         });
     }
-});
+});// =====================================================
+// KHADRWY - AI AGRICULTURAL ASSISTANT
+// REAL BACKEND RAG CHAT
 // =====================================================
-// AI CHATBOT LOGIC (Front-end Simulation)
-// =====================================================
-document.addEventListener("DOMContentLoaded", () => {
-    const chatForm = document.getElementById("chatForm");
-    const chatInput = document.getElementById("chatInput");
-    const chatBody = document.getElementById("chatBody");
 
-    if (chatForm) {
-        chatForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const userText = chatInput.value.trim();
-            if (!userText) return;
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-            // 1. إضافة رسالة المستخدم
-            appendMessage(userText, "user-message");
-            chatInput.value = "";
+        const chatForm =
+            document.getElementById("chatForm");
 
-            // 2. إظهار حالة جاري الكتابة "Typing..."
-            const typingId = showTypingIndicator();
+        const chatInput =
+            document.getElementById("chatInput");
 
-            // 3. محاكاة رد الـ API بعد ثانيتين
-            setTimeout(() => {
-                removeTypingIndicator(typingId);
-                // هنا مستقبلاً هتحطي الـ Response اللي راجع من الموديل بتاعك
-                const aiResponse = "I recommend checking the soil moisture levels first. If drainage is fine, consider applying a balanced NPK feed to support healthy growth.";
-                appendMessage(aiResponse, "ai-message");
-            }, 2000);
-        });
-    }
+        const chatBody =
+            document.getElementById("chatBody");
 
-    // دالة لطباعة الرسالة في الشات
-    function appendMessage(text, className) {
-        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const msgDiv = document.createElement("div");
-        msgDiv.className = `message ${className}`;
-        msgDiv.innerHTML = `
-            <div class="bubble">${text}</div>
-            <span class="msg-time">${time}</span>
-        `;
-        chatBody.appendChild(msgDiv);
-        scrollToBottom();
-    }
 
-    // دالة لإظهار النقط المتحركة (جاري الكتابة)
-    function showTypingIndicator() {
-        const id = "typing-" + Date.now();
-        const typingDiv = document.createElement("div");
-        typingDiv.className = "typing-indicator";
-        typingDiv.id = id;
-        typingDiv.innerHTML = `<span></span><span></span><span></span>`;
-        chatBody.appendChild(typingDiv);
-        scrollToBottom();
-        return id;
-    }
+        // =================================================
+        // CHECK CHAT ELEMENTS
+        // =================================================
 
-    // دالة لإخفاء النقط
-    function removeTypingIndicator(id) {
-        const typingDiv = document.getElementById(id);
-        if (typingDiv) {
-            typingDiv.remove();
+        if (!chatForm || !chatInput || !chatBody) {
+
+            console.warn(
+                "AI Assistant elements were not found."
+            );
+
+            return;
+        }
+
+
+        // =================================================
+        // CHAT FORM SUBMIT
+        // =================================================
+
+        chatForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const userText =
+                    chatInput.value.trim();
+
+
+                // -------------------------------------------------
+                // EMPTY MESSAGE
+                // -------------------------------------------------
+
+                if (!userText) {
+                    return;
+                }
+
+
+                // -------------------------------------------------
+                // LOGIN CHECK
+                // -------------------------------------------------
+
+                if (!accessToken) {
+
+                    appendMessage(
+                        document.documentElement.lang === "ar"
+                            ? "من فضلك سجل الدخول أولاً لاستخدام المساعد الذكي."
+                            : "Please login first to use the AI Assistant.",
+                        "ai-message"
+                    );
+
+                    openLogin();
+
+                    return;
+                }
+
+
+                // -------------------------------------------------
+                // ADD USER MESSAGE
+                // -------------------------------------------------
+
+                appendMessage(
+                    userText,
+                    "user-message"
+                );
+
+
+                // Clear input
+                chatInput.value = "";
+
+
+                // -------------------------------------------------
+                // SHOW TYPING
+                // -------------------------------------------------
+
+                const typingId =
+                    showTypingIndicator();
+
+
+                // -------------------------------------------------
+                // DISABLE INPUT
+                // -------------------------------------------------
+
+                chatInput.disabled = true;
+
+
+                const submitButton =
+                    chatForm.querySelector(
+                        "button[type='submit']"
+                    );
+
+
+                if (submitButton) {
+
+                    submitButton.disabled = true;
+                }
+
+
+                try {
+
+                    // =================================================
+                    // BUILD CHAT REQUEST
+                    // =================================================
+
+                    const requestBody = {
+
+                        message:
+                            userText,
+
+                        plant:
+                            lastDiagnosis
+                                ? lastDiagnosis.plant
+                                : null,
+
+                        condition:
+                            lastDiagnosis
+                                ? lastDiagnosis.condition
+                                : null,
+
+                        confidence:
+                            lastDiagnosis
+                                ? lastDiagnosis.confidence
+                                : null
+                    };
+
+
+                    console.log(
+                        "🌱 Sending Chat Request:",
+                        requestBody
+                    );
+
+
+                    // =================================================
+                    // CALL BACKEND
+                    // =================================================
+
+                    const response =
+                        await fetch(
+                            CHAT_URL,
+                            {
+                                method: "POST",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Authorization":
+                                        `Bearer ${accessToken}`
+                                },
+
+                                body:
+                                    JSON.stringify(
+                                        requestBody
+                                    )
+                            }
+                        );
+
+
+                    // =================================================
+                    // READ RESPONSE
+                    // =================================================
+
+                    const contentType =
+                        response.headers.get(
+                            "content-type"
+                        );
+
+
+                    let data;
+
+
+                    if (
+                        contentType &&
+                        contentType.includes(
+                            "application/json"
+                        )
+                    ) {
+
+                        data =
+                            await response.json();
+
+                    }
+
+                    else {
+
+                        const text =
+                            await response.text();
+
+                        throw new Error(
+                            text ||
+                            `Server returned ${response.status}`
+                        );
+                    }
+
+
+                    console.log(
+                        "🤖 Chat Response:",
+                        data
+                    );
+
+
+                    // =================================================
+                    // SESSION EXPIRED
+                    // =================================================
+
+                    if (
+                        response.status ===
+                        401
+                    ) {
+
+                        logout();
+
+                        throw new Error(
+                            document.documentElement.lang === "ar"
+                                ? "انتهت جلسة تسجيل الدخول. من فضلك سجل الدخول مرة أخرى."
+                                : "Your session has expired. Please login again."
+                        );
+                    }
+
+
+                    // =================================================
+                    // SERVER ERROR
+                    // =================================================
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.detail ||
+                            data.message ||
+                            (
+                                document.documentElement.lang === "ar"
+                                    ? "حدث خطأ أثناء الاتصال بالمساعد الذكي."
+                                    : "An error occurred while contacting the AI Assistant."
+                            )
+                        );
+                    }
+
+
+                    // =================================================
+                    // REMOVE TYPING
+                    // =================================================
+
+                    removeTypingIndicator(
+                        typingId
+                    );
+
+
+                    // =================================================
+                    // DISPLAY AI ANSWER
+                    // =================================================
+
+                    const answer =
+                        data.answer ||
+                        (
+                            document.documentElement.lang === "ar"
+                                ? "لم يتم الحصول على إجابة."
+                                : "No answer was returned."
+                        );
+
+
+                    appendMessage(
+                        answer,
+                        "ai-message"
+                    );
+
+
+                    // =================================================
+                    // DISPLAY SOURCES
+                    // =================================================
+
+                    if (
+                        Array.isArray(
+                            data.sources
+                        ) &&
+                        data.sources.length > 0
+                    ) {
+
+                        appendSources(
+                            data.sources
+                        );
+                    }
+
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "AI CHAT ERROR:",
+                        error
+                    );
+
+
+                    removeTypingIndicator(
+                        typingId
+                    );
+
+
+                    const errorMessage =
+                        document.documentElement.lang === "ar"
+
+                            ? "حدث خطأ أثناء الاتصال بالمساعد الذكي. تأكدي أن الـ Backend يعمل."
+
+                            : "Something went wrong while connecting to the AI Assistant. Please make sure the backend is running.";
+
+
+                    appendMessage(
+                        errorMessage,
+                        "ai-message"
+                    );
+                }
+
+
+                finally {
+
+                    // =================================================
+                    // RESTORE INPUT
+                    // =================================================
+
+                    chatInput.disabled =
+                        false;
+
+
+                    if (submitButton) {
+
+                        submitButton.disabled =
+                            false;
+                    }
+
+
+                    chatInput.focus();
+                }
+            }
+        );
+
+
+        // =================================================
+        // APPEND MESSAGE
+        // =================================================
+
+        function appendMessage(
+            text,
+            className
+        ) {
+
+            const time =
+                new Date().toLocaleTimeString(
+                    [],
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }
+                );
+
+
+            const msgDiv =
+                document.createElement(
+                    "div"
+                );
+
+
+            msgDiv.className =
+                `message ${className}`;
+
+
+            // -------------------------------------------------
+            // Bubble
+            // -------------------------------------------------
+
+            const bubble =
+                document.createElement(
+                    "div"
+                );
+
+
+            bubble.className =
+                "bubble";
+
+
+            // textContent instead of innerHTML
+            // to avoid injecting HTML from user/API text
+            bubble.textContent =
+                text;
+
+
+            // -------------------------------------------------
+            // Time
+            // -------------------------------------------------
+
+            const timeSpan =
+                document.createElement(
+                    "span"
+                );
+
+
+            timeSpan.className =
+                "msg-time";
+
+
+            timeSpan.textContent =
+                time;
+
+
+            // -------------------------------------------------
+            // Build message
+            // -------------------------------------------------
+
+            msgDiv.appendChild(
+                bubble
+            );
+
+            msgDiv.appendChild(
+                timeSpan
+            );
+
+
+            chatBody.appendChild(
+                msgDiv
+            );
+
+
+            scrollToBottom();
+        }
+
+
+        // =================================================
+        // SHOW TYPING INDICATOR
+        // =================================================
+
+        function showTypingIndicator() {
+
+            const id =
+                "typing-" +
+                Date.now();
+
+
+            const typingDiv =
+                document.createElement(
+                    "div"
+                );
+
+
+            typingDiv.className =
+                "typing-indicator";
+
+
+            typingDiv.id =
+                id;
+
+
+            typingDiv.innerHTML =
+                `
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                `;
+
+
+            chatBody.appendChild(
+                typingDiv
+            );
+
+
+            scrollToBottom();
+
+
+            return id;
+        }
+
+
+        // =================================================
+        // REMOVE TYPING INDICATOR
+        // =================================================
+
+        function removeTypingIndicator(
+            id
+        ) {
+
+            const typingDiv =
+                document.getElementById(
+                    id
+                );
+
+
+            if (typingDiv) {
+
+                typingDiv.remove();
+            }
+        }
+
+
+        // =================================================
+        // DISPLAY SOURCES
+        // =================================================
+
+        function appendSources(
+            sources
+        ) {
+
+            const sourcesDiv =
+                document.createElement(
+                    "div"
+                );
+
+
+            sourcesDiv.className =
+                "ai-sources";
+
+
+            const title =
+                document.createElement(
+                    "div"
+                );
+
+
+            title.className =
+                "ai-sources-title";
+
+
+            title.textContent =
+                document.documentElement.lang === "ar"
+                    ? "📚 مصادر المعلومات"
+                    : "📚 Information Sources";
+
+
+            sourcesDiv.appendChild(
+                title
+            );
+
+
+            sources.forEach(
+                function (source) {
+
+                    if (!source || !source.title) {
+                        return;
+                    }
+
+
+                    const sourceItem =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    sourceItem.className =
+                        "ai-source-item";
+
+
+                    sourceItem.textContent =
+                        source.title;
+
+
+                    sourcesDiv.appendChild(
+                        sourceItem
+                    );
+                }
+            );
+
+
+            chatBody.appendChild(
+                sourcesDiv
+            );
+
+
+            scrollToBottom();
+        }
+
+
+        // =================================================
+        // SCROLL CHAT TO BOTTOM
+        // =================================================
+
+        function scrollToBottom() {
+
+            chatBody.scrollTop =
+                chatBody.scrollHeight;
         }
     }
-
-    // دالة للنزول لآخر رسالة أوتوماتيك
-    function scrollToBottom() {
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-});
+);
