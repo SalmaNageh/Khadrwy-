@@ -1823,3 +1823,336 @@ max-width: 700px;
     background-color: #d9534f;
     color: white;
 }
+/* =====================================================
+   SMART SETTINGS MODAL & FORM STYLES
+===================================================== */
+/* 1. النافذة والخلفية */
+.settings-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(31, 66, 41, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* عشان تغطي على النافبار */
+    padding: 20px;
+}
+
+.settings-modal {
+    background: #fcfdfc;
+    width: 100%;
+    max-width: 850px;
+    max-height: 90vh;
+    border-radius: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 2. زرار الإغلاق (X) */
+.settings-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #f4f8f4;
+    border: none;
+    width: 35px; height: 35px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: #1f4229;
+    cursor: pointer;
+    z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.3s;
+}
+.settings-close:hover { background: #eaf3eb; transform: rotate(90deg); color: #d9534f; }
+[dir="rtl"] .settings-close { right: auto; left: 20px; }
+
+/* 3. الهيدر والمحتوى */
+.settings-modal-header {
+    padding: 30px 40px 20px;
+    border-bottom: 1px solid #eef2ef;
+}
+.settings-modal-header h2 { margin: 10px 0; font-size: 1.8rem; color: #1f4229; }
+.settings-modal-header p { margin: 0; color: #68776b; font-size: 0.95rem; line-height: 1.5; }
+
+.settings-modal-body {
+    padding: 20px 40px 40px;
+    overflow-y: auto;
+}
+.text-left { text-align: left; }
+[dir="rtl"] .text-left { text-align: right; }
+
+/* 4. شريط الإعدادات السريعة (Presets) */
+.presets-banner {
+    background-color: #1f4229;
+    border-radius: 16px;
+    padding: 25px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(31, 66, 41, 0.15);
+}
+.presets-info h3 { color: #ffffff; margin: 0 0 5px; font-size: 1.2rem; }
+.presets-info p { color: #b8d5bc; margin: 0; font-size: 0.9rem; }
+.btn-preset {
+    background: #4d9b5a;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn-preset:hover { background: #3c7d47; transform: scale(1.05); }
+
+/* 5. كروت الإعدادات (Cards) */
+.settings-card {
+    background: #ffffff;
+    border: 1px solid #eef2ef;
+    border-radius: 16px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    overflow: hidden;
+}
+.card-header {
+    padding: 25px 30px;
+    border-bottom: 1px solid #f4f8f4;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+.card-header .icon-box {
+    width: 45px; height: 45px;
+    background: #f4f8f4; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+}
+.header-text h3 { margin: 0 0 5px; font-size: 1.4rem; color: #1f4229; }
+.header-text p { margin: 0; color: #8fa092; font-size: 0.95rem; }
+.card-body { padding: 30px; }
+
+/* 6. المدخلات (Inputs & Selects) */
+.grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.mt-20 { margin-top: 20px; }
+.mt-30 { margin-top: 30px; }
+.input-group label, .section-sublabel, .toggle-label {
+    display: block; font-size: 0.75rem; color: #1f4229; font-weight: 700;
+    letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase;
+}
+.lbl-light { color: #8fa092; font-weight: normal; text-transform: lowercase; }
+select, input[type="time"] {
+    width: 100%; padding: 14px 16px; border: 1px solid #eef2ef;
+    border-radius: 12px; background-color: #fcfdfc; color: #1f4229;
+    font-size: 0.95rem; outline: none; cursor: pointer;
+}
+select:focus, input[type="time"]:focus { border-color: #4d9b5a; }
+
+/* 7. مؤشرات السحب (Sliders) */
+.slider-group { margin-bottom: 30px; }
+.slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.slider-value-box { background: #eaf3eb; color: #1f4229; padding: 6px 16px; border-radius: 10px; font-weight: bold; }
+.custom-slider { -webkit-appearance: none; width: 100%; height: 8px; background: #eef2ef; border-radius: 5px; outline: none; }
+.custom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 20px; height: 20px;
+    border-radius: 50%; background: #2e7d32; cursor: pointer; box-shadow: 0 0 0 4px #eaf3eb;
+}
+
+/* 8. زرار التشغيل والإيقاف (Toggle Switch) */
+.toggle-box { border: 1px solid #eef2ef; border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+.toggle-info h4 { margin: 0 0 5px; color: #1f4229; }
+.toggle-info p { margin: 0; color: #8fa092; font-size: 0.85rem; }
+.toggle-controls { display: flex; align-items: center; gap: 15px; }
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider.round { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+.slider.round:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider.round { background-color: #2e7d32; }
+input:checked + .slider.round:before { transform: translateX(20px); }
+
+/* 9. الأرقام والمودز (Number & Segments) */
+.num-input-box { display: flex; align-items: center; border: 1px solid #eef2ef; border-radius: 12px; padding: 8px 15px; background: #fcfdfc; width: 100px; }
+.num-input-box.full-width { width: auto; }
+.num-input-box input { border: none; outline: none; background: transparent; width: 100%; font-size: 1rem; color: #1f4229; }
+.segmented-control { display: flex; background: #f4f8f4; border-radius: 12px; padding: 5px; gap: 5px; }
+.segment-radio input { display: none; }
+.segment-btn { flex: 1; text-align: center; padding: 12px; border-radius: 10px; color: #68776b; cursor: pointer; font-weight: 600; transition: 0.3s; }
+.segment-radio input:checked + .segment-btn { background: #ffffff; color: #1f4229; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
+/* 10. الوقت والأزرار السفلية */
+.time-restrictions-grid { display: flex; align-items: center; gap: 20px; }
+.through-text { color: #8fa092; font-size: 0.9rem; margin-top: 25px; }
+.settings-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; }
+.btn-outline { background: transparent; border: 1px solid #eef2ef; color: #68776b; padding: 14px 24px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+.btn-outline:hover { background: #f4f8f4; color: #1f4229; }
+.btn-primary { background: #2e7d32; color: white; border: none; padding: 14px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+.btn-primary:hover { background: #1f4229; }
+
+@media (max-width: 768px) {
+    .grid-2-col, .time-restrictions-grid { flex-direction: column; display: flex; }
+    .presets-banner { flex-direction: column; text-align: center; gap: 15px; }
+    .toggle-box { flex-direction: column; gap: 15px; align-items: flex-start; }
+    .settings-actions { flex-direction: column; }
+    .settings-actions button { width: 100%; }
+}
+
+/* =====================================================
+   FARM CONTROL PANEL STYLES
+===================================================== */
+.farm-control-panel {
+    background: #f4f8f4;
+    border: 1px solid #dbeadd;
+    border-radius: 20px;
+    padding: 25px 30px;
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.control-panel-info h3 {
+    margin: 0 0 5px;
+    font-size: 1.2rem;
+    color: #1f4229;
+    font-family: 'Playfair Display', serif;
+}
+
+.control-panel-info p {
+    margin: 0;
+    color: #68776b;
+    font-size: 0.9rem;
+}
+
+/* مؤشر الحالة (Status Indicator Badge) */
+.status-badge-indicator {
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.status-auto {
+    background-color: #eaf3eb;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.status-manual {
+    background-color: #fff4e5;
+    color: #e65100;
+    border: 1px solid #ffe0b2;
+}
+
+/* أزرار لوحة التحكم */
+.control-panel-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    position: relative;
+}
+
+.btn-control {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    outline: none;
+}
+
+.manual-btn {
+    background-color: #2e7d32;
+    color: #ffffff;
+}
+
+.manual-btn.active-stop {
+    background-color: #d9534f;
+}
+
+.manual-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.timer-btn {
+    background-color: #ffffff;
+    color: #1f4229;
+    border: 1px solid #dbeadd;
+}
+
+.timer-btn:hover {
+    background-color: #eaf3eb;
+}
+
+/* قائمة خيارات الـ Timer السريع */
+.timer-dropdown-wrapper {
+    position: relative;
+}
+
+.timer-menu {
+    position: absolute;
+    bottom: 110%;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #dbeadd;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    overflow: hidden;
+    z-index: 100;
+    min-width: 160px;
+    display: flex;
+    flex-direction: column;
+}
+
+.timer-option {
+    background: transparent;
+    border: none;
+    padding: 12px 18px;
+    text-align: left;
+    font-size: 0.9rem;
+    color: #1f4229;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+[dir="rtl"] .timer-option {
+    text-align: right;
+}
+
+.timer-option:hover {
+    background-color: #f4f8f4;
+}
+
+@media (max-width: 768px) {
+    .farm-control-panel {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .control-panel-actions {
+        flex-direction: column;
+    }
+    .timer-menu {
+        width: 100%;
+        right: auto;
+        left: 0;
+    }
+}

@@ -33,6 +33,7 @@
                 <a href="#monitoring" data-i18n="nav_monitor">Monitoring</a>
                 <a href="#assistant" data-i18n="nav_assist">AI Assistant</a>
                 <a href="#about" data-i18n="nav_about">About</a>
+                <a href="#" id="navSettingsBtn" data-i18n="nav_settings">Settings</a>
             </nav>
 
             <div class="nav-right">
@@ -43,7 +44,8 @@
 
                 <div class="auth-buttons" id="authButtons">
                     <button type="button" class="login-button" id="loginButton" data-i18n="btn_login">Login</button>
-                    <button type="button" class="signup-button" id="signupButton" data-i18n="btn_signup">Sign Up</button>
+                    <button type="button" class="signup-button" id="signupButton" data-i18n="btn_signup">Sign
+                        Up</button>
                 </div>
 
                 <div class="user-menu" id="userMenu" style="display: none;">
@@ -70,18 +72,20 @@
                     <form id="loginFormElement">
                         <div class="auth-field">
                             <label for="loginUsername" data-i18n="auth_user">Username</label>
-                            <input type="text" id="loginUsername" data-i18n-placeholder="auth_user_ph" placeholder="Enter your username" required>
+                            <input type="text" id="loginUsername" data-i18n-placeholder="auth_user_ph"
+                                placeholder="Enter your username" required>
                         </div>
                         <div class="auth-field">
                             <label for="loginPassword" data-i18n="auth_pass">Password</label>
-                            <input type="password" id="loginPassword" data-i18n-placeholder="auth_pass_ph" placeholder="Enter your password" required>
+                            <input type="password" id="loginPassword" data-i18n-placeholder="auth_pass_ph"
+                                placeholder="Enter your password" required>
                         </div>
                         <button type="submit" class="auth-submit" data-i18n="auth_login_btn">Login</button>
                         <p class="auth-message" id="loginMessage"></p>
                     </form>
 
                     <div class="auth-switch">
-                        <span data-i18n="auth_no_acc">Don't have an account?</span> 
+                        <span data-i18n="auth_no_acc">Don't have an account?</span>
                         <button type="button" id="showSignup" data-i18n="auth_signup_link">Sign Up</button>
                     </div>
                 </div>
@@ -95,28 +99,32 @@
                     <form id="signupFormElement">
                         <div class="auth-field">
                             <label for="signupUsername" data-i18n="auth_user">Username</label>
-                            <input type="text" id="signupUsername" data-i18n-placeholder="auth_user_ph2" placeholder="Choose a username" required>
+                            <input type="text" id="signupUsername" data-i18n-placeholder="auth_user_ph2"
+                                placeholder="Choose a username" required>
                         </div>
                         <div class="auth-field">
                             <label for="signupEmail" data-i18n="auth_email">Email</label>
-                            <input type="email" id="signupEmail" data-i18n-placeholder="auth_email_ph" placeholder="Enter your email" required>
+                            <input type="email" id="signupEmail" data-i18n-placeholder="auth_email_ph"
+                                placeholder="Enter your email" required>
                         </div>
                         <div class="auth-field">
                             <label for="signupPassword" data-i18n="auth_pass">Password</label>
-                            <input type="password" id="signupPassword" data-i18n-placeholder="auth_pass_ph2" placeholder="Create a password" minlength="8" required>
+                            <input type="password" id="signupPassword" data-i18n-placeholder="auth_pass_ph2"
+                                placeholder="Create a password" minlength="8" required>
                         </div>
                         <button type="submit" class="auth-submit" data-i18n="auth_signup_btn">Create Account</button>
                         <p class="auth-message" id="signupMessage"></p>
                     </form>
 
                     <div class="auth-switch">
-                        <span data-i18n="auth_has_acc">Already have an account?</span> 
+                        <span data-i18n="auth_has_acc">Already have an account?</span>
                         <button type="button" id="showLogin" data-i18n="auth_login_link">Login</button>
                     </div>
                 </div>
 
             </div>
         </div>
+
     </header>
 
     <main>
@@ -126,10 +134,11 @@
         ================================================== -->
         <section class="hero" id="home">
             <div class="hero-content">
-                
+
                 <div class="hero-text">
                     <div class="badge new-badge">
-                        <span class="status-dot"></span> <span data-i18n="hero_badge">AI-Powered Agricultural Platform — خضراوي</span>
+                        <span class="status-dot"></span> <span data-i18n="hero_badge">AI-Powered Agricultural Platform —
+                            خضراوي</span>
                     </div>
 
                     <h1 data-i18n="hero_title">
@@ -138,7 +147,8 @@
                     </h1>
 
                     <p class="hero-desc" data-i18n="hero_desc">
-                        Detect diseases instantly, monitor your farm in real-time, and get AI-driven recommendations — in Arabic or English. Built for every farmer, from smallholders to agri-enterprises.
+                        Detect diseases instantly, monitor your farm in real-time, and get AI-driven recommendations —
+                        in Arabic or English. Built for every farmer, from smallholders to agri-enterprises.
                     </p>
 
                     <div class="hero-actions">
@@ -164,7 +174,7 @@
 
                 <div class="hero-visual-square">
                     <div class="square-card">
-                        
+
                         <div class="scan-illustration">
                             <div class="scan-corners"></div>
                             <div class="scan-plant">🪴</div>
@@ -172,7 +182,8 @@
                         </div>
 
                         <div class="float-badge badge-top-right">
-                            <span style="color:#d9534f; margin-right:5px;">⚡</span> <span data-i18n="badge_ai">AI Analysis Active</span>
+                            <span style="color:#d9534f; margin-right:5px;">⚡</span> <span data-i18n="badge_ai">AI
+                                Analysis Active</span>
                         </div>
 
                         <div class="float-badge badge-bottom-left gold-badge">
@@ -185,8 +196,8 @@
             </div>
         </section>
 
- <section class="doctor-section" id="doctor">
-            
+        <section class="doctor-section" id="doctor">
+
             <div class="doctor-header-top">
                 <div class="doctor-title-area">
                     <span class="badge free-badge">
@@ -195,23 +206,24 @@
                     <h2 class="serif-highlight" data-i18n="doc_title">AI Plant<br>Doctor</h2>
                 </div>
                 <div class="doctor-desc-area">
-                    <p data-i18n="doc_desc">Upload a photo of your crop and our AI diagnoses disease, pests, and nutrient deficiencies in seconds — completely free.</p>
+                    <p data-i18n="doc_desc">Upload a photo of your crop and our AI diagnoses disease, pests, and
+                        nutrient deficiencies in seconds — completely free.</p>
                 </div>
             </div>
 
             <div class="doctor-workspace" id="doctorWorkspace">
-                
+
                 <!-- 1. UPLOAD CARD -->
                 <div class="upload-card" id="uploadCard">
-                    
+
                     <div class="upload-icon-wrapper" id="uploadIconWrapper">
                         <span id="defaultIcon">🌿</span>
                         <img id="previewImage" src="" alt="Selected plant" style="display: none;">
                     </div>
-                    
+
                     <h3 data-i18n="up_title">Drop your plant photo here</h3>
                     <p class="supported" data-i18n="up_support">Supports JPG, PNG, HEIC — Max 10MB</p>
-                    
+
                     <div class="upload-options" id="uploadOptions">
                         <label class="upload-btn" for="imageInput">
                             <span class="btn-icon">📁</span> <span data-i18n="up_choose">Choose Image</span>
@@ -225,8 +237,10 @@
                     </div>
 
                     <div class="action-options" id="actionOptions" style="display: none;">
-                        <button type="button" class="action-btn dismiss-btn" id="removeButton">✕ <span data-i18n="up_dismiss">Dismiss</span></button>
-                        <button type="button" class="action-btn analyze-btn" id="analyzeButton">🔍 <span data-i18n="up_analyze">Analyze</span></button>
+                        <button type="button" class="action-btn dismiss-btn" id="removeButton">✕ <span
+                                data-i18n="up_dismiss">Dismiss</span></button>
+                        <button type="button" class="action-btn analyze-btn" id="analyzeButton">🔍 <span
+                                data-i18n="up_analyze">Analyze</span></button>
                     </div>
 
                     <div class="loading" id="loading" style="display: none;">
@@ -242,7 +256,7 @@
                 </div>
 
                 <!-- 2. RESULT CARD -->
-                <div class="result-card-modern" id="resultCard" style="display: none;">                    
+                <div class="result-card-modern" id="resultCard" style="display: none;">
                     <div class="result-header-modern">
                         <div class="plant-id-area">
                             <div class="plant-avatar" id="resultIcon">🍅</div>
@@ -271,7 +285,8 @@
                         </div>
 
                         <div class="treatment-box">
-                            <span class="label-sm title-treatment" data-i18n="res_treat_label">TREATMENT RECOMMENDATION</span>
+                            <span class="label-sm title-treatment" data-i18n="res_treat_label">TREATMENT
+                                RECOMMENDATION</span>
                             <p id="resultRecommendation">
                                 Apply copper-based fungicide immediately. Remove and destroy infected leaves.
                             </p>
@@ -279,348 +294,654 @@
                         </div>
 
                     </div>
-                        <button id="speakResultButton" type="button">
-    🔊 Read Result
-</button>
+                    <button id="speakResultButton" type="button">
+                        🔊 Read Result
+                    </button>
                 </div>
 
             </div>
         </section>
 
-<!-- =================================================
+        <!-- =================================================
      HOW IT WORKS SECTION (ستايل احترافي جديد)
 ================================================== -->
-<section class="how-section" id="how-it-works">
-    <div class="container">
-        
-<div class="section-title">
-            <span class="small-badge" data-i18n="how_badge">HOW IT WORKS</span>
-            <h2 class="serif-heading" data-i18n="how_title">Diagnosis Made Simple</h2>
-            <p data-i18n="how_desc">From a simple leaf photo to practical plant care advice.</p>
-        </div>
+        <section class="how-section" id="how-it-works">
+            <div class="container">
 
-        <div class="steps-grid-modern">
-            
-            <!-- الخطوة 1 -->
-            <article class="modern-step-card">
-                <div class="step-head">
-                    <div class="modern-icon">📷</div>
-                    <span class="step-pill">01</span>
+                <div class="section-title">
+                    <span class="small-badge" data-i18n="how_badge">HOW IT WORKS</span>
+                    <h2 class="serif-heading" data-i18n="how_title">Diagnosis Made Simple</h2>
+                    <p data-i18n="how_desc">From a simple leaf photo to practical plant care advice.</p>
                 </div>
-                <div class="step-body">
-                    <h3 data-i18n="step_1_title">Capture</h3>
-                    <p data-i18n="step_1_desc">Take a clear photo or upload an existing image of your plant leaf.</p>
-                </div>
-            </article>
 
-            <!-- الخطوة 2 -->
-            <article class="modern-step-card">
-                <div class="step-head">
-                    <div class="modern-icon">🤖</div>
-                    <span class="step-pill">02</span>
-                </div>
-                <div class="step-body">
-                    <h3 data-i18n="step_2_title">Analyze</h3>
-                    <p data-i18n="step_2_desc">Our AI model analyzes the image and identifies the most likely condition.</p>
-                </div>
-            </article>
+                <div class="steps-grid-modern">
 
-            <!-- الخطوة 3 -->
-            <article class="modern-step-card">
-                <div class="step-head">
-                    <div class="modern-icon">💡</div>
-                    <span class="step-pill">03</span>
-                </div>
-                <div class="step-body">
-                    <h3 data-i18n="step_3_title">Get Advice</h3>
-                    <p data-i18n="step_3_desc">Receive an AI diagnosis with symptoms, actions, and prevention tips.</p>
-                </div>
-            </article>
+                    <!-- الخطوة 1 -->
+                    <article class="modern-step-card">
+                        <div class="step-head">
+                            <div class="modern-icon">📷</div>
+                            <span class="step-pill">01</span>
+                        </div>
+                        <div class="step-body">
+                            <h3 data-i18n="step_1_title">Capture</h3>
+                            <p data-i18n="step_1_desc">Take a clear photo or upload an existing image of your plant
+                                leaf.</p>
+                        </div>
+                    </article>
 
-        </div>
-    </div>
-</section>
-<!-- =================================================
+                    <!-- الخطوة 2 -->
+                    <article class="modern-step-card">
+                        <div class="step-head">
+                            <div class="modern-icon">🤖</div>
+                            <span class="step-pill">02</span>
+                        </div>
+                        <div class="step-body">
+                            <h3 data-i18n="step_2_title">Analyze</h3>
+                            <p data-i18n="step_2_desc">Our AI model analyzes the image and identifies the most likely
+                                condition.</p>
+                        </div>
+                    </article>
+
+                    <!-- الخطوة 3 -->
+                    <article class="modern-step-card">
+                        <div class="step-head">
+                            <div class="modern-icon">💡</div>
+                            <span class="step-pill">03</span>
+                        </div>
+                        <div class="step-body">
+                            <h3 data-i18n="step_3_title">Get Advice</h3>
+                            <p data-i18n="step_3_desc">Receive an AI diagnosis with symptoms, actions, and prevention
+                                tips.</p>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+        <!-- =================================================
      SMART MONITORING SECTION
 ================================================== -->
-<section class="monitoring-section" id="monitoring">
-    <div class="container">
-        
-        <!-- Header -->
-        <div class="section-title">
-            <span class="small-badge" data-i18n="mon_badge">SMART MONITORING</span>
-            <h2 class="serif-heading" data-i18n="mon_title">Your Farm, Always<br>in Sight</h2>
-            <p data-i18n="mon_desc">Real-time environmental data from precision sensors deployed across your fields<br>— delivered to you instantly, interpreted intelligently.</p>
+        <section class="monitoring-section" id="monitoring">
+            <div class="container">
+
+                <!-- Header -->
+                <div class="section-title">
+                    <span class="small-badge" data-i18n="mon_badge">SMART MONITORING</span>
+                    <h2 class="serif-heading" data-i18n="mon_title">Your Farm, Always<br>in Sight</h2>
+                    <p data-i18n="mon_desc">Real-time environmental data from precision sensors deployed across your
+                        fields<br>— delivered to you instantly, interpreted intelligently.</p>
+                </div>
+
+                <!-- Sensors Grid -->
+                <div class="sensors-grid">
+
+                    <!-- Sensor 1: Temperature -->
+                    <article class="sensor-card">
+                        <div class="sensor-icon-box">🌡️</div>
+                        <div class="sensor-label" data-i18n="sens_temp_label">AIR TEMPERATURE</div>
+                        <div class="sensor-value serif-heading"><span id="val-temp">24</span> <span
+                                class="unit">°C</span></div>
+                        <span class="status-pill status-optimal" data-i18n="status_optimal">Optimal</span>
+                    </article>
+
+                    <!-- Sensor 2: Humidity -->
+                    <article class="sensor-card">
+                        <div class="sensor-icon-box">💧</div>
+                        <div class="sensor-label" data-i18n="sens_hum_label">HUMIDITY</div>
+                        <div class="sensor-value serif-heading"><span id="val-hum">45</span> <span class="unit">%</span>
+                        </div>
+                        <span class="status-pill status-normal" data-i18n="status_normal">Normal</span>
+                    </article>
+
+                    <!-- Sensor 3: Soil Moisture -->
+                    <article class="sensor-card">
+                        <div class="sensor-icon-box">🌱</div>
+                        <div class="sensor-label" data-i18n="sens_soil_label">SOIL MOISTURE</div>
+                        <div class="sensor-value serif-heading"><span id="val-soil">62</span> <span
+                                class="unit">%</span></div>
+                        <span class="status-pill status-warning" data-i18n="status_review">Review</span>
+                    </article>
+
+                    <!-- Sensor 4: Light Intensity -->
+                    <article class="sensor-card">
+                        <div class="sensor-icon-box">☀️</div>
+                        <div class="sensor-label" data-i18n="sens_light_label">LIGHT INTENSITY</div>
+                        <div class="sensor-value serif-heading"><span id="val-light">8,400</span> <span
+                                class="unit">lx</span></div>
+                        <span class="status-pill status-optimal" data-i18n="status_high">High</span>
+                    </article>
+
+                </div><!-- لوحة التحكم الجديدة (Control Panel) -->
+<div class="farm-control-panel">
+    <div class="control-panel-header">
+        <div class="control-panel-info">
+            <h3 data-i18n="ctrl_panel_title">🚰 Irrigation Control Panel</h3>
+            <p data-i18n="ctrl_panel_desc">Manage water pumps instantly or switch system overrides</p>
         </div>
-
-        <!-- Sensors Grid -->
-        <div class="sensors-grid">
-            
-            <!-- Sensor 1: Temperature -->
-            <article class="sensor-card">
-                <div class="sensor-icon-box">🌡️</div>
-                <div class="sensor-label" data-i18n="sens_temp_label">AIR TEMPERATURE</div>
-                <div class="sensor-value serif-heading"><span id="val-temp">24</span> <span class="unit">°C</span></div>
-                <span class="status-pill status-optimal" data-i18n="status_optimal">Optimal</span>
-            </article>
-
-            <!-- Sensor 2: Humidity -->
-            <article class="sensor-card">
-                <div class="sensor-icon-box">💧</div>
-                <div class="sensor-label" data-i18n="sens_hum_label">HUMIDITY</div>
-                <div class="sensor-value serif-heading"><span id="val-hum">45</span> <span class="unit">%</span></div>
-                <span class="status-pill status-normal" data-i18n="status_normal">Normal</span>
-            </article>
-
-            <!-- Sensor 3: Soil Moisture -->
-            <article class="sensor-card">
-                <div class="sensor-icon-box">🌱</div>
-                <div class="sensor-label" data-i18n="sens_soil_label">SOIL MOISTURE</div>
-                <div class="sensor-value serif-heading"><span id="val-soil">62</span> <span class="unit">%</span></div>
-                <span class="status-pill status-warning" data-i18n="status_review">Review</span>
-            </article>
-
-            <!-- Sensor 4: Light Intensity -->
-            <article class="sensor-card">
-                <div class="sensor-icon-box">☀️</div>
-                <div class="sensor-label" data-i18n="sens_light_label">LIGHT INTENSITY</div>
-                <div class="sensor-value serif-heading"><span id="val-light">8,400</span> <span class="unit">lx</span></div>
-                <span class="status-pill status-optimal" data-i18n="status_high">High</span>
-            </article>
-
+        <!-- مؤشر الحالة (Status Indicator) -->
+        <div id="systemStatusBadge" class="status-badge-indicator status-auto" data-i18n="status_auto_label">
+            🟢 SYSTEM: AUTO
         </div>
     </div>
-</section>
-<!-- =================================================
+
+    <div class="control-panel-actions">
+        <!-- زرار Manual (تشغيل/إيقاف يدوي) -->
+        <button type="button" id="manualWaterBtn" class="btn-control manual-btn" data-i18n="btn_water_now">
+            💧 Water Now
+        </button>
+
+        <!-- زرار Timer (تشغيل المؤقت السريع) -->
+        <div class="timer-dropdown-wrapper">
+            <button type="button" id="timerDropdownBtn" class="btn-control timer-btn" data-i18n="btn_run_for">
+                ⏱ Run for... ▾
+            </button>
+            <div id="timerMenu" class="timer-menu" style="display: none;">
+                <button type="button" class="timer-option" data-minutes="10" data-i18n="timer_10m">10 Minutes</button>
+                <button type="button" class="timer-option" data-minutes="30" data-i18n="timer_30m">30 Minutes</button>
+                <button type="button" class="timer-option" data-minutes="60" data-i18n="timer_1h">1 Hour</button>
+            </div>
+        </div>
+    </div>
+</div>
+            </div>
+        </section>
+
+        <!-- =================================================
      AI ASSISTANT SECTION
 ================================================== -->
-<section class="ai-section" id="ai-assistant">
-    <div class="container">
-        
-        <!-- الجزء العلوي: النصوص والمميزات -->
-        <div class="ai-intro">
-            <div class="section-title">
-                <span class="small-badge" data-i18n="ai_badge">AI ASSISTANT</span>
-                <h2 class="serif-heading" data-i18n="ai_title">Your Expert Agronomist,<br>Available 24 / 7</h2>
-                <p data-i18n="ai_desc">Khadrawy's AI speaks your language — ask anything from soil chemistry to harvest timing. It learns your farm, so advice gets sharper over time.</p>
-            </div>
+        <section class="ai-section" id="ai-assistant">
+            <div class="container">
 
-            <!-- شبكة المميزات الـ 4 -->
-            <div class="ai-features">
-                <div class="feature-item">
-                    <div class="feature-icon">⚡</div>
-                    <div class="feature-text">
-                        <h4 data-i18n="ai_feat1_title">Instant advice</h4>
-                        <p data-i18n="ai_feat1_desc">Actionable answers in seconds — no waiting, no call centres.</p>
+                <!-- الجزء العلوي: النصوص والمميزات -->
+                <div class="ai-intro">
+                    <div class="section-title">
+                        <span class="small-badge" data-i18n="ai_badge">AI ASSISTANT</span>
+                        <h2 class="serif-heading" data-i18n="ai_title">Your Expert Agronomist,<br>Available 24 / 7</h2>
+                        <p data-i18n="ai_desc">Khadrawy's AI speaks your language — ask anything from soil chemistry to
+                            harvest timing. It learns your farm, so advice gets sharper over time.</p>
+                    </div>
+
+                    <!-- شبكة المميزات الـ 4 -->
+                    <div class="ai-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">⚡</div>
+                            <div class="feature-text">
+                                <h4 data-i18n="ai_feat1_title">Instant advice</h4>
+                                <p data-i18n="ai_feat1_desc">Actionable answers in seconds — no waiting, no call
+                                    centres.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🔍</div>
+                            <div class="feature-text">
+                                <h4 data-i18n="ai_feat2_title">Pest & disease identification</h4>
+                                <p data-i18n="ai_feat2_desc">Upload a photo and get a diagnosis with a treatment plan.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">📅</div>
+                            <div class="feature-text">
+                                <h4 data-i18n="ai_feat3_title">Seasonal crop planning</h4>
+                                <p data-i18n="ai_feat3_desc">Personalised sowing and irrigation schedules built around
+                                    your climate.</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🌐</div>
+                            <div class="feature-text">
+                                <h4 data-i18n="ai_feat4_title">Arabic & English support</h4>
+                                <p data-i18n="ai_feat4_desc">Switch languages mid-conversation — the AI keeps up.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="feature-item">
-                    <div class="feature-icon">🔍</div>
-                    <div class="feature-text">
-                        <h4 data-i18n="ai_feat2_title">Pest & disease identification</h4>
-                        <p data-i18n="ai_feat2_desc">Upload a photo and get a diagnosis with a treatment plan.</p>
+
+                <!-- الجزء السفلي: واجهة الشات الحقيقية -->
+                <div class="chat-container">
+                    <!-- هيدر الشات -->
+                    <div class="chat-header">
+                        <div class="chat-avatar-box">🌿</div>
+                        <div class="chat-info">
+                            <h3 data-i18n="chat_name">Khadrawy AI</h3>
+                            <span class="chat-status"><span class="dot"></span> Online now</span>
+                        </div>
+                    </div>
+
+                    <!-- مكان الرسايل -->
+                    <div class="chat-body" id="chatBody">
+                        <!-- رسالة ترحيب من الذكاء الاصطناعي -->
+                        <div class="message ai-message">
+                            <div class="bubble" data-i18n="chat_welcome">Hello! I'm here to help with your crops. What's
+                                on your mind today?</div>
+                            <span class="msg-time">09:14 AM</span>
+                        </div>
+                    </div>
+
+                    <!-- مكان الكتابة -->
+                    <div class="chat-footer">
+                        <form id="chatForm">
+                            <input type="text" id="chatInput" data-i18n-placeholder="chat_placeholder"
+                                placeholder="Ask anything about your farm..." required autocomplete="off">
+                            <button type="submit" id="sendBtn">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                                </svg>
+                            </button>
+                        </form>
                     </div>
                 </div>
-                <div class="feature-item">
-                    <div class="feature-icon">📅</div>
-                    <div class="feature-text">
-                        <h4 data-i18n="ai_feat3_title">Seasonal crop planning</h4>
-                        <p data-i18n="ai_feat3_desc">Personalised sowing and irrigation schedules built around your climate.</p>
-                    </div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">🌐</div>
-                    <div class="feature-text">
-                        <h4 data-i18n="ai_feat4_title">Arabic & English support</h4>
-                        <p data-i18n="ai_feat4_desc">Switch languages mid-conversation — the AI keeps up.</p>
-                    </div>
-                </div>
+
             </div>
-        </div>
+        </section>
 
-        <!-- الجزء السفلي: واجهة الشات الحقيقية -->
-        <div class="chat-container">
-            <!-- هيدر الشات -->
-            <div class="chat-header">
-                <div class="chat-avatar-box">🌿</div>
-                <div class="chat-info">
-                    <h3 data-i18n="chat_name">Khadrawy AI</h3>
-                    <span class="chat-status"><span class="dot"></span> Online now</span>
-                </div>
-            </div>
-
-            <!-- مكان الرسايل -->
-            <div class="chat-body" id="chatBody">
-                <!-- رسالة ترحيب من الذكاء الاصطناعي -->
-                <div class="message ai-message">
-                    <div class="bubble" data-i18n="chat_welcome">Hello! I'm here to help with your crops. What's on your mind today?</div>
-                    <span class="msg-time">09:14 AM</span>
-                </div>
-            </div>
-
-            <!-- مكان الكتابة -->
-            <div class="chat-footer">
-                <form id="chatForm">
-                    <input type="text" id="chatInput" data-i18n-placeholder="chat_placeholder" placeholder="Ask anything about your farm..." required autocomplete="off">
-                    <button type="submit" id="sendBtn">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-    </div>
-</section>
-
- <!-- =================================================
+        <!-- =================================================
      OUR MISSION / ABOUT SECTION
 ================================================== -->
-<section class="about-section" id="about">
-    <div class="container">
-        
-        <!-- Header -->
-        <div class="section-title">
-            <span class="small-badge" data-i18n="abt_mission_badge">OUR MISSION</span>
-            <h2 class="serif-heading" data-i18n="abt_mission_title">Empowering Farmers with AI</h2>
-            <p data-i18n="abt_mission_desc">Khadrawy was founded on a simple conviction: every farmer — regardless of farm size or technical background — deserves access to world-class agricultural intelligence.</p>
-        </div>
+        <section class="about-section" id="about">
+            <div class="container">
 
-        <!-- Mission Cards Grid -->
-        <div class="mission-cards-grid">
-            
-            <!-- Card 1 -->
-            <article class="mission-card">
-                <div class="mission-icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <!-- Header -->
+                <div class="section-title">
+                    <span class="small-badge" data-i18n="abt_mission_badge">OUR MISSION</span>
+                    <h2 class="serif-heading" data-i18n="abt_mission_title">Empowering Farmers with AI</h2>
+                    <p data-i18n="abt_mission_desc">Khadrawy was founded on a simple conviction: every farmer —
+                        regardless of farm size or technical background — deserves access to world-class agricultural
+                        intelligence.</p>
                 </div>
-                <h3 class="serif-heading" data-i18n="abt_card1_title">Sustainability</h3>
-                <p data-i18n="abt_card1_desc">We design every feature to reduce chemical use, conserve water, and protect soil health — because long-term yield depends on long-term stewardship.</p>
-            </article>
 
-            <!-- Card 2 -->
-            <article class="mission-card">
-                <div class="mission-icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <!-- Mission Cards Grid -->
+                <div class="mission-cards-grid">
+
+                    <!-- Card 1 -->
+                    <article class="mission-card">
+                        <div class="mission-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <h3 class="serif-heading" data-i18n="abt_card1_title">Sustainability</h3>
+                        <p data-i18n="abt_card1_desc">We design every feature to reduce chemical use, conserve water,
+                            and protect soil health — because long-term yield depends on long-term stewardship.</p>
+                    </article>
+
+                    <!-- Card 2 -->
+                    <article class="mission-card">
+                        <div class="mission-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                            </svg>
+                        </div>
+                        <h3 class="serif-heading" data-i18n="abt_card2_title">Innovation</h3>
+                        <p data-i18n="abt_card2_desc">From satellite imagery to in-field sensor networks, we combine the
+                            best available technology to give farmers an edge rooted in evidence, not guesswork.</p>
+                    </article>
+
+                    <!-- Card 3 -->
+                    <article class="mission-card">
+                        <div class="mission-icon">
+                            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <h3 class="serif-heading" data-i18n="abt_card3_title">Community</h3>
+                        <p data-i18n="abt_card3_desc">We grow stronger together. Khadrawy connects farmers, agronomists,
+                            and researchers into a shared knowledge network that benefits everyone on the platform.</p>
+                    </article>
+
                 </div>
-                <h3 class="serif-heading" data-i18n="abt_card2_title">Innovation</h3>
-                <p data-i18n="abt_card2_desc">From satellite imagery to in-field sensor networks, we combine the best available technology to give farmers an edge rooted in evidence, not guesswork.</p>
-            </article>
 
-            <!-- Card 3 -->
-            <article class="mission-card">
-                <div class="mission-icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <!-- Stats Banner -->
+                <div class="stats-banner">
+                    <div class="stat-item">
+                        <h3 class="serif-heading">12,400<span class="highlight-symbol">+</span></h3>
+                        <p data-i18n="abt_stat1_label">ACTIVE FARMERS</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 class="serif-heading">340,000<span class="highlight-symbol">+</span></h3>
+                        <p data-i18n="abt_stat2_label">HECTARES MONITORED</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 class="serif-heading">98<span class="highlight-symbol">%</span></h3>
+                        <p data-i18n="abt_stat3_label">SATISFACTION RATE</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 class="serif-heading">24<span class="highlight-slash">/</span>7</h3>
+                        <p data-i18n="abt_stat4_label">AI AVAILABILITY</p>
+                    </div>
                 </div>
-                <h3 class="serif-heading" data-i18n="abt_card3_title">Community</h3>
-                <p data-i18n="abt_card3_desc">We grow stronger together. Khadrawy connects farmers, agronomists, and researchers into a shared knowledge network that benefits everyone on the platform.</p>
-            </article>
 
-        </div>
-
-        <!-- Stats Banner -->
-        <div class="stats-banner">
-            <div class="stat-item">
-                <h3 class="serif-heading">12,400<span class="highlight-symbol">+</span></h3>
-                <p data-i18n="abt_stat1_label">ACTIVE FARMERS</p>
             </div>
-            <div class="stat-item">
-                <h3 class="serif-heading">340,000<span class="highlight-symbol">+</span></h3>
-                <p data-i18n="abt_stat2_label">HECTARES MONITORED</p>
-            </div>
-            <div class="stat-item">
-                <h3 class="serif-heading">98<span class="highlight-symbol">%</span></h3>
-                <p data-i18n="abt_stat3_label">SATISFACTION RATE</p>
-            </div>
-            <div class="stat-item">
-                <h3 class="serif-heading">24<span class="highlight-slash">/</span>7</h3>
-                <p data-i18n="abt_stat4_label">AI AVAILABILITY</p>
-            </div>
-        </div>
-
-    </div>
-</section>
+        </section>
 
     </main>
 
-<!-- =================================================
+    <!-- =================================================
      FOOTER SECTION
 ================================================== -->
-<footer class="site-footer">
-    <div class="container">
-        
-        <div class="footer-grid">
-            <!-- العمود الأول: البراند -->
-            <div class="footer-col brand-col">
-                <div class="footer-logo">
-                    <span class="logo-icon">🌿</span>
-                    <h2 class="serif-heading">Khadrawy</h2>
+    <footer class="site-footer">
+        <div class="container">
+
+            <div class="footer-grid">
+                <!-- العمود الأول: البراند -->
+                <div class="footer-col brand-col">
+                    <div class="footer-logo">
+                        <span class="logo-icon">🌿</span>
+                        <h2 class="serif-heading">Khadrawy</h2>
+                    </div>
+                    <p data-i18n="ftr_brand_desc">Precision agriculture intelligence for the farmers who feed the world.
+                        Smarter growing starts here.</p>
+
+                    <div class="social-links">
+                        <a href="#" aria-label="X (Twitter)"><svg viewBox="0 0 24 24" width="20" height="20"
+                                stroke="currentColor" stroke-width="2" fill="none">
+                                <line x1="4" y1="4" x2="20" y2="20"></line>
+                                <line x1="20" y1="4" x2="4" y2="20"></line>
+                            </svg></a>
+                        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" width="20" height="20"
+                                stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                            </svg></a>
+                        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="20" height="20"
+                                stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path
+                                    d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z">
+                                </path>
+                                <rect x="2" y="9" width="4" height="12"></rect>
+                                <circle cx="4" cy="4" r="2"></circle>
+                            </svg></a>
+                        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" width="20" height="20"
+                                stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path
+                                    d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z">
+                                </path>
+                                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                            </svg></a>
+                    </div>
                 </div>
-                <p data-i18n="ftr_brand_desc">Precision agriculture intelligence for the farmers who feed the world. Smarter growing starts here.</p>
-                
-                <div class="social-links">
-                    <a href="#" aria-label="X (Twitter)"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="4" y1="4" x2="20" y2="20"></line><line x1="20" y1="4" x2="4" y2="20"></line></svg></a>
-                    <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
-                    <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
-                    <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg></a>
+
+                <!-- العمود الثاني: روابط سريعة -->
+                <div class="footer-col links-col">
+                    <h4 data-i18n="ftr_quick_links">QUICK LINKS</h4>
+                    <ul>
+                        <li><a href="#" data-i18n="ftr_link_home">Home</a></li>
+                        <li><a href="#monitoring" data-i18n="ftr_link_monitor">Smart Monitoring</a></li>
+                        <li><a href="#ai-assistant" data-i18n="ftr_link_ai">AI Assistant</a></li>
+                        <li><a href="#about" data-i18n="ftr_link_about">About Us</a></li>
+                        <li><a href="#" data-i18n="ftr_link_pricing">Pricing</a></li>
+                        <li><a href="#" data-i18n="ftr_link_contact">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- العمود الثالث: المصادر -->
+                <div class="footer-col links-col">
+                    <h4 data-i18n="ftr_resources">RESOURCES</h4>
+                    <ul>
+                        <li><a href="#" data-i18n="ftr_link_docs">Documentation</a></li>
+                        <li><a href="#" data-i18n="ftr_link_blog">Blog & Insights</a></li>
+                        <li><a href="#" data-i18n="ftr_link_guides">Crop Guides</a></li>
+                        <li><a href="#" data-i18n="ftr_link_api">API Access</a></li>
+                        <li><a href="#" data-i18n="ftr_link_support">Support Centre</a></li>
+                        <li><a href="#" data-i18n="ftr_link_forum">Community Forum</a></li>
+                    </ul>
+                </div>
+
+                <!-- العمود الرابع: النشرة البريدية -->
+                <div class="footer-col newsletter-col">
+                    <h4 data-i18n="ftr_newsletter">STAY IN THE KNOW</h4>
+                    <p data-i18n="ftr_news_desc">Seasonal tips, new features, and agronomy insights — delivered monthly.
+                        No spam.</p>
+                    <form class="newsletter-form" onsubmit="event.preventDefault();">
+                        <input type="email" data-i18n-placeholder="ftr_news_ph" placeholder="your@email.com" required>
+                        <button type="submit" data-i18n="ftr_news_btn">Subscribe</button>
+                    </form>
+                    <p class="privacy-note" data-i18n="ftr_news_privacy">We respect your privacy. Unsubscribe any time.
+                    </p>
                 </div>
             </div>
 
-            <!-- العمود الثاني: روابط سريعة -->
-            <div class="footer-col links-col">
-                <h4 data-i18n="ftr_quick_links">QUICK LINKS</h4>
-                <ul>
-                    <li><a href="#" data-i18n="ftr_link_home">Home</a></li>
-                    <li><a href="#monitoring" data-i18n="ftr_link_monitor">Smart Monitoring</a></li>
-                    <li><a href="#ai-assistant" data-i18n="ftr_link_ai">AI Assistant</a></li>
-                    <li><a href="#about" data-i18n="ftr_link_about">About Us</a></li>
-                    <li><a href="#" data-i18n="ftr_link_pricing">Pricing</a></li>
-                    <li><a href="#" data-i18n="ftr_link_contact">Contact</a></li>
-                </ul>
+            <!-- الجزء السفلي: الحقوق -->
+            <div class="footer-bottom">
+                <p data-i18n="ftr_copyright">© 2026 Khadrawy — خضراوي. All rights reserved.</p>
+                <div class="legal-links">
+                    <a href="#" data-i18n="ftr_privacy">Privacy Policy</a>
+                    <span class="dot-separator">·</span>
+                    <a href="#" data-i18n="ftr_terms">Terms of Service</a>
+                    <span class="dot-separator">·</span>
+                    <a href="#" data-i18n="ftr_cookies">Cookie Settings</a>
+                </div>
             </div>
 
-            <!-- العمود الثالث: المصادر -->
-            <div class="footer-col links-col">
-                <h4 data-i18n="ftr_resources">RESOURCES</h4>
-                <ul>
-                    <li><a href="#" data-i18n="ftr_link_docs">Documentation</a></li>
-                    <li><a href="#" data-i18n="ftr_link_blog">Blog & Insights</a></li>
-                    <li><a href="#" data-i18n="ftr_link_guides">Crop Guides</a></li>
-                    <li><a href="#" data-i18n="ftr_link_api">API Access</a></li>
-                    <li><a href="#" data-i18n="ftr_link_support">Support Centre</a></li>
-                    <li><a href="#" data-i18n="ftr_link_forum">Community Forum</a></li>
-                </ul>
+        </div>
+    </footer>
+
+    <div class="settings-overlay" id="settingsOverlay" style="display: none;">
+        <div class="settings-modal">
+
+            <button type="button" class="settings-close" id="settingsClose">✕</button>
+
+            <div class="settings-modal-header text-left">
+                <span class="small-badge" data-i18n="set_badge">IOT AUTOMATION</span>
+                <h2 class="serif-heading" data-i18n="set_title">Smart Automation Settings</h2>
+                <p data-i18n="set_desc">Configure intelligent irrigation rules for your connected water pump based on
+                    real-time sensor data.</p>
             </div>
 
-            <!-- العمود الرابع: النشرة البريدية -->
-            <div class="footer-col newsletter-col">
-                <h4 data-i18n="ftr_newsletter">STAY IN THE KNOW</h4>
-                <p data-i18n="ftr_news_desc">Seasonal tips, new features, and agronomy insights — delivered monthly. No spam.</p>
-                <form class="newsletter-form" onsubmit="event.preventDefault();">
-                    <input type="email" data-i18n-placeholder="ftr_news_ph" placeholder="your@email.com" required>
-                    <button type="submit" data-i18n="ftr_news_btn">Subscribe</button>
+            <div class="settings-modal-body text-left">
+                <div class="presets-banner">
+                    <div class="presets-info">
+                        <h3 data-i18n="set_preset_title">Apply Smart Presets</h3>
+                        <p data-i18n="set_preset_desc">Auto-fill optimal values based on selected crop & growth stage
+                        </p>
+                    </div>
+                    <button type="button" class="btn-preset" id="applyPresetsBtn">✨ <span
+                            data-i18n="set_preset_btn">Apply Smart Presets</span></button>
+                </div>
+
+                <form id="automationForm">
+
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="icon-box">🌱</div>
+                            <div class="header-text">
+                                <h3 class="serif-heading" data-i18n="set_c1_title">Field & Crop Profile</h3>
+                                <p data-i18n="set_c1_desc">Define the crop context for smart threshold calibration</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="grid-2-col">
+                                <div class="input-group">
+                                    <label data-i18n="set_lbl_crop">CROP TYPE</label>
+                                    <select id="cropType">
+                                        <option value="" disabled selected data-i18n="set_opt_select_crop">Select
+                                            crop...</option>
+                                        <option value="apple" data-i18n="set_opt_apple">Apple</option>
+                                        <option value="blueberry" data-i18n="set_opt_blueberry">Blueberry</option>
+                                        <option value="cherry" data-i18n="set_opt_cherry">Cherry</option>
+                                        <option value="corn" data-i18n="set_opt_corn">Corn / Maize</option>
+                                        <option value="grape" data-i18n="set_opt_grape">Grape</option>
+                                        <option value="orange" data-i18n="set_opt_orange">Orange</option>
+                                        <option value="peach" data-i18n="set_opt_peach">Peach</option>
+                                        <option value="pepper" data-i18n="set_opt_pepper">Pepper bell</option>
+                                        <option value="potato" data-i18n="set_opt_potato">Potato</option>
+                                        <option value="raspberry" data-i18n="set_opt_raspberry">Raspberry</option>
+                                        <option value="soybean" data-i18n="set_opt_soybean">Soybean</option>
+                                        <option value="squash" data-i18n="set_opt_squash">Squash</option>
+                                        <option value="strawberry" data-i18n="set_opt_strawberry">Strawberry</option>
+                                        <option value="tomato" data-i18n="set_opt_tomato">Tomato</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label data-i18n="set_lbl_growth">GROWTH STAGE</label>
+                                    <select id="growthStage">
+                                        <option value="seed" data-i18n="set_opt_seed">Seed</option>
+                                        <option value="germination" data-i18n="set_opt_germination">Germination</option>
+                                        <option value="seedling" data-i18n="set_opt_seedling">Seedling</option>
+                                        <option value="vegetative" selected data-i18n="set_opt_vegetative">Vegetative
+                                            Growth</option>
+                                        <option value="budding" data-i18n="set_opt_budding">Budding</option>
+                                        <option value="flowering" data-i18n="set_opt_flowering">Flowering</option>
+                                        <option value="fruiting" data-i18n="set_opt_fruiting">Fruiting</option>
+                                        <option value="ripening" data-i18n="set_opt_ripening">Ripening / Maturity
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-group mt-20">
+                                <label data-i18n="set_lbl_soil">SOIL TYPE</label>
+                                <select id="soilType">
+                                    <option value="loamy" selected data-i18n="set_opt_loamy">Loamy Soil</option>
+                                    <option value="sandy" data-i18n="set_opt_sandy">Sandy Soil</option>
+                                    <option value="clay" data-i18n="set_opt_clay">Clay Soil</option>
+                                    <option value="silty" data-i18n="set_opt_silty">Silty Soil</option>
+                                    <option value="peaty" data-i18n="set_opt_peaty">Peaty Soil</option>
+                                    <option value="chalky" data-i18n="set_opt_chalky">Chalky Soil</option>
+                                </select>
+                            </div>
+
+                            <div class="settings-card">
+                                <div class="card-header">
+                                    <div class="icon-box">📊</div>
+                                    <div class="header-text">
+                                        <h3 class="serif-heading" data-i18n="set_c2_title">Automation Thresholds</h3>
+                                        <p data-i18n="set_c2_desc">Set the soil moisture levels that trigger pump ON/OFF
+                                            cycles
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+
+                                    <div class="slider-group">
+                                        <div class="slider-header">
+                                            <label><span data-i18n="set_lbl_turnon">TURN ON BELOW</span> <span
+                                                    class="lbl-light">— soil moisture %</span></label>
+                                            <div class="slider-value-box"><span id="valOn">52</span>%</div>
+                                        </div>
+                                        <input type="range" id="sliderOn" min="0" max="100" value="52"
+                                            class="custom-slider">
+                                    </div>
+
+                                    <div class="slider-group">
+                                        <div class="slider-header">
+                                            <label><span data-i18n="set_lbl_turnoff">TURN OFF ABOVE</span> <span
+                                                    class="lbl-light">— soil moisture %</span></label>
+                                            <div class="slider-value-box"><span id="valOff">70</span>%</div>
+                                        </div>
+                                        <input type="range" id="sliderOff" min="0" max="100" value="70"
+                                            class="custom-slider">
+                                    </div>
+
+                                    <div class="toggle-group mt-30">
+                                        <label class="toggle-label" data-i18n="set_lbl_hightemp">HIGH TEMPERATURE
+                                            OVERRIDE</label>
+                                        <div class="toggle-box">
+                                            <div class="toggle-info">
+                                                <h4 data-i18n="set_hightemp_title">High Temperature Override</h4>
+                                                <p data-i18n="set_hightemp_desc">Briefly run the pump for cooling when
+                                                    air
+                                                    temperature exceeds the set threshold</p>
+                                            </div>
+                                            <div class="toggle-controls">
+                                                <label class="switch">
+                                                    <input type="checkbox" id="tempOverrideToggle" checked>
+                                                    <span class="slider round"></span>
+                                                </label>
+                                                <div class="num-input-box">
+                                                    <input type="number" id="tempThreshold" value="32" min="20"
+                                                        max="50">
+                                                    <span>°C</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-card">
+                                <div class="card-header">
+                                    <div class="icon-box">⚙️</div>
+                                    <div class="header-text">
+                                        <h3 class="serif-heading" data-i18n="set_c3_title">Pump & Safety Settings</h3>
+                                        <p data-i18n="set_c3_desc">Protect equipment and prevent flooding with hard
+                                            limits</p>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <label class="section-sublabel" data-i18n="set_lbl_mode">OPERATION MODE</label>
+                        
+                                    <div class="grid-2-col mt-30">
+                                        <div class="input-group">
+                                            <label data-i18n="set_lbl_maxrun">MAX RUN TIME</label>
+                                            <div class="num-input-box full-width">
+                                                <input type="number" id="maxRun" value="20" min="1" max="120">
+                                                <span>min</span>
+                                            </div>
+                                        </div>
+                                        <div class="input-group">
+                                            <label data-i18n="set_lbl_cooldown">COOLDOWN PERIOD</label>
+                                            <div class="num-input-box full-width">
+                                                <input type="number" id="cooldown" value="2" min="1" max="24">
+                                                <span>hr</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-card">
+                                <div class="card-header">
+                                    <div class="icon-box">🕒</div>
+                                    <div class="header-text">
+                                        <h3 class="serif-heading" data-i18n="set_c4_title">Time Restrictions</h3>
+                                        <p data-i18n="set_c4_desc">Prevent irrigation during peak-sun hours to reduce
+                                            evaporation loss</p>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="time-restrictions-grid">
+                                        <div class="input-group">
+                                            <label data-i18n="set_lbl_start">DO NOT WATER — START</label>
+                                            <input type="time" id="timeStart" value="12:00">
+                                        </div>
+                                        <div class="through-text" data-i18n="set_lbl_through">through</div>
+                                        <div class="input-group">
+                                            <label data-i18n="set_lbl_end">DO NOT WATER — END</label>
+                                            <input type="time" id="timeEnd" value="15:00">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-actions">
+                                <button type="button" class="btn-outline" id="resetSettingsBtn"
+                                    data-i18n="set_btn_reset">Reset
+                                    to Defaults</button>
+                                <button type="submit" class="btn-primary" data-i18n="set_btn_save">💾 Save Automation
+                                    Settings</button>
+                            </div>
+
                 </form>
-                <p class="privacy-note" data-i18n="ftr_news_privacy">We respect your privacy. Unsubscribe any time.</p>
             </div>
-        </div>
 
-        <!-- الجزء السفلي: الحقوق -->
-        <div class="footer-bottom">
-            <p data-i18n="ftr_copyright">© 2026 Khadrawy — خضراوي. All rights reserved.</p>
-            <div class="legal-links">
-                <a href="#" data-i18n="ftr_privacy">Privacy Policy</a>
-                <span class="dot-separator">·</span>
-                <a href="#" data-i18n="ftr_terms">Terms of Service</a>
-                <span class="dot-separator">·</span>
-                <a href="#" data-i18n="ftr_cookies">Cookie Settings</a>
-            </div>
         </div>
-
     </div>
-</footer>
     <!-- =====================================================
          JAVASCRIPT
     ====================================================== -->
     <script src="script.js"></script>
 
 </body>
+
 </html>

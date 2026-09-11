@@ -1735,10 +1735,10 @@ function displayResult(data) {
     // Show result
     // -------------------------------------------------
 
-if (resultCard) {
+    if (resultCard) {
         // إظهار زرار فحص نبات آخر
         document.getElementById("anotherButton").style.display = "block";
-        
+
         // 🪄 السطرين دول هما اللي هيظهروا زرار القراءة!
         const speakBtn = document.getElementById("speakResultButton");
         if (speakBtn) speakBtn.style.display = "block";
@@ -2445,11 +2445,11 @@ const translations = {
         how_badge: "HOW IT WORKS",
         how_title: "Diagnosis Made Simple",
         how_desc: "From a simple leaf photo to practical plant care advice.",
-        step_1_title: "Capture", 
+        step_1_title: "Capture",
         step_1_desc: "Take a clear photo or upload an existing image of your plant leaf.",
-        step_2_title: "Analyze", 
+        step_2_title: "Analyze",
         step_2_desc: "Our AI model analyzes the image and identifies the most likely condition.",
-        step_3_title: "Get Advice", 
+        step_3_title: "Get Advice",
         step_3_desc: "Receive an AI diagnosis with symptoms, actions, and prevention tips.",
 
         // --- Smart Monitoring ---
@@ -2520,7 +2520,107 @@ const translations = {
         ftr_copyright: "© 2026 Khadrawy — خضراوي. All rights reserved.",
         ftr_privacy: "Privacy Policy",
         ftr_terms: "Terms of Service",
-        ftr_cookies: "Cookie Settings"
+        ftr_cookies: "Cookie Settings",
+        mon_badge: "SMART MONITORING",
+        mon_title: "Your Farm, Always<br>in Sight",
+        mon_desc: "Real-time environmental data from precision sensors deployed across your fields<br>— delivered to you instantly, interpreted intelligently.",
+        sens_temp_label: "AIR TEMPERATURE",
+        sens_hum_label: "HUMIDITY",
+        sens_soil_label: "SOIL MOISTURE",
+        sens_light_label: "LIGHT INTENSITY",
+        status_optimal: "Optimal",
+        status_normal: "Normal",
+        status_review: "Review",
+        status_high: "High",
+
+        // Control Panel
+        ctrl_panel_title: "🚰 Irrigation Control Panel",
+        ctrl_panel_desc: "Manage water pumps instantly or switch system overrides",
+        status_auto: "🟢 SYSTEM: AUTO",
+        status_manual: "🟠 SYSTEM: MANUAL OVERRIDE",
+        btn_water_now: "💧 Water Now",
+        btn_stop: "Stop",
+        btn_run_for: "⏱ Run for...",
+        timer_10m: "10 Minutes",
+        timer_30m: "30 Minutes",
+        timer_1h: "1 Hour",
+
+        // --- Smart Automation Settings Modal ---
+        nav_settings: "Settings",
+        set_badge: "IOT AUTOMATION",
+        set_title: "Smart Automation Settings",
+        set_desc: "Configure intelligent irrigation rules for your connected water pump based on real-time sensor data.",
+        set_preset_title: "Apply Smart Presets",
+        set_preset_desc: "Auto-fill optimal values based on selected crop & growth stage",
+        set_preset_btn: "Apply Smart Presets",
+        set_c1_title: "Field & Crop Profile",
+        set_c1_desc: "Define the crop context for smart threshold calibration",
+        set_lbl_crop: "CROP TYPE",
+        set_opt_select_crop: "Select crop...",
+        set_opt_apple: "Apple",
+        set_opt_blueberry: "Blueberry",
+        set_opt_cherry: "Cherry",
+        set_opt_corn: "Corn / Maize",
+        set_opt_grape: "Grape",
+        set_opt_orange: "Orange",
+        set_opt_peach: "Peach",
+        set_opt_pepper: "Pepper bell",
+        set_opt_potato: "Potato",
+        set_opt_raspberry: "Raspberry",
+        set_opt_soybean: "Soybean",
+        set_opt_squash: "Squash",
+        set_opt_strawberry: "Strawberry",
+        set_opt_tomato: "Tomato",
+        set_lbl_growth: "GROWTH STAGE",
+        set_opt_seed: "Seed",
+        set_opt_germination: "Germination",
+        set_opt_seedling: "Seedling",
+        set_opt_vegetative: "Vegetative Growth",
+        set_opt_budding: "Budding",
+        set_opt_flowering: "Flowering",
+        set_opt_fruiting: "Fruiting",
+        set_opt_ripening: "Ripening / Maturity",
+        set_lbl_soil: "SOIL TYPE",
+        set_opt_loamy: "Loamy Soil",
+        set_opt_sandy: "Sandy Soil",
+        set_opt_clay: "Clay Soil",
+        set_opt_silty: "Silty Soil",
+        set_opt_peaty: "Peaty Soil",
+        set_opt_chalky: "Chalky Soil",
+        set_c2_title: "Automation Thresholds",
+        set_c2_desc: "Set the soil moisture levels that trigger pump ON/OFF cycles",
+        set_lbl_turnon: "TURN ON BELOW",
+        set_lbl_turnoff: "TURN OFF ABOVE",
+        set_lbl_hightemp: "HIGH TEMPERATURE OVERRIDE",
+        set_hightemp_title: "High Temperature Override",
+        set_hightemp_desc: "Briefly run the pump for cooling when air temperature exceeds the set threshold",
+        set_c3_title: "Pump & Safety Settings",
+        set_c3_desc: "Protect equipment and prevent flooding with hard limits",
+        set_lbl_mode: "OPERATION MODE",
+        set_mode_auto: "Auto",
+        set_mode_timer: "Timer",
+        set_mode_manual: "Manual",
+        set_lbl_maxrun: "MAX RUN TIME",
+        set_lbl_cooldown: "COOLDOWN PERIOD",
+        set_c4_title: "Time Restrictions",
+        set_c4_desc: "Prevent irrigation during peak-sun hours to reduce evaporation loss",
+        set_lbl_start: "DO NOT WATER — START",
+        set_lbl_through: "through",
+        set_lbl_end: "DO NOT WATER — END",
+        set_btn_reset: "Reset to Defaults",
+        set_btn_save: "💾 Save Automation Settings",
+        ctrl_panel_title: "🚰 Irrigation Control Panel",
+        ctrl_panel_desc: "Manage water pumps instantly or switch system overrides",
+        status_auto_label: "🟢 SYSTEM: AUTO",
+        status_manual_label: "🟠 SYSTEM: MANUAL OVERRIDE",
+        btn_water_now: "💧 Water Now",
+        btn_stop: "Stop",
+        btn_run_for: "⏱ Run for...",
+        timer_10m: "10 Minutes",
+        timer_30m: "30 Minutes",
+        timer_1h: "1 Hour",
+        btn_water_now: "💧 Water Now",
+        btn_stop: "🛑 Stop Water",
     },
     ar: {
         // Head & Nav
@@ -2592,11 +2692,11 @@ const translations = {
         how_badge: "كيف يعمل؟",
         how_title: "التشخيص الزراعي أصبح أسهل",
         how_desc: "من مجرد صورة لورقة النبات إلى نصائح عملية للعناية به.",
-        step_1_title: "التقط صورة", 
+        step_1_title: "التقط صورة",
         step_1_desc: "التقط صورة واضحة أو ارفع صورة موجودة لورقة نباتك.",
-        step_2_title: "الفحص والتحليل", 
+        step_2_title: "الفحص والتحليل",
         step_2_desc: "يقوم نموذج الذكاء الاصطناعي الخاص بنا بتحليل الصورة وتحديد الحالة الأكثر احتمالاً.",
-        step_3_title: "احصل على النصيحة", 
+        step_3_title: "احصل على النصيحة",
         step_3_desc: "احصل على تشخيص دقيق مع الأعراض، والإجراءات، ونصائح الوقاية.",
 
         // --- Smart Monitoring ---
@@ -2667,7 +2767,105 @@ const translations = {
         ftr_copyright: "© 2026 خضراوي. جميع الحقوق محفوظة.",
         ftr_privacy: "سياسة الخصوصية",
         ftr_terms: "شروط الخدمة",
-        ftr_cookies: "إعدادات ملفات تعريف الارتباط"
+        ftr_cookies: "إعدادات ملفات تعريف الارتباط",
+        // --- Smart Monitoring & Control Panel ---
+        mon_badge: "المراقبة الذكية",
+        mon_title: "مزرعتك، دائماً<br>تحت نظرك",
+        mon_desc: "بيانات بيئية لحظية من مستشعرات دقيقة موزعة في حقلك<br>— تصلك فوراً، وتُحلل بذكاء.",
+        sens_temp_label: "درجة حرارة الهواء",
+        sens_hum_label: "الرطوبة",
+        sens_soil_label: "رطوبة التربة",
+        sens_light_label: "شدة الإضاءة",
+        status_optimal: "مثالي",
+        status_normal: "طبيعي",
+        status_review: "يحتاج مراجعة",
+        status_high: "مرتفع",
+
+        // Control Panel
+        ctrl_panel_title: "🚰 لوحة تحكم الري",
+        ctrl_panel_desc: "إدارة مضخات المياه فورياً أو تبديل وضع النظام",
+        btn_run_for: "⏱ Run for...",
+        timer_10m: "10 دقائق",
+        timer_30m: "30 دقيقة",
+        timer_1h: "ساعة واحدة",
+
+        // --- Smart Automation Settings Modal ---
+        nav_settings: "الإعدادات",
+        set_badge: "أتمتة إنترنت الأشياء",
+        set_title: "إعدادات الأتمتة الذكية",
+        set_desc: "تهيئة قواعد الري الذكية لمضخة المياه المتصلة بناءً على بيانات المستشعرات في الوقت الفعلي.",
+        set_preset_title: "تطبيق الإعدادات المسبقة الذكية",
+        set_preset_desc: "املأ القيم المثلى تلقائياً بناءً على المحصول المختار ومرحلة النمو",
+        set_preset_btn: "تطبيق الإعدادات المسبقة الذكية",
+        set_c1_title: "ملف الحقل والمحصول",
+        set_c1_desc: "حدد سياق المحصول معايرة العتبات الذكية",
+        set_lbl_crop: "نوع المحصول",
+        set_opt_select_crop: "اختر المحصول...",
+        set_opt_apple: "تفاح",
+        set_opt_blueberry: "توت أزرق",
+        set_opt_cherry: "كرز",
+        set_opt_corn: "ذرة",
+        set_opt_grape: "عنب",
+        set_opt_orange: "برتقال",
+        set_opt_peach: "خوخ",
+        set_opt_pepper: "فلفل حلو",
+        set_opt_potato: "بطاطس",
+        set_opt_raspberry: "توت عليق",
+        set_opt_soybean: "فول صويا",
+        set_opt_squash: "كوسة",
+        set_opt_strawberry: "فراولة",
+        set_opt_tomato: "طماطم",
+        set_lbl_growth: "مرحلة النمو",
+        set_opt_seed: "بذرة",
+        set_opt_germination: "إنبات",
+        set_opt_seedling: "بادرة",
+        set_opt_vegetative: "نمو خضري",
+        set_opt_budding: "تزهر / براعم",
+        set_opt_flowering: "إزهار",
+        set_opt_fruiting: "إثمار",
+        set_opt_ripening: "نضج / اكتمال",
+        set_lbl_soil: "نوع التربة",
+        set_opt_loamy: "تربة طينية صفصالية",
+        set_opt_sandy: "تربة رملية",
+        set_opt_clay: "تربة طينية",
+        set_opt_silty: "تربة غرينية",
+        set_opt_peaty: "تربة عضوية (بيتي)",
+        set_opt_chalky: "تربة طباشيرية",
+        set_c2_title: "عتبات الأتمتة",
+        set_c2_desc: "ضبط مستويات رطوبة التربة التي تؤدي إلى دورات تشغيل/إيقاف المضخة",
+        set_lbl_turnon: "التحفيز للتشغيل أدنى من",
+        set_lbl_turnoff: "إيقاف التشغيل أعلى من",
+        set_lbl_hightemp: "تجاوز درجة الحرارة المرتفعة",
+        set_hightemp_title: "تجاوز درجة الحرارة المرتفعة",
+        set_hightemp_desc: "تشغيل المضخة لفترة وجيزة للتبريد عندما تتجاوز درجة حرارة الهواء العتبة المحددة",
+        set_c3_title: "إعدادات المضخة والأمان",
+        set_c3_desc: "حماية المعدات ومنع الفيضانات بحدود صارمة",
+        set_lbl_mode: "وضع التشغيل",
+        set_mode_auto: "تلقائي",
+        set_mode_timer: "مؤقت",
+        set_mode_manual: "يدوي",
+        set_lbl_maxrun: "أقصى وقت تشغيل",
+        set_lbl_cooldown: "فترة التبريد",
+        set_c4_title: "قيود الوقت",
+        set_c4_desc: "منع الري خلال ساعات ذروة الشمس لتقليل الفقد الناتج عن التبخر",
+        set_lbl_start: "عدم الري — البدء",
+        set_lbl_through: "إلى",
+        set_lbl_end: "عدم الري — الانتهاء",
+        set_btn_reset: "إعادة الضبط إلى الافتراضيات",
+        set_btn_save: "💾 حفظ إعدادات الأتمتة",
+        // --- Control Panel ---
+        ctrl_panel_title: "🚰 لوحة تحكم الري",
+        ctrl_panel_desc: "إدارة مضخات المياه فورياً أو تبديل وضع النظام",
+        status_auto_label: "🟢 النظام: تلقائي",
+        status_manual_label: "🟠 النظام: تحكم يدوي",
+        btn_water_now: "💧 اروي الآن",
+        btn_stop: "إيقاف",
+        btn_run_for: "⏱ تشغيل لمدة...",
+        timer_10m: "10 دقائق",
+        timer_30m: "30 دقيقة",
+        timer_1h: "ساعة واحدة",
+        btn_water_now: "💧 اروي الآن",
+        btn_stop: "🛑 إيقاف الري",
     }
 };
 
@@ -2732,9 +2930,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (resetBtn) {
         resetBtn.addEventListener("click", (e) => {
             // إخفاء زرار قراءة النتيجة
-const speakBtn = document.getElementById("speakResultButton");
-if (speakBtn) speakBtn.style.display = "none";
-           // منع أي تحديث للصفحة
+            const speakBtn = document.getElementById("speakResultButton");
+            if (speakBtn) speakBtn.style.display = "none";
+            // منع أي تحديث للصفحة
             document.getElementById("anotherButton").style.display = "none";
             if (cardToHide) {
                 // إخفاء الكارت نهائياً
@@ -2817,5 +3015,404 @@ document.addEventListener("DOMContentLoaded", () => {
     // دالة للنزول لآخر رسالة أوتوماتيك
     function scrollToBottom() {
         chatBody.scrollTop = chatBody.scrollHeight;
+    }
+});// =====================================================
+// SETTINGS MODAL & AUTOMATION LOGIC (With Auth, Validation & Edit Mode)
+// =====================================================
+document.addEventListener("DOMContentLoaded", () => {
+    const settingsOverlay = document.getElementById("settingsOverlay");
+    const navSettingsBtn = document.getElementById("navSettingsBtn");
+    const settingsClose = document.getElementById("settingsClose");
+    const automationForm = document.getElementById("automationForm");
+
+    // عناصر الفورم
+    const cropTypeSelect = document.getElementById("cropType");
+    const growthStageSelect = document.getElementById("growthStage");
+    const soilTypeSelect = document.getElementById("soilType");
+    const sliderOnInput = document.getElementById("sliderOn");
+    const sliderOffInput = document.getElementById("sliderOff");
+    const tempOverrideToggle = document.getElementById("tempOverrideToggle");
+    const tempThresholdInput = document.getElementById("tempThreshold");
+    const maxRunInput = document.getElementById("maxRun");
+    const cooldownInput = document.getElementById("cooldown");
+    const timeStartInput = document.getElementById("timeStart");
+    const timeEndInput = document.getElementById("timeEnd");
+    const resetSettingsBtn = document.getElementById("resetSettingsBtn");
+
+    let isEditMode = false;
+
+    // دالة فتح النافذة
+    function openSettingsModal(e) {
+        if (e) e.preventDefault();
+        if (settingsOverlay) settingsOverlay.style.display = "flex";
+        loadSavedSettingsState();
+    }
+
+    // دالة غلق النافذة
+    function closeSettingsModal() {
+        if (settingsOverlay) settingsOverlay.style.display = "none";
+    }
+
+    if (navSettingsBtn) navSettingsBtn.addEventListener("click", openSettingsModal);
+    if (settingsClose) settingsClose.addEventListener("click", closeSettingsModal);
+
+    if (settingsOverlay) {
+        settingsOverlay.addEventListener("click", (e) => {
+            if (e.target === settingsOverlay) closeSettingsModal();
+        });
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && settingsOverlay && settingsOverlay.style.display !== "none") {
+            closeSettingsModal();
+        }
+    });
+
+    function saveSettingsToLocalStorage(data) {
+        localStorage.setItem('khadrwy_settings', JSON.stringify(data));
+        localStorage.setItem('khadrwy_settings_saved', 'true');
+    }
+
+    function getSavedSettings() {
+        const saved = localStorage.getItem('khadrwy_settings');
+        return saved ? JSON.parse(saved) : null;
+    }
+
+    // قفل أو فتح الحقول
+    function setFormFieldsDisabled(disabled) {
+        const elements = [
+            cropTypeSelect, growthStageSelect, soilTypeSelect,
+            sliderOnInput, sliderOffInput, tempOverrideToggle,
+            tempThresholdInput, maxRunInput, cooldownInput,
+            timeStartInput, timeEndInput, resetSettingsBtn,
+            document.getElementById("applyPresetsBtn")
+        ];
+
+        elements.forEach(el => {
+            if (el) el.disabled = disabled;
+        });
+    }
+
+    // تحديث نص زر الحفظ ليصبح Save أو Update حسب الحالة
+    function updateSaveButtonState() {
+        const saveBtn = automationForm?.querySelector("button[type='submit']");
+        if (!saveBtn) return;
+
+        const lang = document.documentElement.lang || 'en';
+        if (isEditMode) {
+            saveBtn.textContent = lang === 'ar' ? "💾 تحديث الإعدادات (Update)" : "💾 Update Settings";
+        } else {
+            saveBtn.textContent = lang === 'ar' ? "💾 حفظ إعدادات الأتمتة" : "💾 Save Automation Settings";
+        }
+    }
+
+    function loadSavedSettingsState() {
+        const isSaved = localStorage.getItem('khadrwy_settings_saved') === 'true';
+        const data = getSavedSettings();
+
+        if (isSaved && data) {
+            if (cropTypeSelect) cropTypeSelect.value = data.cropType || "";
+            if (growthStageSelect) growthStageSelect.value = data.growthStage || "";
+            if (soilTypeSelect) soilTypeSelect.value = data.soilType || "";
+            if (sliderOnInput) sliderOnInput.value = data.sliderOn || 52;
+            if (sliderOffInput) sliderOffInput.value = data.sliderOff || 70;
+            if (tempOverrideToggle) tempOverrideToggle.checked = data.tempOverride !== undefined ? data.tempOverride : true;
+            if (tempThresholdInput) tempThresholdInput.value = data.tempThreshold || 32;
+            if (maxRunInput) maxRunInput.value = data.maxRun || 20;
+            if (cooldownInput) cooldownInput.value = data.cooldown || 2;
+            if (timeStartInput) timeStartInput.value = data.timeStart || "12:00";
+            if (timeEndInput) timeEndInput.value = data.timeEnd || "15:00";
+
+            document.getElementById("valOn").textContent = sliderOnInput?.value || 52;
+            document.getElementById("valOff").textContent = sliderOffInput?.value || 70;
+
+            isEditMode = true;
+            setFormFieldsDisabled(true);
+        } else {
+            isEditMode = false;
+            setFormFieldsDisabled(false);
+        }
+        updateSaveButtonState();
+    }
+
+    // دالة التحقق من صحة المدخلات (Validation)
+    function validateForm() {
+        const lang = document.documentElement.lang || 'en';
+
+        // 1. التحقق من اختيار نوع المحصول
+        if (!cropTypeSelect || !cropTypeSelect.value) {
+            alert(lang === 'ar' ? "خطأ: يرجى اختيار نوع المحصول!" : "Error: Please select a crop type!");
+            cropTypeSelect?.focus();
+            return false;
+        }
+
+        // 2. التحقق من عتبات الرطوبة (Turn On يجب أن تكون أقل من Turn Off)
+        const onVal = parseInt(sliderOnInput?.value || 0);
+        const offVal = parseInt(sliderOffInput?.value || 0);
+        if (onVal >= offVal) {
+            alert(lang === 'ar' 
+                ? "خطأ: قيمة 'الفتح أدنى من' يجب أن تكون أقل من قيمة 'الإيقاف أعلى من'!" 
+                : "Error: 'Turn On Below' value must be less than 'Turn Off Above' value!");
+            sliderOnInput?.focus();
+            return false;
+        }
+
+        // 3. التحقق من درجة الحرارة العالية
+        const tempVal = parseInt(tempThresholdInput?.value || 0);
+        if (tempVal < 20 || tempVal > 50) {
+            alert(lang === 'ar' 
+                ? "خطأ: درجة حرارة تجاوز الحرارة يجب أن تكون بين 20 و 50 درجة مئوية!" 
+                : "Error: Temperature threshold must be between 20°C and 50°C!");
+            tempThresholdInput?.focus();
+            return false;
+        }
+
+        // 4. التحقق من أقصى وقت تشغيل (Max Run Time)
+        const maxRunVal = parseInt(maxRunInput?.value || 0);
+        if (maxRunVal < 1 || maxRunVal > 120) {
+            alert(lang === 'ar' 
+                ? "خطأ: أقصى وقت تشغيل يجب أن يكون بين 1 و 120 دقيقة!" 
+                : "Error: Max run time must be between 1 and 120 minutes!");
+            maxRunInput?.focus();
+            return false;
+        }
+
+        // 5. التحقق من فترة التبريد (Cooldown Period)
+        const cooldownVal = parseInt(cooldownInput?.value || 0);
+        if (cooldownVal < 1 || cooldownVal > 24) {
+            alert(lang === 'ar' 
+                ? "خطأ: فترة التبريد يجب أن تكون بين 1 و 24 ساعة!" 
+                : "Error: Cooldown period must be between 1 and 24 hours!");
+            cooldownInput?.focus();
+            return false;
+        }
+
+        // 6. التحقق من أوقات الحظر (Time Restrictions)
+        if (!timeStartInput?.value || !timeEndInput?.value) {
+            alert(lang === 'ar' ? "خطأ: يرجى تحديد أوقات حظر الري بنجاح!" : "Error: Please specify valid restriction times!");
+            return false;
+        }
+
+        return true; // كل الفاليديشن سليمة
+    }
+
+    // التعامل مع الحفظ أو التحديث
+    if (automationForm) {
+        automationForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const lang = document.documentElement.lang || 'en';
+
+            // 1. التأكد من تسجيل الدخول
+            if (!accessToken) {
+                const loginMsg = lang === 'ar' 
+                    ? "يجب تسجيل الدخول أولاً لحفظ الإعدادات!" 
+                    : "You must login first to save settings!";
+                alert(loginMsg);
+                closeSettingsModal();
+                openLogin();
+                return;
+            }
+
+            // لو الحقول مقفولة وهو داس على الزرار، معناه إنه عايز يعمل "تعديل" (Edit) ويفتح الحقول
+            if (isEditMode && cropTypeSelect.disabled) {
+                setFormFieldsDisabled(false);
+                updateSaveButtonState();
+                return;
+            }
+
+            // 2. تطبيق الفاليديشن قبل الحفظ النهائي
+            if (!validateForm()) {
+                return; // هيوقف التنفيذ ويظهر الأخطاء لغاية ما كل الشروط تتحقق
+            }
+
+            // 3. حفظ البيانات بعد تخطي الفاليديشن بنجاح
+            const formData = {
+                cropType: cropTypeSelect?.value,
+                growthStage: growthStageSelect?.value,
+                soilType: soilTypeSelect?.value,
+                sliderOn: sliderOnInput?.value,
+                sliderOff: sliderOffInput?.value,
+                tempOverride: tempOverrideToggle?.checked,
+                tempThreshold: tempThresholdInput?.value,
+                maxRun: maxRunInput?.value,
+                cooldown: cooldownInput?.value,
+                timeStart: timeStartInput?.value,
+                timeEnd: timeEndInput?.value
+            };
+
+            saveSettingsToLocalStorage(formData);
+
+            const successMsg = lang === 'ar'
+                ? "تم حفظ وتحديث الإعدادات بنجاح!"
+                : "Settings successfully saved!";
+            alert(successMsg);
+
+            // قفل الحقول وتحويل الزر لوضع الـ Edit
+            isEditMode = true;
+            setFormFieldsDisabled(true);
+            updateSaveButtonState();
+
+            // إغلاق المودال والانتقال التلقائي لسيكشن الـ Monitoring
+            closeSettingsModal();
+            window.location.hash = "#monitoring";
+        });
+    }
+});
+// =====================================================
+// SMART AUTOMATION SETTINGS LOGIC (SLIDERS & PRESETS)
+// =====================================================
+document.addEventListener("DOMContentLoaded", () => {
+    const sliderOn = document.getElementById("sliderOn");
+    const valOn = document.getElementById("valOn");
+    const sliderOff = document.getElementById("sliderOff");
+    const valOff = document.getElementById("valOff");
+
+    // دالة ذكية لتلوين الشريط حسب النسبة واللغة
+    function updateSliderFill(slider, valElement) {
+        if (!slider || !valElement) return;
+        const value = slider.value;
+        valElement.textContent = value;
+        const progress = (value / slider.max) * 100;
+
+        // التحقق هل الموقع عربي ولا إنجليزي لضبط اتجاه التلوين
+        const isRTL = document.documentElement.dir === 'rtl';
+        const direction = isRTL ? 'to left' : 'to right';
+
+        // تلوين الجزء اللي قبل الدايرة بالأخضر واللي بعدها بالرمادي
+        slider.style.background = `linear-gradient(${direction}, #2e7d32 ${progress}%, #eef2ef ${progress}%)`;
+    }
+
+    if (sliderOn) {
+        sliderOn.addEventListener("input", () => updateSliderFill(sliderOn, valOn));
+        updateSliderFill(sliderOn, valOn);
+    }
+    if (sliderOff) {
+        sliderOff.addEventListener("input", () => updateSliderFill(sliderOff, valOff));
+        updateSliderFill(sliderOff, valOff);
+    }
+
+    // عشان اللون يظبط تلقائياً لو غيرنا اللغة من النافبار
+    document.getElementById("btnAr")?.addEventListener("click", () => {
+        setTimeout(() => { updateSliderFill(sliderOn, valOn); updateSliderFill(sliderOff, valOff); }, 50);
+    });
+    document.getElementById("btnEn")?.addEventListener("click", () => {
+        setTimeout(() => { updateSliderFill(sliderOn, valOn); updateSliderFill(sliderOff, valOff); }, 50);
+    });
+
+    // زرار الـ Smart Presets
+    const applyPresetsBtn = document.getElementById("applyPresetsBtn");
+    if (applyPresetsBtn) {
+        applyPresetsBtn.addEventListener("click", () => {
+            const crop = document.getElementById("cropType").value;
+            if (!crop) {
+                alert(document.documentElement.lang === 'ar' ? "يرجى اختيار نوع المحصول أولاً!" : "Please select a crop type first!");
+                return;
+            }
+            // أرقام عشوائية كمثال لتطبيق الإعدادات
+            sliderOn.value = 55; updateSliderFill(sliderOn, valOn);
+            sliderOff.value = 75; updateSliderFill(sliderOff, valOff);
+            document.getElementById("maxRun").value = 15;
+            document.getElementById("cooldown").value = 3;
+
+            const btnText = applyPresetsBtn.innerHTML;
+            applyPresetsBtn.innerHTML = "✅ Applied!";
+            setTimeout(() => { applyPresetsBtn.innerHTML = btnText; }, 2000);
+        });
+    }
+});
+// =====================================================
+// SMART MONITORING CONTROL PANEL LOGIC (Multilingual)
+// =====================================================
+document.addEventListener("DOMContentLoaded", () => {
+    const manualWaterBtn = document.getElementById("manualWaterBtn");
+    const timerDropdownBtn = document.getElementById("timerDropdownBtn");
+    const timerMenu = document.getElementById("timerMenu");
+    const systemStatusBadge = document.getElementById("systemStatusBadge");
+
+    let isManualRunning = false;
+    let activeTimer = null;
+
+    // دالة مساعدة لمعرفة هل اللغة الحالية عربية أم لا
+    function isArabic() {
+        return document.documentElement.getAttribute("dir") === "rtl";
+    }
+
+    // 1. تبديل حالة زرار Manual (تشغيل / إيقاف)
+    if (manualWaterBtn) {
+        manualWaterBtn.addEventListener("click", () => {
+            isManualRunning = !isManualRunning;
+
+            if (isManualRunning) {
+                // تفعيل وضع اليدوي
+                manualWaterBtn.textContent = isArabic() ? "🛑 إيقاف الري" : "🛑 Stop Water";
+                manualWaterBtn.classList.add("active-stop");
+                setSystemStatus("manual", isArabic() ? "🟠 النظام: تحكم يدوي" : "🟠 SYSTEM: MANUAL OVERRIDE");
+
+                // إلغاء أي مؤقت سابق لو كان شغال
+                if (activeTimer) clearTimeout(activeTimer);
+            } else {
+                // إيقاف الوضع اليدوي والرجوع للأوتوماتيك
+                resetManualState();
+            }
+        });
+    }
+
+    // 2. إظهار/إخفاء قائمة الـ Timer السريع
+    if (timerDropdownBtn && timerMenu) {
+        timerDropdownBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const isOpen = timerMenu.style.display === "flex";
+            timerMenu.style.display = isOpen ? "none" : "flex";
+        });
+
+        // غلق القائمة لو اليوزر داس بره
+        document.addEventListener("click", () => {
+            timerMenu.style.display = "none";
+        });
+    }
+
+    // 3. اختيار مدة المؤقت السريع (10 دقائق، 30 دقيقة، ساعة)
+    const timerOptions = document.querySelectorAll(".timer-option");
+    timerOptions.forEach(option => {
+        option.addEventListener("click", function () {
+            const minutes = parseInt(this.getAttribute("data-minutes"));
+
+            // تفعيل حالة التشغيل اليدوي المؤقت
+            isManualRunning = true;
+            if (manualWaterBtn) {
+                manualWaterBtn.textContent = isArabic() ? "🛑 إيقاف الري" : "🛑 Stop Water";
+                manualWaterBtn.classList.add("active-stop");
+            }
+
+            const timerTextAr = minutes === 60 ? "ساعة واحدة" : `${minutes} دقائق`;
+            const timerTextEn = minutes === 60 ? "1 Hour" : `${minutes}m Timer`;
+
+            setSystemStatus("manual", isArabic() ? `🟠 النظام: يدوي (${timerTextAr})` : `🟠 SYSTEM: MANUAL (${timerTextEn})`);
+            if (timerMenu) timerMenu.style.display = "none";
+
+            // محاكاة انتهاء المؤقت تلقائياً وإرجاع السيستم للوضع الأوتوماتيكي
+            if (activeTimer) clearTimeout(activeTimer);
+            activeTimer = setTimeout(() => {
+                resetManualState();
+            }, minutes * 60 * 1000);
+        });
+    });
+
+    // دالة إعادة السيستم للوضع التلقائي
+    function resetManualState() {
+        isManualRunning = false;
+        if (manualWaterBtn) {
+            manualWaterBtn.textContent = isArabic() ? "💧 اوي الآن" : "💧 Water Now";
+            manualWaterBtn.classList.remove("active-stop");
+        }
+        setSystemStatus("auto", isArabic() ? "🟢 النظام: تلقائي" : "🟢 SYSTEM: AUTO");
+        if (activeTimer) clearTimeout(activeTimer);
+    }
+
+    // دالة تغيير مؤشر الحالة والتصميم
+    function setSystemStatus(mode, text) {
+        if (!systemStatusBadge) return;
+        systemStatusBadge.textContent = text;
+        systemStatusBadge.className = "status-badge-indicator " + (mode === "manual" ? "status-manual" : "status-auto");
     }
 });
