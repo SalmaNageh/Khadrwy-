@@ -1,10 +1,17 @@
+# =====================================================
+# KHADRWY - AUTHENTICATION
+# =====================================================
+
 from datetime import datetime, timedelta, timezone
+import os
 
 import bcrypt
 from jose import JWTError, jwt
 
+from dotenv import load_dotenv
+
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from sqlalchemy.orm import Session
 
@@ -13,10 +20,22 @@ from backend.user_model import User
 
 
 # =====================================================
+# ENVIRONMENT
+# =====================================================
+
+load_dotenv()
+
+
+# =====================================================
 # JWT CONFIG
 # =====================================================
 
-SECRET_KEY = "CHANGE_THIS_TO_A_LONG_RANDOM_SECRET_KEY"
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+if not SECRET_KEY:
+    raise RuntimeError(
+        "SECRET_KEY is not configured in .env"
+    )
 
 ALGORITHM = "HS256"
 
@@ -39,6 +58,10 @@ def hash_password(password: str) -> str:
     return hashed.decode("utf-8")
 
 
+# =====================================================
+# PASSWORD VERIFICATION
+# =====================================================
+
 def verify_password(
     plain_password: str,
     hashed_password: str
@@ -51,13 +74,15 @@ def verify_password(
 
 
 # =====================================================
-# JWT AUTHENTICATION
+# HTTP BEARER
 # =====================================================
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/login"
-)
+security = HTTPBearer()
 
+
+# =====================================================
+# CREATE ACCESS TOKEN
+# =====================================================
 
 def create_access_token(
     data: dict,
@@ -98,7 +123,9 @@ def create_access_token(
 # =====================================================
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    credentials: HTTPAuthorizationCredentials = Depends(
+        security
+    ),
     db: Session = Depends(get_db)
 ):
 
@@ -109,6 +136,8 @@ def get_current_user(
             "WWW-Authenticate": "Bearer"
         }
     )
+
+    token = credentials.credentials
 
     try:
 
@@ -136,7 +165,6 @@ def get_current_user(
     )
 
     if user is None:
-
         raise credentials_exception
 
     return user

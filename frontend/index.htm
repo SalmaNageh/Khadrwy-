@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="page_title">Khadrwy | AI Plant Doctor</title>
+    
+    <!-- إضافة صورة التاب (Favicon) -->
+    <link rel="icon" type="image/png" href="logo.png">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -15,11 +19,12 @@
     ====================================================== -->
     <header class="navbar">
         <div class="logo">
-            <div class="logo-icon">🌳</div>
-            <div class="logo-text">
-                <strong>Khadrawy</strong>
-                <span class="logo-ar">خضراوي</span>
-            </div>
+           <div class="logo-icon">
+    <img src="logo.png" alt="Khadrwy Logo">
+</div>
+            <div class="logo-text-image">
+        <img src="kd.png" alt="Khadrawy Text">
+    </div>
         </div>
 
         <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle Menu">
@@ -177,7 +182,9 @@
 
                         <div class="scan-illustration">
                             <div class="scan-corners"></div>
-                            <div class="scan-plant">🪴</div>
+                            <div class="scan-plant">
+    <img src="hero.png" alt="Plant Image">
+</div>
                             <div class="scan-line-anim"></div>
                         </div>
 
@@ -412,37 +419,43 @@
                     </article>
 
                 </div><!-- لوحة التحكم الجديدة (Control Panel) -->
-<div class="farm-control-panel">
-    <div class="control-panel-header">
-        <div class="control-panel-info">
-            <h3 data-i18n="ctrl_panel_title">🚰 Irrigation Control Panel</h3>
-            <p data-i18n="ctrl_panel_desc">Manage water pumps instantly or switch system overrides</p>
-        </div>
-        <!-- مؤشر الحالة (Status Indicator) -->
-        <div id="systemStatusBadge" class="status-badge-indicator status-auto" data-i18n="status_auto_label">
-            🟢 SYSTEM: AUTO
-        </div>
-    </div>
+                <div class="farm-control-panel">
+                    <div class="control-panel-header">
+                        <div class="control-panel-info">
+                            <h3 data-i18n="ctrl_panel_title">🚰 Irrigation Control Panel</h3>
+                            <p data-i18n="ctrl_panel_desc">Manage water pumps instantly or switch system overrides</p>
+                        </div>
+                        <!-- مؤشر الحالة (Status Indicator) -->
+                        <div id="systemStatusBadge" class="status-badge-indicator status-auto"
+                            data-i18n="status_auto_label">
+                            🟢 SYSTEM: AUTO
+                        </div>
+                    </div>
 
-    <div class="control-panel-actions">
-        <!-- زرار Manual (تشغيل/إيقاف يدوي) -->
-        <button type="button" id="manualWaterBtn" class="btn-control manual-btn" data-i18n="btn_water_now">
-            💧 Water Now
-        </button>
+                    <div class="control-panel-actions">
+                        <!-- زرار Manual (تشغيل/إيقاف يدوي) -->
+                        <button type="button" id="manualWaterBtn" class="btn-control manual-btn"
+                            data-i18n="btn_water_now">
+                            💧 Water Now
+                        </button>
 
-        <!-- زرار Timer (تشغيل المؤقت السريع) -->
-        <div class="timer-dropdown-wrapper">
-            <button type="button" id="timerDropdownBtn" class="btn-control timer-btn" data-i18n="btn_run_for">
-                ⏱ Run for... ▾
-            </button>
-            <div id="timerMenu" class="timer-menu" style="display: none;">
-                <button type="button" class="timer-option" data-minutes="10" data-i18n="timer_10m">10 Minutes</button>
-                <button type="button" class="timer-option" data-minutes="30" data-i18n="timer_30m">30 Minutes</button>
-                <button type="button" class="timer-option" data-minutes="60" data-i18n="timer_1h">1 Hour</button>
-            </div>
-        </div>
-    </div>
-</div>
+                        <!-- زرار Timer (تشغيل المؤقت السريع) -->
+                        <div class="timer-dropdown-wrapper">
+                            <button type="button" id="timerDropdownBtn" class="btn-control timer-btn"
+                                data-i18n="btn_run_for">
+                                ⏱ Run for... ▾
+                            </button>
+                            <div id="timerMenu" class="timer-menu" style="display: none;">
+                                <button type="button" class="timer-option" data-minutes="10" data-i18n="timer_10m">10
+                                    Minutes</button>
+                                <button type="button" class="timer-option" data-minutes="30" data-i18n="timer_30m">30
+                                    Minutes</button>
+                                <button type="button" class="timer-option" data-minutes="60" data-i18n="timer_1h">1
+                                    Hour</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -501,7 +514,9 @@
                 <div class="chat-container">
                     <!-- هيدر الشات -->
                     <div class="chat-header">
-                        <div class="chat-avatar-box">🌿</div>
+                        <div class="chat-avatar-box">
+    <img src="logo.png" alt="Khadrawy AI">
+</div>
                         <div class="chat-info">
                             <h3 data-i18n="chat_name">Khadrawy AI</h3>
                             <span class="chat-status"><span class="dot"></span> Online now</span>
@@ -633,9 +648,13 @@
                 <!-- العمود الأول: البراند -->
                 <div class="footer-col brand-col">
                     <div class="footer-logo">
-                        <span class="logo-icon">🌿</span>
-                        <h2 class="serif-heading">Khadrawy</h2>
-                    </div>
+    <div class="footer-logo-icon">
+        <img src="logo.png" alt="Khadrwy Logo">
+    </div>
+    <div class="footer-logo-text">
+        <img src="kd.png" alt="Khadrawy Text">
+    </div>
+</div>
                     <p data-i18n="ftr_brand_desc">Precision agriculture intelligence for the farmers who feed the world.
                         Smarter growing starts here.</p>
 
@@ -880,7 +899,7 @@
                                 </div>
                                 <div class="card-body">
                                     <label class="section-sublabel" data-i18n="set_lbl_mode">OPERATION MODE</label>
-                        
+
                                     <div class="grid-2-col mt-30">
                                         <div class="input-group">
                                             <label data-i18n="set_lbl_maxrun">MAX RUN TIME</label>
@@ -925,9 +944,6 @@
                             </div>
 
                             <div class="settings-actions">
-                                <button type="button" class="btn-outline" id="resetSettingsBtn"
-                                    data-i18n="set_btn_reset">Reset
-                                    to Defaults</button>
                                 <button type="submit" class="btn-primary" data-i18n="set_btn_save">💾 Save Automation
                                     Settings</button>
                             </div>

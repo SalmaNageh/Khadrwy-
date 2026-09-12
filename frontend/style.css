@@ -75,37 +75,38 @@ input {
 .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
     color: #1f4229;
 }
 
 .logo-icon {
-    font-size: 32px;
-    background: #255a3a;
-    color: white;
-    width: 45px;
-    height: 45px;
+    /* تم تقليل الحجم قليلاً ليتناسب مع ارتفاع النافبار 85px ولا يخرج عن حدوده */
+    width: 90px;  
+    height: 90px; 
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    overflow: hidden; 
+    background: transparent; 
 }
 
-.logo-text {
+.logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+}
+
+/* تنسيق صورة النص الجديدة kd.png */
+.logo-text-image {
     display: flex;
-    flex-direction: column;
-    line-height: 1;
+    align-items: center;
+    height: 45px; /* نتحكم في الحجم عن طريق الطول لكي يحافظ العرض على نسبته الطبيعية */
 }
 
-.logo-text strong {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-}
-
-.logo-ar {
-    font-size: 11px;
-    color: #718074;
+.logo-text-image img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
 }
 
 .hamburger-btn {
@@ -386,8 +387,18 @@ input {
 }
 
 .scan-plant {
-    font-size: 120px;
+    width: 160px; /* عرض الصورة داخل المربع */
+    height: 160px; /* طول الصورة */
     z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scan-plant img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* للحفاظ على أبعاد الصورة دون قص أو تشوه */
 }
 
 .scan-line-anim {
@@ -1134,14 +1145,21 @@ max-width: 700px;
 }
 
 .chat-avatar-box {
-    width: 45px;
-    height: 45px;
-    background: #eaf3eb;
+    width: 65px;
+    height: 65px;
+    background: transparent; /* شيلنا الخلفية الخضراء عشان اللوجو يظهر بشكله الطبيعي */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    overflow: hidden; /* لقص أي حواف زيادة برا الدائرة */
+}
+
+/* الكود الجديد لضبط مقاس الصورة جوه الأفاتار */
+.chat-avatar-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .chat-info h3 {
@@ -1456,24 +1474,43 @@ max-width: 700px;
 }
 
 /* العمود الأول (الشعار) */
+/* تنسيق الحاوية الرئيسية للصفتين في الفوتر */
 .footer-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
     margin-bottom: 20px;
 }
 
-.footer-logo .logo-icon {
-    font-size: 1.5rem;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 8px;
-    border-radius: 8px;
+/* تنسيق أيقونة اللوجو (logo.png) */
+.footer-logo-icon {
+    width: 70px; /* حجم الأيقونة في الفوتر */
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+    /* background: rgba(255, 255, 255, 0.1); لو حابة ترجعي الخلفية الشفافة المربعة حوالين اللوجو، فعّلي السطر ده */
 }
 
-.footer-logo h2 {
-    color: #ffffff;
-    margin: 0;
-    font-size: 1.8rem;
+.footer-logo-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* تنسيق صورة النص (kd.png) */
+.footer-logo-text {
+    display: flex;
+    align-items: center;
+    height: 35px; /* ارتفاع صورة النص عشان تليق مع الأيقونة */
+}
+
+.footer-logo-text img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+ filter: brightness(0) invert(1); 
 }
 
 .brand-col p {
