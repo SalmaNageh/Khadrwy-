@@ -621,165 +621,6 @@ if (speakResultButton) {
     });
 }
 
-// =====================================================
-// AI CHATBOT LOGIC (REAL BACKEND RAG CHAT)
-// =====================================================
-document.addEventListener("DOMContentLoaded", () => {
-    const chatForm = document.getElementById("chatForm");
-    const chatInput = document.getElementById("chatInput");
-    const chatBody = document.getElementById("chatBody");
-
-    if (!chatForm || !chatInput || !chatBody) return;
-
-    chatForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const userText = chatInput.value.trim();
-        if (!userText) return;
-
-        // 1. Check Login
-        if (!accessToken) {
-            const lang = document.documentElement.lang || "en";
-            appendMessage(
-                lang === "ar" ? "من فضلك سجل الدخول أولاً لاستخدام المساعد الذكي." : "Please login first to use the AI Assistant.",
-                "ai-message"
-            );
-            openLogin();
-            return;
-        }
-
-        // 2. Add User Message
-        appendMessage(userText, "user-message");
-        chatInput.value = "";
-
-        // 3. Show Typing Indicator
-        const typingId = showTypingIndicator();
-        chatInput.disabled = true;
-        const submitBtn = chatForm.querySelector("button[type='submit']");
-        if (submitBtn) submitBtn.disabled = true;
-
-        try {
-            // 4. Prepare Request Body
-            const requestBody = {
-                message: userText,
-                plant: lastDiagnosis ? lastDiagnosis.plant : null,
-                condition: lastDiagnosis ? lastDiagnosis.condition : null,
-                confidence: lastDiagnosis ? lastDiagnosis.confidence : null
-            };
-
-            // 5. Call API
-            const response = await fetch(CHAT_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${accessToken}`
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            const contentType = response.headers.get("content-type");
-            let data;
-
-            if (contentType && contentType.includes("application/json")) {
-                data = await response.json();
-            } else {
-                const text = await response.text();
-                throw new Error(text || `Server returned ${response.status}`);
-            }
-
-            if (response.status === 401) {
-                logout();
-                throw new Error(document.documentElement.lang === "ar" ? "انتهت جلسة تسجيل الدخول. من فضلك سجل الدخول مرة أخرى." : "Your session has expired. Please login again.");
-            }
-
-            if (!response.ok) {
-                throw new Error(data.detail || data.message || (document.documentElement.lang === "ar" ? "حدث خطأ أثناء الاتصال بالمساعد الذكي." : "An error occurred while contacting the AI Assistant."));
-            }
-
-            // 6. Remove Typing & Display Answer
-            removeTypingIndicator(typingId);
-            const answer = data.answer || (document.documentElement.lang === "ar" ? "لم يتم الحصول على إجابة." : "No answer was returned.");
-            appendMessage(answer, "ai-message");
-
-            // 7. Display Sources (if any)
-            if (data.sources && Array.isArray(data.sources) && data.sources.length > 0) {
-                appendSources(data.sources);
-            }
-
-        } catch (error) {
-            console.error("AI CHAT ERROR:", error);
-            removeTypingIndicator(typingId);
-            const errorMessage = document.documentElement.lang === "ar"
-                ? "حدث خطأ أثناء الاتصال بالمساعد الذكي. تأكد أن الخادم يعمل."
-                : "Something went wrong while connecting to the AI Assistant. Please make sure the backend is running.";
-            appendMessage(errorMessage, "ai-message");
-        } finally {
-            chatInput.disabled = false;
-            if (submitBtn) submitBtn.disabled = false;
-            chatInput.focus();
-        }
-    });
-
-    function appendMessage(text, className) {
-        const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        const msgDiv = document.createElement("div");
-        msgDiv.className = `message ${className}`;
-
-        const bubble = document.createElement("div");
-        bubble.className = "bubble";
-        bubble.textContent = text;
-
-        const timeSpan = document.createElement("span");
-        timeSpan.className = "msg-time";
-        timeSpan.textContent = time;
-
-        msgDiv.appendChild(bubble);
-        msgDiv.appendChild(timeSpan);
-        chatBody.appendChild(msgDiv);
-        scrollToBottom();
-    }
-
-    function showTypingIndicator() {
-        const id = "typing-" + Date.now();
-        const typingDiv = document.createElement("div");
-        typingDiv.className = "typing-indicator";
-        typingDiv.id = id;
-        typingDiv.innerHTML = `<span></span><span></span><span></span>`;
-        chatBody.appendChild(typingDiv);
-        scrollToBottom();
-        return id;
-    }
-
-    function removeTypingIndicator(id) {
-        const typingDiv = document.getElementById(id);
-        if (typingDiv) typingDiv.remove();
-    }
-
-    function appendSources(sources) {
-        const sourcesDiv = document.createElement("div");
-        sourcesDiv.className = "ai-sources";
-
-        const title = document.createElement("div");
-        title.className = "ai-sources-title";
-        title.textContent = document.documentElement.lang === "ar" ? "📚 مصادر المعلومات" : "📚 Information Sources";
-        sourcesDiv.appendChild(title);
-
-        sources.forEach(source => {
-            if (!source || !source.title) return;
-            const sourceItem = document.createElement("div");
-            sourceItem.className = "ai-source-item";
-            sourceItem.textContent = source.title;
-            sourcesDiv.appendChild(sourceItem);
-        });
-
-        chatBody.appendChild(sourcesDiv);
-        scrollToBottom();
-    }
-
-    function scrollToBottom() {
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-});
-
 
 // =====================================================
 // SETTINGS MODAL & AUTOMATION LOGIC (With Auth, Validation & Edit Mode)
@@ -1316,7 +1157,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // =====================================================
 const hamburgerBtn = document.getElementById('hamburgerBtn');
 const navContainer = document.getElementById('navContainer');
-
 if (hamburgerBtn && navContainer) {
     hamburgerBtn.addEventListener('click', () => {
         navContainer.classList.toggle('active');
@@ -1330,6 +1170,9 @@ if (hamburgerBtn && navContainer) {
     });
 }
 
+// -------------------------------------------------
+// SCROLL SPY LOGIC (From HEAD)
+// -------------------------------------------------
 const sections = document.querySelectorAll("main section[id]");
 const navLinks = document.querySelectorAll(".navbar nav a");
 
@@ -1344,3 +1187,245 @@ function updateActiveNav() {
     });
 }
 window.addEventListener("scroll", updateActiveNav);
+
+// =====================================================
+// KHADRWY - AI AGRICULTURAL ASSISTANT
+// REAL BACKEND RAG CHAT (From origin/main)
+// =====================================================
+
+function shouldUseLastDiagnosis(message) {
+    if (!lastDiagnosis) return false;
+    if (!message || !message.trim()) return false;
+
+    const text = message.toLowerCase().trim();
+
+    const arabicDiagnosisKeywords = [
+        "الصورة", "الصوره", "الصورة دي", "الصوره دي", "الصورة اللي", "الصوره اللي", "الصورة التي", "الصوره التي",
+        "النبات ده", "النبات دا", "النبات دي", "النبات ده اللي", "النبات اللي", "النبات اللى", "النبات الذي", "النبات الذى",
+        "النبات الي", "النبات السابق", "النبات المصور", "النبات اللي صورته", "النبات اللي صورتهولك", "النبات اللي رفعته",
+        "النبات الذي رفعته", "التشخيص", "التشخيص ده", "التشخيص السابق", "النتيجة", "النتيجة دي", "النتيجة السابقة",
+        "النتيجة اللي ظهرت", "المرض اللي ظهر", "المرض الذي ظهر", "المرض المكتشف", "المرض ده", "الحالة اللي ظهرت",
+        "الحالة التي ظهرت", "الحالة المكتشفة", "الحالة دي", "نسبة الثقة", "نسبة الدقة", "التحليل", "التحليل ده", "الفحص", "الفحص ده"
+    ];
+
+    const englishDiagnosisKeywords = [
+        "this plant", "this image", "this photo", "the image", "the photo", "the plant i uploaded", "the plant i uploaded before",
+        "the plant i showed", "the plant i sent", "the picture i uploaded", "the picture i sent", "the uploaded image",
+        "the uploaded photo", "the previous image", "the previous photo", "the previous plant", "my uploaded plant",
+        "my plant image", "my plant photo", "the diagnosis", "this diagnosis", "previous diagnosis", "the result",
+        "this result", "previous result", "detected disease", "detected condition", "the detected disease",
+        "the detected condition", "confidence score", "confidence", "analysis result", "the analysis", "this analysis"
+    ];
+
+    for (const keyword of arabicDiagnosisKeywords) {
+        if (text.includes(keyword)) return true;
+    }
+
+    for (const keyword of englishDiagnosisKeywords) {
+        if (text.includes(keyword)) return true;
+    }
+
+    const diagnosisQuestionPatterns = [
+        "أعالجه", "اعالجه", "أتعامل معاه", "اتعامل معاه", "هل هو مصاب", "هل الحالة خطيرة", "هل المرض خطير",
+        "what should i do with it", "how should i treat it", "how do i treat it", "is it infected", "is it serious",
+        "is the disease serious", "what is the treatment", "how can i treat it"
+    ];
+
+    for (const pattern of diagnosisQuestionPatterns) {
+        if (text.includes(pattern)) return true;
+    }
+
+    return false;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const chatBody = document.getElementById("chatBody");
+
+    if (!chatForm || !chatInput || !chatBody) {
+        console.warn("AI Assistant elements were not found.");
+        return;
+    }
+
+    chatForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const userText = chatInput.value.trim();
+
+        if (!userText) return;
+
+        if (!accessToken) {
+            appendMessage(
+                document.documentElement.lang === "ar"
+                    ? "من فضلك سجل الدخول أولاً لاستخدام المساعد الذكي."
+                    : "Please login first to use the AI Assistant.",
+                "ai-message"
+            );
+            openLogin();
+            return;
+        }
+
+        appendMessage(userText, "user-message");
+        chatInput.value = "";
+        const typingId = showTypingIndicator();
+        chatInput.disabled = true;
+
+        const submitButton = chatForm.querySelector("button[type='submit']");
+        if (submitButton) submitButton.disabled = true;
+
+        try {
+            const useDiagnosis = shouldUseLastDiagnosis(userText);
+            const requestBody = {
+                message: userText,
+                plant: useDiagnosis && lastDiagnosis ? lastDiagnosis.plant : null,
+                condition: useDiagnosis && lastDiagnosis ? lastDiagnosis.condition : null,
+                confidence: useDiagnosis && lastDiagnosis ? lastDiagnosis.confidence : null
+            };
+
+            console.log("🌱 Sending Chat Request:", requestBody);
+            console.log("🩺 Diagnosis context used:", useDiagnosis);
+
+            const response = await fetch(CHAT_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            const contentType = response.headers.get("content-type");
+            let data;
+
+            if (contentType && contentType.includes("application/json")) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                throw new Error(text || `Server returned ${response.status}`);
+            }
+
+            console.log("🤖 Chat Response:", data);
+
+            if (response.status === 401) {
+                logout();
+                throw new Error(
+                    document.documentElement.lang === "ar"
+                        ? "انتهت جلسة تسجيل الدخول. من فضلك سجل الدخول مرة أخرى."
+                        : "Your session has expired. Please login again."
+                );
+            }
+
+            if (!response.ok) {
+                throw new Error(
+                    data.detail || data.message ||
+                    (document.documentElement.lang === "ar"
+                        ? "حدث خطأ أثناء الاتصال بالمساعد الذكي."
+                        : "An error occurred while contacting the AI Assistant.")
+                );
+            }
+
+            removeTypingIndicator(typingId);
+            const answer = data.answer || (document.documentElement.lang === "ar" ? "لم يتم الحصول على إجابة." : "No answer was returned.");
+            appendMessage(answer, "ai-message");
+
+            if (Array.isArray(data.sources) && data.sources.length > 0) {
+                appendSources(data.sources);
+            }
+
+        } catch (error) {
+            console.error("AI CHAT ERROR:", error);
+            removeTypingIndicator(typingId);
+            const errorMessage = document.documentElement.lang === "ar"
+                ? "حدث خطأ أثناء الاتصال بالمساعد الذكي. تأكدي أن الـ Backend يعمل."
+                : "Something went wrong while connecting to the AI Assistant. Please make sure the backend is running.";
+            appendMessage(errorMessage, "ai-message");
+        } finally {
+            chatInput.disabled = false;
+            if (submitButton) submitButton.disabled = false;
+            chatInput.focus();
+        }
+    });
+
+    function appendMessage(text, className) {
+        const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `message ${className}`;
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = text;
+
+        const timeSpan = document.createElement("span");
+        timeSpan.className = "msg-time";
+        timeSpan.textContent = time;
+
+        msgDiv.appendChild(bubble);
+        msgDiv.appendChild(timeSpan);
+        chatBody.appendChild(msgDiv);
+        scrollToBottom();
+    }
+
+    function showTypingIndicator() {
+        const id = "typing-" + Date.now();
+        const typingDiv = document.createElement("div");
+        typingDiv.className = "typing-indicator";
+        typingDiv.id = id;
+        typingDiv.innerHTML = `<span></span><span></span><span></span>`;
+        chatBody.appendChild(typingDiv);
+        scrollToBottom();
+        return id;
+    }
+
+    function removeTypingIndicator(id) {
+        const typingDiv = document.getElementById(id);
+        if (typingDiv) typingDiv.remove();
+    }
+
+    function appendSources(sources) {
+        if (!Array.isArray(sources) || sources.length === 0) return;
+
+        const sourcesDiv = document.createElement("div");
+        sourcesDiv.className = "ai-sources";
+
+        const title = document.createElement("div");
+        title.className = "ai-sources-title";
+        title.textContent = document.documentElement.lang === "ar" ? "📚 مصادر المعلومات" : "📚 Information Sources";
+        sourcesDiv.appendChild(title);
+
+        sources.forEach(function (source) {
+            if (!source) return;
+
+            const sourceTitle = source.title || source.name || source.source_title || "Unknown";
+            const sourceName = source.source_name || source.source || source.source_type || "";
+            const sourceItem = document.createElement("div");
+            sourceItem.className = "ai-source-item";
+
+            const sourceTitleElement = document.createElement("div");
+            sourceTitleElement.className = "ai-source-title";
+            sourceTitleElement.textContent = `• ${sourceTitle}`;
+            sourceItem.appendChild(sourceTitleElement);
+
+            if (sourceName) {
+                const sourceNameElement = document.createElement("div");
+                sourceNameElement.className = "ai-source-name";
+                sourceNameElement.textContent = sourceName;
+                sourceItem.appendChild(sourceNameElement);
+            }
+
+            if (source.source_type && source.source_type !== sourceName) {
+                const sourceTypeElement = document.createElement("div");
+                sourceTypeElement.className = "ai-source-type";
+                sourceTypeElement.textContent = source.source_type;
+                sourceItem.appendChild(sourceTypeElement);
+            }
+            sourcesDiv.appendChild(sourceItem);
+        });
+
+        chatBody.appendChild(sourcesDiv);
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+});

@@ -3,193 +3,373 @@
 # =====================================================
 
 import re
-
+import string
+import torch
 import faiss
+
 from sentence_transformers import SentenceTransformer
 
 from backend.rag.knowledge_base import get_documents
+from backend.rag.fao_loader import get_fao_documents
 
 
 # =====================================================
-# LOAD KNOWLEDGE BASE
+# PERFORMANCE SETTINGS
 # =====================================================
 
-documents = get_documents()
+EMBEDDING_MODEL_NAME = (
+    "paraphrase-multilingual-MiniLM-L12-v2"
+)
+
+EMBEDDING_BATCH_SIZE = 8
+CPU_THREADS = 2
+
+SEARCH_MULTIPLIER = 12
+MIN_SEARCH_RESULTS = 30
+
+
+torch.set_num_threads(CPU_THREADS)
 
 
 # =====================================================
-# TEXT NORMALIZATION
+# ARABIC NORMALIZATION
 # =====================================================
 
-def normalize_arabic(text: str) -> str:
-    """
-    Normalize common Arabic character variations.
-    """
+ARABIC_DIACRITICS = re.compile(
+    r"[\u0617-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]"
+)
 
-    text = text.lower()
 
-    # Arabic character normalization
-    text = text.replace("أ", "ا")
-    text = text.replace("إ", "ا")
-    text = text.replace("آ", "ا")
+def normalize_arabic(text):
 
-    text = text.replace("ة", "ه")
-    text = text.replace("ى", "ي")
+    if not text:
+        return ""
 
-    # Remove Arabic diacritics
-    text = re.sub(
-        r"[\u064B-\u065F\u0670]",
+    text = str(text)
+
+    text = ARABIC_DIACRITICS.sub(
         "",
         text
+    )
+
+    text = re.sub(
+        r"[إأآٱ]",
+        "ا",
+        text
+    )
+
+    text = text.replace(
+        "ى",
+        "ي"
+    )
+
+    text = text.replace(
+        "ة",
+        "ه"
     )
 
     return text
 
 
-def normalize_text(text: str) -> str:
+# =====================================================
+# GENERAL TEXT NORMALIZATION
+# =====================================================
+
+def normalize_text(text):
+
+    if not text:
+        return ""
 
     text = normalize_arabic(text)
 
-    # Normalize spaces
+    text = text.lower()
+
+    text = text.replace(
+        "_",
+        " "
+    )
+
+    text = text.replace(
+        "-",
+        " "
+    )
+
+    punctuation = (
+        string.punctuation
+        + "،؛؟«»…"
+    )
+
+    text = text.translate(
+        str.maketrans(
+            "",
+            "",
+            punctuation
+        )
+    )
+
     text = re.sub(
         r"\s+",
         " ",
         text
-    ).strip()
+    )
 
-    return text
+    return text.strip()
+
+
+# =====================================================
+# SENTENCE SPLITTER
+# =====================================================
+
+def split_sentences(text):
+
+    if not text:
+        return []
+
+    text = text.strip()
+
+    sentences = re.split(
+        r"(?<=[.!؟?])\s+",
+        text
+    )
+
+    return [
+        sentence.strip()
+        for sentence in sentences
+        if sentence.strip()
+    ]
+
+
+# =====================================================
+# DOCUMENT CHUNKING
+# =====================================================
+
+def chunk_document(
+    document,
+    sentences_per_chunk=3
+):
+
+    content = document.get(
+        "content",
+        ""
+    )
+
+    sentences = split_sentences(
+        content
+    )
+
+    if not sentences:
+        return []
+
+    chunks = []
+
+    for i in range(
+        0,
+        len(sentences),
+        sentences_per_chunk
+    ):
+
+        chunk_sentences = sentences[
+            i:i + sentences_per_chunk
+        ]
+
+        chunk_text = " ".join(
+            chunk_sentences
+        )
+
+        chunk = dict(document)
+
+        chunk["content"] = chunk_text
+
+        chunks.append(
+            chunk
+        )
+
+    return chunks
+
+
+# =====================================================
+# LOAD DOCUMENTS
+# =====================================================
+
+def load_all_documents():
+
+    documents = []
+
+    # -------------------------------------------------
+    # Khadrwy Knowledge Base
+    # -------------------------------------------------
+
+    try:
+
+        kb_documents = get_documents()
+
+        if kb_documents:
+
+            documents.extend(
+                kb_documents
+            )
+
+    except Exception as e:
+
+        print(
+            f"[RAG] Knowledge base loading error: {e}"
+        )
+
+    # -------------------------------------------------
+    # FAO documents
+    # -------------------------------------------------
+
+    try:
+
+        fao_documents = get_fao_documents()
+
+        if fao_documents:
+
+            documents.extend(
+                fao_documents
+            )
+
+    except Exception as e:
+
+        print(
+            f"[RAG] FAO loading error: {e}"
+        )
+
+    return documents
 
 
 # =====================================================
 # BUILD CHUNKS
 # =====================================================
 
-chunks = []
+def build_chunks(documents):
 
+    chunks = []
 
-for document in documents:
+    for document in documents:
 
-    title = document.get(
-        "title",
-        "Unknown"
-    )
-
-    plant = document.get(
-        "plant"
-    )
-
-    condition = document.get(
-        "condition"
-    )
-
-    category = document.get(
-        "category",
-        "general"
-    )
-
-    text = normalize_text(
-        document.get(
-            "content",
-            ""
-        )
-    )
-
-    # -------------------------------------------------
-    # Split into sentences
-    # -------------------------------------------------
-
-    sentences = re.split(
-        r"(?<=[.!?؟])\s+",
-        text
-    )
-
-    current_chunk = []
-
-    for sentence in sentences:
-
-        sentence = sentence.strip()
-
-        if not sentence:
-            continue
-
-        current_chunk.append(
-            sentence
+        document_chunks = chunk_document(
+            document
         )
 
-        # Keep 2 sentences per chunk
-        if len(current_chunk) >= 2:
+        chunks.extend(
+            document_chunks
+        )
 
-            chunks.append({
-
-                "title": title,
-
-                "content": " ".join(
-                    current_chunk
-                ),
-
-                # IMPORTANT:
-                # Preserve document metadata
-                "plant": plant,
-                "condition": condition,
-                "category": category
-
-            })
-
-            current_chunk = []
-
-    # -------------------------------------------------
-    # Remaining sentence
-    # -------------------------------------------------
-
-    if current_chunk:
-
-        chunks.append({
-
-            "title": title,
-
-            "content": " ".join(
-                current_chunk
-            ),
-
-            "plant": plant,
-            "condition": condition,
-            "category": category
-
-        })
+    return chunks
 
 
 # =====================================================
-# MULTILINGUAL EMBEDDING MODEL
+# EMBEDDING MODEL
 # =====================================================
+
+print(
+    "[RAG] Loading embedding model..."
+)
 
 embedding_model = SentenceTransformer(
-    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    EMBEDDING_MODEL_NAME,
+    device="cpu"
 )
+
+print(
+    "[RAG] Embedding model loaded."
+)
+
+
+# =====================================================
+# LOAD DOCUMENTS
+# =====================================================
+
+print(
+    "[RAG] Loading agricultural documents..."
+)
+
+documents = load_all_documents()
+
+print(
+    f"[RAG] Documents loaded: {len(documents)}"
+)
+
+
+# =====================================================
+# BUILD CHUNKS
+# =====================================================
+
+chunks = build_chunks(
+    documents
+)
+
+print(
+    f"[RAG] Chunks created: {len(chunks)}"
+)
+
+
+# =====================================================
+# PREPARE EMBEDDING TEXT
+# =====================================================
+
+def build_embedding_text(chunk):
+
+    title = chunk.get(
+        "title",
+        ""
+    )
+
+    plant = chunk.get(
+        "plant",
+        ""
+    )
+
+    condition = chunk.get(
+        "condition",
+        ""
+    )
+
+    category = chunk.get(
+        "category",
+        ""
+    )
+
+    content = chunk.get(
+        "content",
+        ""
+    )
+
+    return (
+        f"Title: {title}. "
+        f"Plant: {plant}. "
+        f"Condition: {condition}. "
+        f"Category: {category}. "
+        f"{content}"
+    )
+
+
+embedding_texts = [
+    build_embedding_text(chunk)
+    for chunk in chunks
+]
 
 
 # =====================================================
 # CREATE EMBEDDINGS
 # =====================================================
 
-chunk_texts = [
-
-    f"""
-    {chunk['title']}.
-    Plant: {chunk.get('plant') or ''}.
-    Condition: {chunk.get('condition') or ''}.
-    Category: {chunk.get('category') or ''}.
-    {chunk['content']}
-    """
-
-    for chunk in chunks
-]
-
+print(
+    "[RAG] Creating embeddings..."
+)
 
 embeddings = embedding_model.encode(
-    chunk_texts,
-    convert_to_numpy=True,
-    normalize_embeddings=True
-).astype("float32")
+    embedding_texts,
+    batch_size=EMBEDDING_BATCH_SIZE,
+    show_progress_bar=True,
+    normalize_embeddings=True,
+    convert_to_numpy=True
+)
+
+print(
+    "[RAG] Embeddings created."
+)
 
 
 # =====================================================
@@ -198,123 +378,24 @@ embeddings = embedding_model.encode(
 
 embedding_dimension = embeddings.shape[1]
 
-
 index = faiss.IndexFlatIP(
     embedding_dimension
 )
-
 
 index.add(
     embeddings
 )
 
+print(
+    f"[RAG] FAISS index ready: {index.ntotal} vectors"
+)
+
 
 # =====================================================
-# DOMAIN TOPICS
+# DOMAIN KEYWORDS
 # =====================================================
 
 DOMAIN_KEYWORDS = {
-
-    # -------------------------------------------------
-    # DISEASES
-    # -------------------------------------------------
-
-    "early_blight": [
-        "early blight",
-        "alternaria",
-        "اللفحة المبكرة",
-        "لفحة مبكرة",
-        "اللفحه المبكره",
-        "لفحه مبكره"
-    ],
-
-    "late_blight": [
-        "late blight",
-        "phytophthora",
-        "اللفحة المتأخرة",
-        "لفحة متأخرة",
-        "اللفحه المتاخره",
-        "لفحه متاخره"
-    ],
-
-    "powdery_mildew": [
-        "powdery mildew",
-        "البياض الدقيقي",
-        "بياض دقيقي"
-    ],
-
-    # -------------------------------------------------
-    # PLANTS
-    # -------------------------------------------------
-
-    "tomato": [
-        "tomato",
-        "tomatoes",
-        "طماطم",
-        "الطماطم"
-    ],
-
-    "apple": [
-        "apple",
-        "تفاح",
-        "التفاح"
-    ],
-
-    "corn": [
-        "corn",
-        "maize",
-        "ذرة",
-        "الذرة"
-    ],
-
-    "blueberry": [
-        "blueberry",
-        "التوت الازرق",
-        "توت ازرق"
-    ],
-
-    "cherry": [
-        "cherry",
-        "كرز",
-        "الكرز"
-    ],
-
-    # -------------------------------------------------
-    # CULTIVATION
-    # -------------------------------------------------
-
-    "cultivation": [
-
-        # English
-        "cultivation",
-        "cultivate",
-        "grow",
-        "growing",
-        "planting",
-        "plant",
-        "how to grow",
-        "how to plant",
-
-        # Arabic
-        "ازرع",
-        "ازرعها",
-        "ازرعه",
-        "زراعه",
-        "زراعة",
-        "الزراعة",
-        "زرع",
-        "يزرع",
-        "ازاي ازرع",
-        "ازاى ازرع",
-        "كيف ازرع",
-        "كيفية الزراعة",
-        "ابدأ الزراعة",
-        "ابدا الزراعه",
-        "خطوات الزراعة",
-        "خطوات الزراعه",
-        "طريقة الزراعة",
-        "طريقه الزراعه"
-    ],
 
     # -------------------------------------------------
     # IRRIGATION
@@ -325,16 +406,41 @@ DOMAIN_KEYWORDS = {
         "irrigation",
         "watering",
         "water",
-        "watering schedule",
+        "overwatering",
+        "underwatering",
+        "water stress",
+        "soil moisture",
+        "dry soil",
+        "wet soil",
 
         "ري",
         "الري",
-        "المياه",
         "مياه",
-        "سقي",
-        "اسقي",
-        "اسقيها",
-        "اسقيه"
+        "المياه",
+        "الري الزائد",
+        "زيادة الري",
+        "افراط الري",
+        "إفراط الري",
+        "الري الناقص",
+        "نقص الري",
+        "نقص المياه",
+        "قلة المياه",
+        "عطش النبات",
+        "عطشان",
+        "مشكلة الري",
+
+        "رطوبة التربة",
+        "رطوبه التربه",
+        "التربة رطبة",
+        "التربة جافة",
+        "تربة رطبة",
+        "تربة جافة",
+        "التربة عنده رطبة",
+        "التربة عنده جافة",
+        "رطبة",
+        "رطبه",
+        "جافة",
+        "جافه",
     ],
 
     # -------------------------------------------------
@@ -344,53 +450,57 @@ DOMAIN_KEYWORDS = {
     "soil": [
 
         "soil",
+        "soil condition",
+        "soil quality",
         "soil moisture",
+        "soil drainage",
+        "soil compaction",
+        "soil structure",
 
+        "تربة",
         "التربة",
-        "التربه",
+        "جودة التربة",
+        "حالة التربة",
+        "صرف التربة",
+        "انضغاط التربة",
         "رطوبة التربة",
-        "رطوبه التربه"
+        "رطوبه التربه",
+        "التربة رطبة",
+        "التربة جافة",
+        "تربة رطبة",
+        "تربة جافة",
+        "رطبة",
+        "رطبه",
+        "جافة",
+        "جافه",
     ],
 
     # -------------------------------------------------
-    # HUMIDITY
+    # ROOTS
     # -------------------------------------------------
 
-    "humidity": [
+    "roots": [
 
-        "humidity",
+        "root",
+        "roots",
+        "root problem",
+        "root problems",
+        "root damage",
+        "root health",
+        "root condition",
+        "root rot",
 
-        "الرطوبة",
-        "الرطوبه"
-    ],
-
-    # -------------------------------------------------
-    # TEMPERATURE
-    # -------------------------------------------------
-
-    "temperature": [
-
-        "temperature",
-
-        "درجة الحرارة",
-        "درجه الحراره",
-        "الحراره"
-    ],
-
-    # -------------------------------------------------
-    # LIGHT
-    # -------------------------------------------------
-
-    "light": [
-
-        "light",
-        "sunlight",
-
-        "ضوء",
-        "الإضاءة",
-        "الاضاءة",
-        "ضوء الشمس",
-        "الشمس"
+        "جذر",
+        "جذور",
+        "الجذر",
+        "الجذور",
+        "مشكلة في الجذور",
+        "مشاكل الجذور",
+        "مشكلة الجذر",
+        "صحة الجذور",
+        "تلف الجذور",
+        "تعفن الجذور",
+        "عفن الجذور",
     ],
 
     # -------------------------------------------------
@@ -400,84 +510,395 @@ DOMAIN_KEYWORDS = {
     "nutrition": [
 
         "nutrition",
+        "plant nutrition",
         "nutrient",
+        "nutrients",
+        "nutrient deficiency",
+        "deficiency",
         "fertilizer",
-        "fertilisation",
         "fertilization",
+        "nitrogen",
+        "phosphorus",
+        "potassium",
+        "iron",
+        "magnesium",
 
-        "سماد",
-        "تسميد",
-        "التسميد",
-        "العناصر الغذائية",
-        "العناصر الغذائيه",
         "تغذية النبات",
-        "تغذيه النبات"
+        "تغذية",
+        "العناصر الغذائية",
+        "العناصر",
+        "نقص العناصر",
+        "نقص عنصر",
+        "نقص المغذيات",
+        "سماد",
+        "التسميد",
+        "نيتروجين",
+        "فوسفور",
+        "بوتاسيوم",
+        "حديد",
+        "ماغنسيوم",
+        "مغنيسيوم",
     ],
 
     # -------------------------------------------------
-    # PREVENTION
+    # YELLOWING
     # -------------------------------------------------
 
-    "prevention": [
+    "yellowing": [
 
-        "prevention",
-        "prevent",
-        "protection",
+        "yellow leaves",
+        "yellowing",
+        "leaf yellowing",
 
-        "وقاية",
-        "الوقايه",
-        "حماية",
-        "الحمايه",
-        "احمي النبات",
-        "احميه"
+        "اصفرار",
+        "اصفرار الأوراق",
+        "اصفرار الورق",
+        "الأوراق الصفراء",
+        "ورق اصفر",
+        "ورقة صفراء",
+        "اوراق صفراء",
+        "الورق بيصفر",
+        "النبات بيصفر",
+        "بتصفر",
+        "بيصفر",
     ],
 
     # -------------------------------------------------
-    # HEALTH / CARE
+    # WILTING
     # -------------------------------------------------
 
-    "healthy": [
+    "wilting": [
 
-        "healthy",
-        "health",
-        "care",
+        "wilting",
+        "wilt",
+        "wilted",
+        "plant wilt",
 
-        "صحي",
-        "سليمة",
-        "سليم",
-        "العناية",
-        "العنايه",
-        "رعاية",
-        "رعايه"
-    ]
+        "ذبول",
+        "يذبل",
+        "النبات بيذبل",
+        "النبات ذابل",
+        "الأوراق ذابلة",
+        "ورق ذابل",
+    ],
+
+    # -------------------------------------------------
+    # DISEASE
+    # -------------------------------------------------
+
+    "disease": [
+
+        "disease",
+        "plant disease",
+        "infection",
+        "fungal",
+        "bacterial",
+        "virus",
+        "pathogen",
+
+        "مرض",
+        "أمراض",
+        "مرض نباتي",
+        "عدوى",
+        "فطري",
+        "فطر",
+        "بكتيري",
+        "فيروس",
+    ],
+
+    # -------------------------------------------------
+    # PESTS
+    # -------------------------------------------------
+
+    "pests": [
+
+        "pest",
+        "pests",
+        "aphid",
+        "whitefly",
+        "thrips",
+        "spider mite",
+        "insect",
+
+        "آفة",
+        "آفات",
+        "حشرة",
+        "حشرات",
+        "من",
+        "الذبابة البيضاء",
+        "تربس",
+        "العنكبوت الأحمر",
+    ],
+
+    # -------------------------------------------------
+    # TEMPERATURE
+    # -------------------------------------------------
+
+    "temperature": [
+
+        "temperature",
+        "heat",
+        "cold",
+        "heat stress",
+        "cold stress",
+
+        "حرارة",
+        "درجة الحرارة",
+        "الحر",
+        "برد",
+        "إجهاد حراري",
+        "اجهاد حراري",
+        "إجهاد البرد",
+    ],
+
+    # -------------------------------------------------
+    # HUMIDITY
+    # -------------------------------------------------
+
+    "humidity": [
+
+        "humidity",
+        "air humidity",
+        "relative humidity",
+
+        "رطوبة الهواء",
+        "الرطوبة",
+        "رطوبه الهواء",
+        "رطوبة الجو",
+    ],
+
+    # -------------------------------------------------
+    # LIGHT
+    # -------------------------------------------------
+
+    "light": [
+
+        "light",
+        "lighting",
+        "light intensity",
+        "sunlight",
+
+        "ضوء",
+        "إضاءة",
+        "شدة الضوء",
+        "ضوء الشمس",
+    ],
+
+    # -------------------------------------------------
+    # MONITORING
+    # -------------------------------------------------
+
+    "monitoring": [
+
+        "monitoring",
+        "monitor",
+        "trend",
+        "patterns",
+        "sensor",
+        "sensor data",
+        "early warning",
+
+        "مراقبة",
+        "متابعة",
+        "نمط",
+        "أنماط",
+        "بيانات",
+        "حساس",
+        "حساسات",
+        "بيانات الحساسات",
+        "إنذار مبكر",
+    ],
+
+    # -------------------------------------------------
+    # GREENHOUSE
+    # -------------------------------------------------
+
+    "greenhouse": [
+
+        "greenhouse",
+        "protected cultivation",
+        "ventilation",
+
+        "صوبة",
+        "الصوبة",
+        "بيت محمي",
+        "الزراعة المحمية",
+        "تهوية",
+    ],
+
+    # -------------------------------------------------
+    # LEAVES
+    # -------------------------------------------------
+
+    "leaves": [
+
+        "leaf",
+        "leaves",
+        "leaf problem",
+        "leaf symptoms",
+
+        "ورقة",
+        "ورق",
+        "أوراق",
+        "مشاكل الأوراق",
+        "أعراض الأوراق",
+    ],
 }
 
 
 # =====================================================
-# DISEASE GROUPS
+# TOPIC GROUPS
 # =====================================================
 
-DISEASE_TOPICS = {
+TOPIC_GROUPS = {
 
-    "early_blight",
-    "late_blight",
-    "powdery_mildew"
-
+    "irrigation": "water",
+    "soil": "soil",
+    "roots": "roots",
+    "nutrition": "nutrition",
+    "yellowing": "symptoms",
+    "wilting": "symptoms",
+    "disease": "disease",
+    "pests": "pests",
+    "temperature": "environment",
+    "humidity": "environment",
+    "light": "environment",
+    "monitoring": "monitoring",
+    "greenhouse": "greenhouse",
+    "leaves": "symptoms",
 }
 
 
 # =====================================================
-# PLANT TOPICS
+# IMPORTANT TOPICS
 # =====================================================
 
-PLANT_TOPICS = {
+SYMPTOM_TOPICS = {
 
-    "tomato",
-    "apple",
-    "corn",
-    "blueberry",
-    "cherry"
+    "yellowing",
+    "wilting",
+    "roots",
+    "leaves",
+}
 
+
+DIAGNOSIS_TOPICS = {
+
+    "irrigation",
+    "soil",
+    "roots",
+    "nutrition",
+    "yellowing",
+    "wilting",
+    "disease",
+    "pests",
+}
+
+
+SOIL_TOPICS = {
+
+    "soil",
+    "irrigation",
+    "roots",
+}
+
+
+# =====================================================
+# PLANT KEYWORDS
+# =====================================================
+
+PLANT_KEYWORDS = {
+
+    "tomato": [
+        "tomato",
+        "tomatoes",
+        "طماطم",
+    ],
+
+    "apple": [
+        "apple",
+        "تفاح",
+    ],
+
+    "corn": [
+        "corn",
+        "maize",
+        "ذرة",
+        "الذرة",
+    ],
+
+    "potato": [
+        "potato",
+        "بطاطس",
+        "البطاطس",
+    ],
+
+    "pepper": [
+        "pepper",
+        "فلفل",
+    ],
+
+    "cucumber": [
+        "cucumber",
+        "خيار",
+    ],
+
+    "lettuce": [
+        "lettuce",
+        "خس",
+    ],
+
+    "onion": [
+        "onion",
+        "بصل",
+    ],
+
+    "wheat": [
+        "wheat",
+        "قمح",
+    ],
+}
+
+
+# =====================================================
+# DISEASE KEYWORDS
+# =====================================================
+
+DISEASE_KEYWORDS = {
+
+    "early blight": [
+        "early blight",
+        "اللفحة المبكرة",
+        "الندوة المبكرة",
+    ],
+
+    "late blight": [
+        "late blight",
+        "اللفحة المتأخرة",
+        "الندوة المتأخرة",
+    ],
+
+    "leaf spot": [
+        "leaf spot",
+        "بقع الأوراق",
+        "تبقع الأوراق",
+    ],
+
+    "root rot": [
+        "root rot",
+        "تعفن الجذور",
+        "عفن الجذور",
+    ],
+
+    "powdery mildew": [
+        "powdery mildew",
+        "البياض الدقيقي",
+    ],
+
+    "rust": [
+        "rust",
+        "الصدأ",
+    ],
 }
 
 
@@ -485,13 +906,13 @@ PLANT_TOPICS = {
 # DETECT TOPICS
 # =====================================================
 
-def detect_topics(query: str):
+def detect_topics(query):
 
     normalized_query = normalize_text(
         query
     )
 
-    detected_topics = []
+    detected = set()
 
     for topic, keywords in DOMAIN_KEYWORDS.items():
 
@@ -501,84 +922,100 @@ def detect_topics(query: str):
                 keyword
             )
 
+            if not normalized_keyword:
+                continue
+
             if normalized_keyword in normalized_query:
 
-                detected_topics.append(
+                detected.add(
                     topic
                 )
 
                 break
 
-    return detected_topics
+    return detected
 
 
 # =====================================================
-# DETECT COMPARISON QUESTIONS
+# DETECT PLANT
 # =====================================================
 
-def is_comparison_query(query: str) -> bool:
+def detect_plant(query):
 
     normalized_query = normalize_text(
         query
     )
 
-    comparison_keywords = [
+    detected = set()
 
-        # English
-        "compare",
-        "comparison",
-        "difference",
-        "differences",
-        "vs",
-        "versus",
+    for plant, keywords in PLANT_KEYWORDS.items():
 
-        # Arabic
-        "الفرق",
-        "فرق",
-        "مقارنة",
-        "قارن",
-        "مقارنه",
-        "ايه الفرق",
-        "ما الفرق",
-        "ما هو الفرق",
-        "ايه الاختلاف",
-        "ما الاختلاف"
+        for keyword in keywords:
 
-    ]
+            normalized_keyword = normalize_text(
+                keyword
+            )
 
-    return any(
-        normalize_text(keyword)
-        in normalized_query
-        for keyword in comparison_keywords
-    )
+            if (
+                normalized_keyword
+                and normalized_keyword
+                in normalized_query
+            ):
+
+                detected.add(
+                    plant
+                )
+
+                break
+
+    return detected
 
 
 # =====================================================
-# DETECT CULTIVATION QUESTIONS
+# DETECT DISEASE
 # =====================================================
 
-def is_cultivation_query(query: str) -> bool:
+def detect_disease(query):
 
-    topics = detect_topics(
+    normalized_query = normalize_text(
         query
     )
 
-    return "cultivation" in topics
+    detected = set()
+
+    for disease, keywords in DISEASE_KEYWORDS.items():
+
+        for keyword in keywords:
+
+            normalized_keyword = normalize_text(
+                keyword
+            )
+
+            if (
+                normalized_keyword
+                and normalized_keyword
+                in normalized_query
+            ):
+
+                detected.add(
+                    disease
+                )
+
+                break
+
+    return detected
 
 
 # =====================================================
-# CHECK KEYWORD MATCH
+# TOPIC KEYWORD MATCH
 # =====================================================
 
 def contains_topic_keyword(
-    text: str,
-    topic: str
-) -> bool:
+    text,
+    topic
+):
 
-    if not text:
-        return False
-
-    normalized_text = normalize_text(
+    normalized = normalize_text(
         text
     )
 
@@ -593,7 +1030,11 @@ def contains_topic_keyword(
             keyword
         )
 
-        if normalized_keyword in normalized_text:
+        if (
+            normalized_keyword
+            and normalized_keyword
+            in normalized
+        ):
 
             return True
 
@@ -601,166 +1042,205 @@ def contains_topic_keyword(
 
 
 # =====================================================
-# CHECK METADATA MATCH
+# TITLE MATCH
 # =====================================================
 
-def metadata_matches(
-    chunk,
-    plant=None,
-    condition=None,
-    category=None
+def title_matches_topic(
+    title,
+    topic
 ):
 
-    chunk_plant = normalize_text(
-        str(chunk.get("plant") or "")
+    return contains_topic_keyword(
+        title,
+        topic
     )
-
-    chunk_condition = normalize_text(
-        str(chunk.get("condition") or "")
-    )
-
-    chunk_category = normalize_text(
-        str(chunk.get("category") or "")
-    )
-
-    # -------------------------------------------------
-    # Plant match
-    # -------------------------------------------------
-
-    if plant:
-
-        normalized_plant = normalize_text(
-            plant
-        )
-
-        if normalized_plant not in chunk_plant:
-
-            return False
-
-    # -------------------------------------------------
-    # Condition match
-    # -------------------------------------------------
-
-    if condition:
-
-        normalized_condition = normalize_text(
-            condition
-        )
-
-        if (
-            normalized_condition not in chunk_condition
-            and normalized_condition not in normalize_text(
-                chunk.get("title", "")
-            )
-        ):
-
-            return False
-
-    # -------------------------------------------------
-    # Category match
-    # -------------------------------------------------
-
-    if category:
-
-        if category != chunk_category:
-
-            return False
-
-    return True
 
 
 # =====================================================
-# RETRIEVE DOCUMENTS
+# COMPLEX QUERY DETECTION
 # =====================================================
 
-def retrieve_documents(
-    query: str,
-    top_k: int = 3,
-    plant: str | None = None,
-    condition: str | None = None
+def is_complex_query(query):
+
+    normalized = normalize_text(
+        query
+    )
+
+    detected_topics = detect_topics(
+        normalized
+    )
+
+    comparison_words = [
+
+        "فرق",
+        "افرق",
+        "أفرق",
+        "مقارنة",
+        "قارن",
+        "بين",
+        "ولا",
+        "او",
+        "أو",
+
+        "versus",
+        "vs",
+        "difference",
+        "compare",
+        "between",
+        "whether",
+    ]
+
+    symptom_words = [
+
+        "اعراض",
+        "أعراض",
+        "علامات",
+        "symptoms",
+        "signs",
+
+        "yellow",
+        "yellowing",
+
+        "اصفرار",
+        "ذبول",
+        "يذبل",
+    ]
+
+    detected_comparison = any(
+        normalize_text(word)
+        in normalized
+        for word in comparison_words
+    )
+
+    detected_symptom = any(
+        normalize_text(word)
+        in normalized
+        for word in symptom_words
+    )
+
+    # -------------------------------------------------
+    # Multiple important topics
+    # -------------------------------------------------
+
+    if len(detected_topics) >= 2:
+        return True
+
+    # -------------------------------------------------
+    # Comparison + symptom
+    # -------------------------------------------------
+
+    if (
+        detected_comparison
+        and detected_symptom
+    ):
+        return True
+
+    # -------------------------------------------------
+    # Long query
+    # -------------------------------------------------
+
+    if len(normalized.split()) >= 25:
+        return True
+
+    return False
+
+
+# =====================================================
+# SHORT QUERY DETECTION
+# =====================================================
+
+def is_short_query(query):
+
+    words = normalize_text(
+        query
+    ).split()
+
+    return len(words) <= 5
+
+
+# =====================================================
+# SEARCH
+# =====================================================
+
+def semantic_search(
+    query,
+    top_k=5
 ):
+
+    if not query or not query.strip():
+        return []
 
     normalized_query = normalize_text(
         query
     )
 
     # -------------------------------------------------
-    # Detect query topics
+    # Query embedding
+    # -------------------------------------------------
+
+    query_embedding = embedding_model.encode(
+        [normalized_query],
+        normalize_embeddings=True,
+        convert_to_numpy=True
+    )
+
+    # -------------------------------------------------
+    # Search more candidates first
+    # -------------------------------------------------
+
+    search_k = max(
+        top_k * SEARCH_MULTIPLIER,
+        MIN_SEARCH_RESULTS
+    )
+
+    search_k = min(
+        search_k,
+        len(chunks)
+    )
+
+    if search_k <= 0:
+        return []
+
+    distances, indices = index.search(
+        query_embedding,
+        search_k
+    )
+
+    # -------------------------------------------------
+    # Detect query information
     # -------------------------------------------------
 
     detected_topics = detect_topics(
         normalized_query
     )
 
-    # -------------------------------------------------
-    # Detect special query types
-    # -------------------------------------------------
-
-    comparison_query = is_comparison_query(
+    detected_plants = detect_plant(
         normalized_query
     )
 
-    cultivation_query = is_cultivation_query(
+    detected_diseases = detect_disease(
         normalized_query
     )
 
-    # -------------------------------------------------
-    # Diagnosis topics
-    # -------------------------------------------------
-
-    diagnosis_topics = []
-
-    if plant:
-
-        diagnosis_topics.extend(
-            detect_topics(plant)
-        )
-
-    if condition:
-
-        diagnosis_topics.extend(
-            detect_topics(condition)
-        )
-
-    diagnosis_topics = list(
-        dict.fromkeys(
-            diagnosis_topics
-        )
+    complex_query = is_complex_query(
+        normalized_query
     )
 
-    # =================================================
-    # QUERY EMBEDDING
-    # =================================================
-
-    query_embedding = embedding_model.encode(
-        [normalized_query],
-        convert_to_numpy=True,
-        normalize_embeddings=True
-    ).astype("float32")
-
-    # =================================================
-    # SEARCH MORE CANDIDATES
-    # =================================================
-
-    search_k = min(
-        max(25, top_k * 8),
-        len(chunks)
+    short_query = is_short_query(
+        normalized_query
     )
 
-    scores, indices = index.search(
-        query_embedding,
-        search_k
-    )
-
-    results = []
+    candidates = []
 
     # =================================================
-    # SCORE EACH RESULT
+    # CANDIDATE SCORING
     # =================================================
 
-    for score, idx in zip(
-        scores[0],
-        indices[0]
+    for rank, (distance, idx) in enumerate(
+        zip(
+            distances[0],
+            indices[0]
+        )
     ):
 
         if idx < 0:
@@ -768,8 +1248,36 @@ def retrieve_documents(
 
         chunk = chunks[idx]
 
-        title = chunk["title"]
-        content = chunk["content"]
+        title = chunk.get(
+            "title",
+            ""
+        )
+
+        content = chunk.get(
+            "content",
+            ""
+        )
+
+        plant = normalize_text(
+            chunk.get(
+                "plant",
+                ""
+            )
+        )
+
+        condition = normalize_text(
+            chunk.get(
+                "condition",
+                ""
+            )
+        )
+
+        category = normalize_text(
+            chunk.get(
+                "category",
+                ""
+            )
+        )
 
         title_normalized = normalize_text(
             title
@@ -779,521 +1287,598 @@ def retrieve_documents(
             content
         )
 
-        chunk_plant = normalize_text(
-            str(chunk.get("plant") or "")
-        )
+        # -------------------------------------------------
+        # Base semantic score
+        # -------------------------------------------------
 
-        chunk_condition = normalize_text(
-            str(chunk.get("condition") or "")
+        score = float(
+            distance
         )
-
-        chunk_category = normalize_text(
-            str(chunk.get("category") or "")
-        )
-
-        final_score = float(score)
 
         # =================================================
-        # 1. QUERY TOPIC BOOST
+        # TITLE TOPIC BOOST
+        # =================================================
+
+        for topic in detected_topics:
+
+            if title_matches_topic(
+                title_normalized,
+                topic
+            ):
+
+                score += 0.28
+
+        # =================================================
+        # CONTENT TOPIC BOOST
         # =================================================
 
         for topic in detected_topics:
 
             if contains_topic_keyword(
-                title,
+                content_normalized,
                 topic
             ):
 
-                final_score += 0.40
+                score += 0.07
 
-            elif contains_topic_keyword(
-                content,
-                topic
+        # =================================================
+        # PLANT BOOST
+        # =================================================
+
+        for detected_plant in detected_plants:
+
+            if (
+                detected_plant in plant
+                or
+                detected_plant
+                in title_normalized
+                or
+                detected_plant
+                in content_normalized
             ):
 
-                final_score += 0.12
+                score += 0.22
 
         # =================================================
-        # 2. DIAGNOSIS BOOST
+        # DISEASE BOOST
         # =================================================
 
-        for topic in diagnosis_topics:
+        for disease in detected_diseases:
 
-            if contains_topic_keyword(
-                title,
-                topic
+            if (
+                disease in condition
+                or
+                disease
+                in title_normalized
+                or
+                disease
+                in content_normalized
             ):
 
-                final_score += 0.30
-
-            elif contains_topic_keyword(
-                content,
-                topic
-            ):
-
-                final_score += 0.08
+                score += 0.25
 
         # =================================================
-        # 3. METADATA PLANT BOOST
-        # =================================================
-
-        if plant:
-
-            normalized_plant = normalize_text(
-                plant
-            )
-
-            if normalized_plant == chunk_plant:
-
-                final_score += 0.45
-
-            elif normalized_plant in title_normalized:
-
-                final_score += 0.25
-
-            elif normalized_plant in content_normalized:
-
-                final_score += 0.08
-
-        # =================================================
-        # 4. METADATA CONDITION BOOST
-        # =================================================
-
-        if condition:
-
-            normalized_condition = normalize_text(
-                condition
-            )
-
-            if normalized_condition == chunk_condition:
-
-                final_score += 0.55
-
-            elif normalized_condition in title_normalized:
-
-                final_score += 0.40
-
-            elif normalized_condition in content_normalized:
-
-                final_score += 0.15
-
-        # =================================================
-        # 5. CULTIVATION BOOST
-        # =================================================
-
-        if cultivation_query:
-
-            if chunk_category == "cultivation":
-
-                final_score += 0.55
-
-            elif contains_topic_keyword(
-                title,
-                "cultivation"
-            ):
-
-                final_score += 0.30
-
-            elif contains_topic_keyword(
-                content,
-                "cultivation"
-            ):
-
-                final_score += 0.10
-
-        # =================================================
-        # 6. CATEGORY MATCH BOOST
+        # CATEGORY BOOST
         # =================================================
 
         for topic in detected_topics:
 
-            if topic == "irrigation":
+            if topic in category:
 
-                if chunk_category in {
-                    "irrigation",
-                    "water",
-                    "cultivation"
-                }:
-
-                    final_score += 0.20
-
-            elif topic == "soil":
-
-                if chunk_category in {
-                    "soil",
-                    "cultivation"
-                }:
-
-                    final_score += 0.20
-
-            elif topic == "nutrition":
-
-                if chunk_category in {
-                    "nutrition",
-                    "fertilizer",
-                    "cultivation"
-                }:
-
-                    final_score += 0.20
-
-            elif topic == "prevention":
-
-                if chunk_category in {
-                    "prevention",
-                    "disease",
-                    "cultivation"
-                }:
-
-                    final_score += 0.20
+                score += 0.12
 
         # =================================================
-        # STORE RESULT
+        # EXACT QUERY IN TITLE
         # =================================================
 
-        results.append({
+        if (
+            normalized_query
+            and normalized_query
+            in title_normalized
+        ):
 
-            "title": title,
+            score += 0.35
 
-            "content": content,
+        # =================================================
+        # COMPLEX QUERY TOPIC COVERAGE
+        # =================================================
 
-            "plant": chunk.get("plant"),
+        topic_coverage = 0
 
-            "condition": chunk.get("condition"),
+        for topic in detected_topics:
 
-            "category": chunk.get(
-                "category",
-                "general"
-            ),
+            if (
+                contains_topic_keyword(
+                    title_normalized,
+                    topic
+                )
+                or
+                contains_topic_keyword(
+                    content_normalized,
+                    topic
+                )
+            ):
 
-            "score": final_score,
+                topic_coverage += 1
 
-            "semantic_score": float(score)
+        if complex_query:
 
-        })
+            score += (
+                min(
+                    topic_coverage,
+                    5
+                )
+                * 0.08
+            )
 
-    # =================================================
-    # SORT
-    # =================================================
+        # =================================================
+        # SYMPTOM BOOST
+        # =================================================
 
-    results.sort(
-        key=lambda x: x["score"],
+        symptom_detected_topics = (
+            detected_topics.intersection(
+                SYMPTOM_TOPICS
+            )
+        )
+
+        if symptom_detected_topics:
+
+            for symptom_topic in (
+                symptom_detected_topics
+            ):
+
+                if title_matches_topic(
+                    title_normalized,
+                    symptom_topic
+                ):
+
+                    score += 0.20
+
+        # =================================================
+        # DIAGNOSIS BOOST
+        # =================================================
+
+        diagnosis_detected_topics = (
+            detected_topics.intersection(
+                DIAGNOSIS_TOPICS
+            )
+        )
+
+        if diagnosis_detected_topics:
+
+            matched_diagnosis_topics = 0
+
+            for topic in detected_topics:
+
+                if topic not in DIAGNOSIS_TOPICS:
+                    continue
+
+                if (
+                    contains_topic_keyword(
+                        title_normalized,
+                        topic
+                    )
+                    or
+                    contains_topic_keyword(
+                        content_normalized,
+                        topic
+                    )
+                ):
+
+                    matched_diagnosis_topics += 1
+
+            score += (
+                min(
+                    matched_diagnosis_topics,
+                    4
+                )
+                * 0.06
+            )
+
+        # =================================================
+        # SOIL / ROOT / IRRIGATION RELATIONSHIP
+        # =================================================
+
+        if detected_topics.intersection(
+            SOIL_TOPICS
+        ):
+
+            soil_root_topics = {
+                "soil",
+                "irrigation",
+                "roots",
+            }
+
+            matched = (
+                detected_topics.intersection(
+                    soil_root_topics
+                )
+            )
+
+            if (
+                "roots" in matched
+                and (
+                    "soil" in matched
+                    or
+                    "irrigation" in matched
+                )
+            ):
+
+                if (
+                    "root"
+                    in title_normalized
+                    or
+                    "جذر"
+                    in title_normalized
+                    or
+                    "soil"
+                    in title_normalized
+                    or
+                    "ترب"
+                    in title_normalized
+                    or
+                    "irrigation"
+                    in title_normalized
+                    or
+                    "ري"
+                    in title_normalized
+                ):
+
+                    score += 0.18
+
+        # =================================================
+        # SAVE CANDIDATE
+        # =================================================
+
+        candidates.append(
+            {
+                "score": score,
+
+                "semantic_score": float(
+                    distance
+                ),
+
+                "rank": rank,
+
+                "index": idx,
+
+                "title": title,
+
+                "content": content,
+
+                "plant": chunk.get(
+                    "plant",
+                    ""
+                ),
+
+                "condition": chunk.get(
+                    "condition",
+                    ""
+                ),
+
+                "category": chunk.get(
+                    "category",
+                    ""
+                ),
+
+                "source_type": chunk.get(
+                    "source_type",
+                    ""
+                ),
+
+                "source_name": chunk.get(
+                    "source_name",
+                    ""
+                ),
+
+                "source_url": chunk.get(
+                    "source_url",
+                    ""
+                ),
+
+                "year": chunk.get(
+                    "year",
+                    None
+                ),
+            }
+        )
+
+    # =====================================================
+    # SORT CANDIDATES
+    # =====================================================
+
+    candidates.sort(
+        key=lambda item: item["score"],
         reverse=True
     )
 
-    # =================================================
-    # DISEASE DETECTION
-    # =================================================
+    # =====================================================
+    # COMPLEX QUERY DIVERSITY
+    # =====================================================
 
-    detected_diseases = [
+    selected = []
 
-        topic
+    seen_titles = set()
 
-        for topic in detected_topics
+    seen_topic_groups = set()
 
-        if topic in DISEASE_TOPICS
+    for candidate in candidates:
 
-    ]
+        title = candidate[
+            "title"
+        ]
 
-    diagnosis_diseases = [
+        # -------------------------------------------------
+        # Avoid duplicate titles
+        # -------------------------------------------------
 
-        topic
+        if title in seen_titles:
+            continue
 
-        for topic in diagnosis_topics
+        # -------------------------------------------------
+        # Detect candidate topics
+        # -------------------------------------------------
 
-        if topic in DISEASE_TOPICS
-
-    ]
-
-    # =================================================
-    # COMPARISON DISEASE HANDLING
-    # =================================================
-
-    if comparison_query:
-
-        target_diseases = list(
-            dict.fromkeys(
-                detected_diseases
-                + diagnosis_diseases
+        candidate_topics = detect_topics(
+            (
+                candidate["title"]
+                + " "
+                + candidate["content"]
             )
         )
 
-        if len(target_diseases) >= 2:
+        candidate_groups = {
+            TOPIC_GROUPS.get(
+                topic,
+                topic
+            )
+            for topic in candidate_topics
+        }
 
-            comparison_results = []
+        topic_group = None
 
-            for disease in target_diseases:
+        if candidate_groups:
 
-                disease_results = [
+            topic_group = sorted(
+                candidate_groups
+            )[0]
 
-                    result
+        # -------------------------------------------------
+        # Diversity for complex queries
+        # -------------------------------------------------
 
-                    for result in results
+        if complex_query:
 
-                    if (
-                        contains_topic_keyword(
-                            result["title"],
-                            disease
-                        )
-                        or
-                        contains_topic_keyword(
-                            result["content"],
-                            disease
-                        )
+            if (
+                topic_group
+                in seen_topic_groups
+            ):
+
+                if selected:
+
+                    best_selected_score = max(
+                        item["score"]
+                        for item in selected
                     )
 
-                ]
-
-                comparison_results.extend(
-                    disease_results[:2]
-                )
-
-            if comparison_results:
-
-                comparison_results.sort(
-                    key=lambda x: x["score"],
-                    reverse=True
-                )
-
-                results = comparison_results
-
-    # =================================================
-    # NORMAL DISEASE CONFLICT PROTECTION
-    # =================================================
-
-    else:
-
-        target_disease = None
-
-        if detected_diseases:
-
-            target_disease = detected_diseases[0]
-
-        elif diagnosis_diseases:
-
-            target_disease = diagnosis_diseases[0]
-
-        if target_disease:
-
-            filtered_results = []
-
-            for result in results:
-
-                title = result["title"]
-
-                conflicting = False
-
-                for disease in DISEASE_TOPICS:
-
-                    if disease == target_disease:
-                        continue
-
-                    if contains_topic_keyword(
-                        title,
-                        disease
+                    if candidate["score"] < (
+                        best_selected_score
+                        - 0.15
                     ):
 
-                        conflicting = True
+                        continue
 
-                        break
-
-                if not conflicting:
-
-                    filtered_results.append(
-                        result
-                    )
-
-            results = filtered_results
-
-    # =================================================
-    # PLANT RELEVANCE FILTER
-    # =================================================
-
-    if plant:
-
-        normalized_plant = normalize_text(
-            plant
+        selected.append(
+            candidate
         )
 
-        plant_specific = [
+        seen_titles.add(
+            title
+        )
 
-            result
+        if topic_group:
 
-            for result in results
-
-            if normalize_text(
-                str(result.get("plant") or "")
-            ) == normalized_plant
-
-        ]
-
-        general_results = [
-
-            result
-
-            for result in results
-
-            if not result.get("plant")
-
-        ]
-
-        if plant_specific:
-
-            results = (
-                plant_specific
-                + general_results
+            seen_topic_groups.add(
+                topic_group
             )
 
-    # =================================================
-    # RELEVANCE FILTER
-    # =================================================
+        if len(selected) >= top_k:
+            break
 
-    MIN_SEMANTIC_SCORE = 0.25
+    # =====================================================
+    # FINAL RELEVANCE FILTER
+    # =====================================================
 
-    results = [
+    final_results = []
 
-        result
+    for candidate in selected:
 
-        for result in results
+        semantic_score = candidate[
+            "semantic_score"
+        ]
 
-        if result["semantic_score"]
-        >= MIN_SEMANTIC_SCORE
-
-    ]
-
-    # =================================================
-    # REMOVE DUPLICATE CHUNKS
-    # =================================================
-
-    unique_results = []
-
-    seen = set()
-
-    for result in results:
-
-        key = (
-            result["title"],
-            result["content"]
+        candidate_text = (
+            candidate["title"]
+            + " "
+            + candidate["content"]
         )
 
-        if key in seen:
-            continue
-
-        seen.add(key)
-
-        unique_results.append(
-            result
+        candidate_topics = detect_topics(
+            candidate_text
         )
 
-    results = unique_results
-
-    # =================================================
-    # DIVERSITY
-    # =================================================
-
-    diversified_results = []
-
-    title_counts = {}
-
-    for result in results:
-
-        title = result["title"]
-
-        count = title_counts.get(
-            title,
-            0
+        topic_match_count = len(
+            detected_topics.intersection(
+                candidate_topics
+            )
         )
 
-        max_per_title = 2
+        # -------------------------------------------------
+        # Complex query validation
+        # -------------------------------------------------
 
-        if count >= max_per_title:
-            continue
+        if complex_query:
 
-        title_counts[title] = (
-            count + 1
-        )
+            valid = (
+                semantic_score >= 0.20
+                or
+                topic_match_count >= 2
+                or
+                (
+                    topic_match_count >= 1
+                    and
+                    candidate["score"] >= 0.80
+                )
+            )
 
-        diversified_results.append(
-            result
-        )
+        # -------------------------------------------------
+        # Normal query validation
+        # -------------------------------------------------
 
-    results = diversified_results
+        else:
 
-    # =================================================
-    # FINAL RETURN
-    # =================================================
+            valid = (
+                semantic_score >= 0.18
+                or
+                topic_match_count >= 1
+                or
+                candidate["score"] >= 0.70
+            )
 
-    return results[:top_k]
+        if valid:
 
+            final_results.append(
+                candidate
+            )
+
+    return final_results[:top_k]
 
 # =====================================================
 # GET CONTEXT
 # =====================================================
 
 def get_context(
-    query: str,
-    top_k: int = 3,
-    plant: str | None = None,
-    condition: str | None = None
+    query,
+    top_k=5,
+    plant=None,
+    condition=None
 ):
 
-    results = retrieve_documents(
+    results = semantic_search(
         query=query,
-        top_k=top_k,
-        plant=plant,
-        condition=condition
+        top_k=top_k
     )
 
-    # -------------------------------------------------
-    # No relevant information
-    # -------------------------------------------------
-
     if not results:
-
         return "", []
 
-    # -------------------------------------------------
-    # Build context
-    # -------------------------------------------------
+
+    # =================================================
+    # OPTIONAL DIAGNOSIS CONTEXT
+    # =================================================
+
+    if plant or condition:
+
+        adjusted_results = []
+
+        for result in results:
+
+            score = float(
+                result.get("score", 0)
+            )
+
+            result_plant = str(
+                result.get("plant", "")
+            ).lower()
+
+            result_condition = str(
+                result.get("condition", "")
+            ).lower()
+
+
+            # -----------------------------------------
+            # Plant match
+            # -----------------------------------------
+
+            if plant:
+
+                plant_text = str(
+                    plant
+                ).lower().strip()
+
+                if (
+                    plant_text
+                    and plant_text in result_plant
+                ):
+                    score += 0.15
+
+
+            # -----------------------------------------
+            # Condition match
+            # -----------------------------------------
+
+            if condition:
+
+                condition_text = str(
+                    condition
+                ).lower().strip()
+
+                if (
+                    condition_text
+                    and condition_text in result_condition
+                ):
+                    score += 0.15
+
+
+            result["score"] = score
+
+            adjusted_results.append(
+                result
+            )
+
+
+        # ---------------------------------------------
+        # Re-sort after diagnosis boosting
+        # ---------------------------------------------
+
+        adjusted_results.sort(
+            key=lambda x: float(
+                x.get("score", 0)
+            ),
+            reverse=True
+        )
+
+        results = adjusted_results[:top_k]
+
+
+    # =================================================
+    # BUILD CONTEXT
+    # =================================================
 
     context_parts = []
 
-    for i, result in enumerate(results):
-
-        metadata = []
-
-        if result.get("plant"):
-            metadata.append(
-                f"Plant: {result['plant']}"
-            )
-
-        if result.get("condition"):
-            metadata.append(
-                f"Condition: {result['condition']}"
-            )
-
-        if result.get("category"):
-            metadata.append(
-                f"Category: {result['category']}"
-            )
-
-        metadata_text = "\n".join(
-            metadata
-        )
+    for i, result in enumerate(
+        results,
+        start=1
+    ):
 
         context_parts.append(
-
             f"""
-Source {i + 1}: {result['title']}
-
-{metadata_text}
-
-{result['content']}
-"""
-
+SOURCE {i}
+Title: {result.get("title", "")}
+Plant: {result.get("plant", "")}
+Condition: {result.get("condition", "")}
+Category: {result.get("category", "")}
+Source: {result.get("source_name", "")}
+Content:
+{result.get("content", "")}
+""".strip()
         )
 
-    context = "\n".join(
+
+    context = "\n\n".join(
         context_parts
     )
+
 
     return context, results
